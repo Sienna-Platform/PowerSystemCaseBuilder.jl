@@ -6,10 +6,12 @@
     @test sys isa PSY.System
 
     # Test that all_systems returns a dict with the expected type
-    small_descriptor = PSB.SYSTEM_CATALOG[findfirst(
+    idx = findfirst(
         d -> PSB.get_category(d) == category && PSB.get_name(d) == name,
         PSB.SYSTEM_CATALOG,
-    )]
+    )
+    @test idx !== nothing
+    small_descriptor = PSB.SYSTEM_CATALOG[something(idx)]
     small_catalog = SystemCatalog([small_descriptor])
     result = all_systems(; system_catalog = small_catalog)
     @test result isa Dict{Tuple{DataType, String}, PSY.System}

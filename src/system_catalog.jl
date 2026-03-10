@@ -88,6 +88,7 @@ function all_systems(;
                     category, name; system_catalog = system_catalog, kwargs...,
                 )
             catch e
+                e isa ErrorException || rethrow()
                 @warn "Skipping system $(category)/$(name)" exception =
                     (e, catch_backtrace())
             end
