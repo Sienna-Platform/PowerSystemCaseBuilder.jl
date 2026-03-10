@@ -64,6 +64,38 @@ function list_systems(catalog::SystemCatalog, category::Type{<:SystemCategory})
     end
 end
 
+"""
+Builds all [`PowerSystems.System`](@extref)s in the [`SystemCatalog`](@ref) and returns them
+as a `Dict` keyed by `(category, system_name)` tuples.
+
+Systems that require additional keyword arguments are built with their default arguments
+where available. Systems that fail to build are skipped with a warning.
+
+# Accepted Key Words
+- `system_catalog::SystemCatalog`: Defaults to the `PowerSystemCaseBuilder.jl` catalog of
+  `System`s
+- All other keyword arguments are forwarded to [`build_system`](@ref)
+"""
+function all_systems(;
+    system_catalog::SystemCatalog = SystemCatalog(),
+    kwargs...,
+)
+    result = Dict{Tuple{DataType, String}, PSY.System}()
+    for category in list_categories(system_catalog)
+        for name in list_systems(system_catalog, category)
+            try
+                result[(category, name)] = build_system(
+                    category, name; system_catalog = system_catalog, kwargs...,
+                )
+            catch e
+                @warn "Skipping system $(category)/$(name)" exception =
+                    (e, catch_backtrace())
+            end
+        end
+    end
+    return result
+end
+
 function SystemCatalog(system_catalogue::Array{SystemDescriptor} = SYSTEM_CATALOG)
     data = Dict{DataType, Dict{String, SystemDescriptor}}()
     unique_names = Set{String}()

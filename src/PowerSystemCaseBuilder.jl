@@ -16,6 +16,7 @@ export PSISystems
 export PSIDSystems
 export SPISystems
 
+export all_systems
 export build_system
 export list_categories
 export show_categories
