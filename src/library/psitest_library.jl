@@ -2513,6 +2513,11 @@ function build_sys_10bus_ac_dc(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     nodes = nodes10()
     nodesdc = nodes10_dc()
+    # Renumber DC buses to avoid conflicts with AC bus numbers (1-10)
+    # ACBus and DCBus share a single bus-number namespace in PowerSystems
+    for n in nodesdc
+        PSY.set_number!(n, PSY.get_number(n) + 100)
+    end
     branchesdc = branches10_dc(nodesdc)
     ipcs = ipcs_10bus(nodes, nodesdc)
 
