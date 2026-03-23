@@ -19,7 +19,7 @@ function build_system(
     name::String,
     print_stat::Bool = false;
     force_build::Bool = false,
-    assign_new_uuids::Bool = false,
+    assign_new_uuids::Bool = true,
     skip_serialization::Bool = false,
     system_catalog::SystemCatalog = SystemCatalog(SYSTEM_CATALOG),
     kwargs...,
@@ -56,7 +56,7 @@ function _build_system(
     sys_args::Dict{Symbol, <:Any},
     print_stat::Bool = false;
     force_build::Bool = false,
-    assign_new_uuids::Bool = false,
+    assign_new_uuids::Bool = true,
     skip_serialization::Bool = false,
 )
     # We skip serialization/de-serialization if sys_args are passed because we currently
