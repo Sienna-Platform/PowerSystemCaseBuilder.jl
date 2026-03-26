@@ -1,6 +1,6 @@
 function build_psse_RTS_GMLC_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = PSY.System(PSY.PowerModelsData(raw_data), sys_kwargs...)
+    sys = PSY.System(PowerFlowFileParser.PowerModelsData(raw_data), sys_kwargs...)
 
     return sys
 end
@@ -16,12 +16,12 @@ end
 
 function build_pti(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = PSY.System(PSY.PowerModelsData(raw_data), sys_kwargs...)
+    sys = PSY.System(PowerFlowFileParser.PowerModelsData(raw_data), sys_kwargs...)
     return sys
 end
 
 function build_pti_30(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = PSY.System(PSY.PowerFlowDataNetwork(raw_data), sys_kwargs...)
+    sys = PSY.System(PowerFlowFileParser.PowerFlowDataNetwork(raw_data), sys_kwargs...)
     return sys
 end

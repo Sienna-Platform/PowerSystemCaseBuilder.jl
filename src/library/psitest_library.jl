@@ -4501,7 +4501,7 @@ end
 function build_5_bus_matpower_DA(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     data_dir = dirname(dirname(raw_data))
-    pm_data = PowerSystems.PowerModelsData(raw_data)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
 
     FORECASTS_DIR = joinpath(data_dir, "5-Bus", "5bus_ts", "7day")
 
@@ -4548,7 +4548,7 @@ end
 function build_5_bus_matpower_AGC(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     data_dir = dirname(dirname(raw_data))
-    pm_data = PowerSystems.PowerModelsData(raw_data)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
 
     FORECASTS_DIR = joinpath(data_dir, "5-Bus", "5bus_ts", "7day")
 
@@ -4565,7 +4565,7 @@ end
 function build_test_RTS_GMLC_sys(; raw_data, add_forecasts, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     if add_forecasts
-        rawsys = PSY.PowerSystemTableData(
+        rawsys = PowerTableDataParser.PowerSystemTableData(
             raw_data,
             100.0,
             joinpath(raw_data, "user_descriptors.yaml");
@@ -4576,7 +4576,7 @@ function build_test_RTS_GMLC_sys(; raw_data, add_forecasts, kwargs...)
         PSY.transform_single_time_series!(sys, Hour(24), Dates.Hour(24))
         return sys
     else
-        rawsys = PSY.PowerSystemTableData(
+        rawsys = PowerTableDataParser.PowerSystemTableData(
             raw_data,
             100.0,
             joinpath(raw_data, "user_descriptors.yaml");

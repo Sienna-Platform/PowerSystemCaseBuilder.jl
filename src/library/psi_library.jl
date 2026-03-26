@@ -235,7 +235,7 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
 end
 
 function build_5_bus_hydro_uc_sys(; add_forecasts, raw_data, sys_kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
@@ -262,7 +262,7 @@ function build_5_bus_hydro_uc_sys(; add_forecasts, raw_data, sys_kwargs...)
 end
 
 function build_5_bus_hydro_uc_sys_targets(; add_forecasts, raw_data, sys_kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
@@ -293,7 +293,7 @@ end
 
 function build_5_bus_hydro_ed_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
@@ -317,7 +317,7 @@ end
 
 function build_5_bus_hydro_ed_sys_targets(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
@@ -345,7 +345,7 @@ end
 
 function build_5_bus_hydro_wk_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
@@ -369,7 +369,7 @@ end
 
 function build_5_bus_hydro_wk_sys_targets(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
@@ -400,7 +400,7 @@ function build_RTS_GMLC_DA_sys(; raw_data, kwargs...)
     RTS_SRC_DIR = joinpath(raw_data, "RTS_Data", "SourceData")
     RTS_SIIP_DIR = joinpath(raw_data, "RTS_Data", "FormattedData", "SIIP")
     MAP_DIR = joinpath(DATA_DIR, "RTS_GMLC")
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
         joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
@@ -420,7 +420,7 @@ function build_RTS_GMLC_RT_sys(; raw_data, kwargs...)
     RTS_SRC_DIR = joinpath(raw_data, "RTS_Data", "SourceData")
     RTS_SIIP_DIR = joinpath(raw_data, "RTS_Data", "FormattedData", "SIIP")
     MAP_DIR = joinpath(DATA_DIR, "RTS_GMLC")
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
         joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
@@ -440,7 +440,7 @@ function build_RTS_GMLC_DA_sys_noForecast(; raw_data, kwargs...)
     RTS_SRC_DIR = joinpath(raw_data, "RTS_Data", "SourceData")
     RTS_SIIP_DIR = joinpath(raw_data, "RTS_Data", "FormattedData", "SIIP")
     MAP_DIR = joinpath(DATA_DIR, "RTS_GMLC")
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
         joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
@@ -457,7 +457,7 @@ function build_RTS_GMLC_RT_sys_noForecast(; raw_data, kwargs...)
     RTS_SRC_DIR = joinpath(raw_data, "RTS_Data", "SourceData")
     RTS_SIIP_DIR = joinpath(raw_data, "RTS_Data", "FormattedData", "SIIP")
     MAP_DIR = joinpath(DATA_DIR, "RTS_GMLC")
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
         joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
@@ -480,7 +480,7 @@ function make_modified_RTS_GMLC_sys(
     DISPATCH_INCREASE = 2.0
     FIX_DECREASE = 0.3
 
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
         joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");

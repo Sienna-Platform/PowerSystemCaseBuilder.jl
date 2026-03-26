@@ -1,7 +1,7 @@
 name = "PowerSystemCaseBuilder"
 uuid = "f00506e0-b84f-492a-93c2-c0a9afc4364e"
-authors = ["SIENNA TEAM"]
 version = "2.2.1"
+authors = ["SIENNA TEAM"]
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
@@ -14,7 +14,9 @@ HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 InfrastructureSystems = "2cd47ed4-ca9b-11e9-27f2-ab636a7671f1"
 JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 LazyArtifacts = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
+PowerFlowFileParser = "a1ee5d7c-0b6f-11f1-9fcb-79237b21bc78"
 PowerSystems = "bcd98974-b02a-5e2f-9ee0-a103f5c450dd"
+PowerTableDataParser = "2b750c0e-0b6f-11f1-9200-1befd75df6be"
 PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"

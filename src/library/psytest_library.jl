@@ -3,7 +3,7 @@ function build_tamu_ACTIVSg2000_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "ACTIVSg2000", "ACTIVSg2000.RAW")
     !isfile(file_path) && throw(DataFormatError("Cannot find $file_path"))
 
-    pm_data = PSY.PowerModelsData(file_path)
+    pm_data = PowerFlowFileParser.PowerModelsData(file_path)
 
     bus_name_formatter =
         get(
