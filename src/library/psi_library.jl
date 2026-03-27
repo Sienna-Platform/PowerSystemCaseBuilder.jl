@@ -548,7 +548,7 @@ function make_modified_RTS_GMLC_sys(
             continue
         end
         PSY.get_operation_cost(d).shut_down = PSY.get_operation_cost(d).start_up / 2.0
-        if PSY.get_rating(d) < 3
+        if PSY.get_rating(d, Float64) < 3
             PSY.set_status!(d, false)
             PSY.set_status!(d, false)
             PSY.set_active_power!(d, 0.0)
@@ -1553,9 +1553,9 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         get_initial_input(old_value_curve)
         old_y =
             get_initial_input(old_value_curve) /
-            (get_active_power_limits(g).min * PSY._get_base_power(g))
+            (get_active_power_limits(g, Float64).min * PSY._get_base_power(g))
         new_first_input =
-            (old_y + direction * cost_noise) * get_active_power_limits(g).min *
+            (old_y + direction * cost_noise) * get_active_power_limits(g, Float64).min *
             PSY._get_base_power(g)
         new_slopes[1] = old_slopes[1] + direction * cost_noise
         @assert new_slopes[1] > 0.0

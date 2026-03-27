@@ -20,7 +20,7 @@
                             get_supplemental_attributes.(
                                 GeometricDistributionForcedOutage,
                                 get_available_components(
-                                    x -> get_max_active_power(x) > 0.0,
+                                    x -> get_max_active_power(x, Float64) > 0.0,
                                     ThermalGen,
                                     sys,
                                 ),
@@ -47,7 +47,7 @@
                             get_supplemental_attributes.(
                                 GeometricDistributionForcedOutage,
                                 get_available_components(
-                                    x -> get_max_active_power(x) > 0.0,
+                                    x -> get_max_active_power(x, Float64) > 0.0,
                                     ThermalGen,
                                     sys2,
                                 ),
