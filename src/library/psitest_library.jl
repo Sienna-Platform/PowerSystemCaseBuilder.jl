@@ -2415,9 +2415,9 @@ function build_c_sys5_reg(; add_forecasts, raw_data, kwargs...)
     for g in PSY.get_components(PSY.Generator, c_sys5_reg)
         droop =
             if isa(g, PSY.ThermalStandard)
-                0.04 * PSY.get_base_power(g)
+                0.04 * PSY._get_base_power(g)
             else
-                0.05 * PSY.get_base_power(g)
+                0.05 * PSY._get_base_power(g)
             end
         p_factor = (up = 1.0, dn = 1.0)
         t = PSY.RegulationDevice(g; participation_factor = p_factor, droop = droop)
