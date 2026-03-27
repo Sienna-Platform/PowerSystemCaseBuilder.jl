@@ -514,7 +514,7 @@ function make_modified_RTS_GMLC_sys(
             PSY.get_operation_cost(g),
             PSY.get_start_up(PSY.get_operation_cost(g)) / 2.0,
         )
-        if PSY.get_base_power(g) > 3
+        if PSY._get_base_power(g) > 3
             continue
         end
         PSY.clear_services!(g)
@@ -1455,11 +1455,11 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         end
         # change scale
         if typeof(b) <: RenewableGen
-            PSY.set_base_power!(b, 1.2 * PSY.get_base_power(b))
-            PSY.set_base_power!(main_comp, 0.9 * PSY.get_base_power(b))
+            PSY.set_base_power!(b, 1.2 * PSY._get_base_power(b))
+            PSY.set_base_power!(main_comp, 0.9 * PSY._get_base_power(b))
         end
         if typeof(b) <: PowerLoad
-            PSY.set_base_power!(main_comp, 1.2 * PSY.get_base_power(b))
+            PSY.set_base_power!(main_comp, 1.2 * PSY._get_base_power(b))
         end
     end
 
@@ -1559,10 +1559,10 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         get_initial_input(old_value_curve)
         old_y =
             get_initial_input(old_value_curve) /
-            (get_active_power_limits(g).min * get_base_power(g))
+            (get_active_power_limits(g).min * PSY._get_base_power(g))
         new_first_input =
             (old_y + direction * cost_noise) * get_active_power_limits(g).min *
-            get_base_power(g)
+            PSY._get_base_power(g)
         new_slopes[1] = old_slopes[1] + direction * cost_noise
         @assert new_slopes[1] > 0.0
         for ix in 2:length(old_slopes)
