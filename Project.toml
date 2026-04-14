@@ -1,7 +1,7 @@
 name = "PowerSystemCaseBuilder"
 uuid = "f00506e0-b84f-492a-93c2-c0a9afc4364e"
-authors = ["Sourabh Dalvi", "Jose Daniel Lara"]
-version = "2.2.0"
+authors = ["SIENNA TEAM"]
+version = "2.2.1"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
