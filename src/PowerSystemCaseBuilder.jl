@@ -27,7 +27,10 @@ export SYSTEM_CATALOG
 
 # imports
 import InfrastructureSystems
-import InfrastructureSystems: InfrastructureSystemsType
+import InfrastructureSystems: 
+    InfrastructureSystemsType,
+    get_name,
+    set_name!
 import PowerSystems
 import DataStructures: SortedDict
 import DataFrames
@@ -50,6 +53,7 @@ import DataFrames: DataFrame
 import LazyArtifacts
 import JSON3
 import SHA
+import YAML
 
 using DocStringExtensions
 
@@ -58,7 +62,7 @@ using DocStringExtensions
                                  $(DOCSTRING)
                                  """
 
-using PowerSystems # I know its not pretty, we can fix later
+using PowerSystems
 const PSY = PowerSystems
 const IS = InfrastructureSystems
 

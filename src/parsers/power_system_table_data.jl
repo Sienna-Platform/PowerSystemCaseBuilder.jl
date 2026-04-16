@@ -115,7 +115,8 @@ function make_system(
         time_series_in_memory = time_series_in_memory,
         time_series_directory = time_series_directory,
         runchecks = runchecks,
-        kwargs...,
+        filter(kv -> kv.first !== :timeseries_metadata_file, kwargs)...,
+        #kwargs...,
     )
     set_units_base_system!(sys, IS.UnitSystem.DEVICE_BASE)
 

@@ -9,7 +9,8 @@ function build_psse_ACTIVSg2000_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     file_path = joinpath(raw_data, "ACTIVSg2000", "ACTIVSg2000.RAW")
     dyr_file = joinpath(raw_data, "psse_dyr", "ACTIVSg2000_dynamics.dyr")
-    sys = PSY.System(file_path, dyr_file; sys_kwargs...)
+    sys = make_system(PowerFlowFileParser.PowerFlowDataNetwork(file_path), sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
 
     return sys
 end

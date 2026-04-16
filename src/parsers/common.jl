@@ -1,13 +1,13 @@
 const SKIP_PM_VALIDATION = false
 
 const GENERATOR_MAPPING_FILE_PM =
-    joinpath(dirname(pathof(PowerSystems)), "parsers", "generator_mapping_pm.yaml")
+    joinpath(dirname(pathof(PowerSystemCaseBuilder)), "parsers", "generator_mapping_pm.yaml")
 
 const GENERATOR_MAPPING_FILE_CDM =
-    joinpath(dirname(pathof(PowerSystems)), "parsers", "generator_mapping_cdm.yaml")
+    joinpath(dirname(pathof(PowerSystemCaseBuilder)), "parsers", "generator_mapping_cdm.yaml")
 
 const PSSE_DYR_MAPPING_FILE =
-    joinpath(dirname(pathof(PowerSystems)), "parsers", "psse_dynamic_mapping.yaml")
+    joinpath(dirname(pathof(PowerSystemCaseBuilder)), "parsers", "psse_dynamic_mapping.yaml")
 
 const STRING2FUEL =
     Dict((normalize(string(x); casefold = true) => x) for x in instances(ThermalFuels))
