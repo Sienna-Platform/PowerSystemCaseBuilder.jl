@@ -78,7 +78,9 @@ function build_psid_psse_test_avr(; raw_data, kwargs...)
             "Kwarg avr_type = $(avr_type) for PSID/PSSE test not supported. Available kwargs are: $(AVAILABLE_PSID_PSSE_AVRS_TEST)",
         )
     end
-    avr_sys = System(raw_file, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
+    avr_sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(avr_sys, dyr_file)
     for l in get_components(PSY.PowerLoad, avr_sys)
         PSY.set_model!(l, PSY.LoadModels.ConstantImpedance)
     end
@@ -108,7 +110,9 @@ function build_psid_psse_test_tg(; raw_data, kwargs...)
             "Kwarg tg_type = $(tg_type) for PSID/PSSE test not supported. Available kwargs are: $(AVAILABLE_PSID_PSSE_TGS_TEST)",
         )
     end
-    tg_sys = System(raw_file, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
+    tg_sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(tg_sys, dyr_file)
 
     for l in get_components(PSY.StandardLoad, tg_sys)
         transform_load_to_constant_impedance(l)
@@ -155,7 +159,9 @@ function build_psid_psse_test_gen(; raw_data, kwargs...)
             "Kwarg gen_type = $(gen_type) for PSID/PSSE test not supported. Available kwargs are: $(AVAILABLE_PSID_PSSE_GENS_TEST)",
         )
     end
-    gen_sys = System(raw_file, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
+    gen_sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(gen_sys, dyr_file)
 
     for l in get_components(PSY.StandardLoad, gen_sys)
         transform_load_to_constant_impedance(l)
@@ -187,7 +193,9 @@ function build_psid_psse_test_pss(; raw_data, kwargs...)
             "Kwarg tg_type = $(pss_type) for PSID/PSSE test not supported. Available kwargs are: $(AVAILABLE_PSID_PSSE_PSS_TEST)",
         )
     end
-    pss_sys = System(raw_file, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
+    pss_sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(pss_sys, dyr_file)
 
     for l in get_components(PSY.StandardLoad, pss_sys)
         transform_load_to_constant_impedance(l)
@@ -198,7 +206,8 @@ end
 
 function build_psid_test_omib(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    omib_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    omib_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(omib_sys)
 
     function dyn_gen_classic(generator)
@@ -226,7 +235,8 @@ end
 
 function build_psid_test_threebus_oneDoneQ(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    threebus_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    threebus_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(threebus_sys)
 
     function dyn_gen_oneDoneQ(generator)
@@ -255,7 +265,8 @@ end
 
 function build_psid_test_threebus_simple_marconato(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    threebus_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    threebus_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(threebus_sys)
 
     function dyn_gen_simple_marconato(generator)
@@ -284,7 +295,8 @@ end
 
 function build_psid_test_threebus_marconato(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    threebus_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    threebus_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(threebus_sys)
 
     function dyn_gen_marconato(generator)
@@ -313,7 +325,8 @@ end
 
 function build_psid_test_threebus_simple_anderson(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    threebus_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    threebus_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(threebus_sys)
 
     function dyn_gen_simple_anderson(generator)
@@ -342,7 +355,8 @@ end
 
 function build_psid_test_threebus_anderson(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    threebus_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    threebus_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(threebus_sys)
 
     function dyn_gen_anderson(generator)
@@ -371,7 +385,8 @@ end
 
 function build_psid_test_threebus_5shaft(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    threebus_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    threebus_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(threebus_sys)
 
     #Reduce generator output
@@ -422,7 +437,8 @@ end
 
 function build_psid_test_vsm_inverter(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    omib_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    omib_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(omib_sys)
 
     function inv_darco(static_device)
@@ -452,7 +468,8 @@ end
 
 function build_psid_test_threebus_machine_vsm(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    threebus_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    threebus_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(threebus_sys)
 
     function dyn_gen_second_order(generator)
@@ -507,7 +524,8 @@ end
 
 function build_psid_test_threebus_multimachine(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    threebus_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    threebus_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
 
     function dyn_gen_multi(generator)
         return PSY.DynamicGenerator(;
@@ -552,7 +570,8 @@ end
 
 function build_psid_test_threebus_psat_avrs(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    threebus_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    threebus_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(threebus_sys)
 
     function dyn_gen_avr_type2(generator)
@@ -598,7 +617,8 @@ end
 
 function build_psid_test_threebus_vsm_reference(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    threebus_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    threebus_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
 
     function inv_case78(static_device)
         return DynamicInverter(;
@@ -644,7 +664,8 @@ end
 
 function build_psid_test_threebus_genrou_avr(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    sys = make_system(pm_data; runchecks = false, sys_kwargs...)
 
     #Replace Gen101 by Source
     remove_component!(ThermalStandard, sys, "generator-101-1")
@@ -676,7 +697,8 @@ end
 
 function build_psid_test_droop_inverter(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    omib_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    omib_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(omib_sys)
 
     ############### Data Dynamic devices ########################
@@ -706,7 +728,8 @@ end
 
 function build_psid_test_gfoll_inverter(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    omib_sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    omib_sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(omib_sys)
 
     ############### Data Dynamic devices ########################
@@ -736,7 +759,8 @@ end
 
 function build_psid_test_threebus_multimachine_dynlines(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    sys = make_system(pm_data; runchecks = false, sys_kwargs...)
 
     ############### Data Dynamic devices ########################
     function dyn_gen_marconato(generator)
@@ -789,7 +813,8 @@ end
 
 function build_psid_test_pvs(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     add_source_to_ref(sys)
 
     ############### Data Dynamic devices ########################
@@ -841,14 +866,17 @@ end
 ###########################
 
 function build_psid_test_ieee_9bus(; raw_data, kwargs...)
-    return System(raw_data)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    return make_system(pm_data)
 end
 
 function build_psid_psse_test_constantP_load(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     raw_file = joinpath(raw_data, "ThreeBusMulti.raw")
     dyr_file = joinpath(raw_data, "ThreeBus_GENROU.dyr")
-    sys = System(raw_file, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
+    sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
     return sys
 end
 
@@ -885,7 +913,9 @@ function build_psid_test_indmotor(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     raw_file = joinpath(raw_data, "TVC_System_motor.raw")
     dyr_file = joinpath(raw_data, "TVC_System_motor.dyr")
-    sys = System(raw_file, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
+    sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
     return sys
 end
 

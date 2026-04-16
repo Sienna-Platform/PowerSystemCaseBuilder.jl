@@ -4,7 +4,9 @@ function build_psid_4bus_multigen(; raw_data, kwargs...)
     raw_file = joinpath(raw_data, "FourBusMulti.raw")
     dyr_file = joinpath(raw_data, "FourBus_multigen.dyr")
 
-    sys = System(raw_file, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
+    sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
     for l in get_components(PSY.StandardLoad, sys)
         transform_load_to_constant_impedance(l)
     end
@@ -15,7 +17,9 @@ function build_psid_11bus_andes(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     raw_file = joinpath(raw_data, "11BUS_KUNDUR.raw")
     dyr_file = joinpath(raw_data, "11BUS_KUNDUR_TGOV.dyr")
-    sys = System(raw_file, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
+    sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
     for l in get_components(PSY.StandardLoad, sys)
         transform_load_to_constant_impedance(l)
     end
@@ -48,7 +52,9 @@ function build_psid_14bus_multigen(; raw_data, kwargs...)
     raw_file = joinpath(raw_data, "14bus.raw")
     dyr_file = joinpath(raw_data, "dyn_data.dyr")
 
-    sys = System(raw_file, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
+    sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
     for l in get_components(PSY.StandardLoad, sys)
         transform_load_to_constant_impedance(l)
     end
@@ -58,13 +64,15 @@ end
 function build_3bus_inverter(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     raw_file = joinpath(raw_data, "ThreeBusInverter.raw")
-    sys = System(raw_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
+    sys = make_system(pm_data; sys_kwargs...)
     return sys
 end
 
 function build_psid_wecc_9_dynamic(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    sys = make_system(pm_data; runchecks = false, sys_kwargs...)
 
     # Manually change reactance of three branches to match Sauer & Pai (2007) Figure 7.4
     set_x!(get_component(Branch, sys, "Bus 5-Bus 4-i_1"), 0.085)
@@ -154,7 +162,8 @@ end
 
 function build_psid_load_tutorial_omib(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = System(raw_data; runchecks = false, sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    sys = make_system(pm_data; runchecks = false, sys_kwargs...)
     l = first(get_components(StandardLoad, sys))
     exp_load = PSY.ExponentialLoad(;
         name = PSY.get_name(l),

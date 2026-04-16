@@ -4537,7 +4537,8 @@ function build_5_bus_matpower_RT(; raw_data, kwargs...)
         joinpath(FORECASTS_DIR, "timeseries_pointers_rt_7day.json"),
     )
 
-    sys = System(raw_data; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    sys = make_system(pm_data; sys_kwargs...)
 
     add_time_series!(sys, tsp)
     transform_single_time_series!(sys, Hour(12), Hour(1))
