@@ -54,6 +54,7 @@ import LazyArtifacts
 import JSON3
 import SHA
 import YAML
+import InteractiveUtils
 
 using DocStringExtensions
 
