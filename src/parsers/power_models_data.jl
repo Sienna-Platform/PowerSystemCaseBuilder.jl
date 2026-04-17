@@ -32,7 +32,10 @@ function make_system(pm_data::PowerFlowFileParser.PowerModelsData; kwargs...)
 
     @info "Constructing System from Power Models" data["name"] data["source_type"]
 
-    sys = System(data["baseMVA"]; kwargs...)
+    filtered_kwargs = filter(kv -> !(kv.first in (:bus_name_formatter, :load_name_formatter)), kwargs)
+
+    sys = System(data["baseMVA"]; filtered_kwargs...)
+
     source_type = data["source_type"]
 
     bus_number_to_bus = read_bus!(sys, data; kwargs...)

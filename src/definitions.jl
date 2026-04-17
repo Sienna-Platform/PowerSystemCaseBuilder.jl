@@ -31,4 +31,11 @@ const AVAILABLE_PSID_PSSE_PSS_TEST = ["STAB1", "IEEEST", "IEEEST_FILTER"]
 
 const INFINITE_BOUND = 1e6
 
+const PSSE_PARSER_TAP_RATIO_UBOUND = 1.5
 const PSSE_PARSER_TAP_RATIO_LBOUND = 0.5
+
+const WINDING_NAMES = Dict(
+    WindingCategory.PRIMARY_WINDING => "primary",
+    WindingCategory.SECONDARY_WINDING => "secondary",
+    WindingCategory.TERTIARY_WINDING => "tertiary",
+)

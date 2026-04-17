@@ -4968,12 +4968,12 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
                 ini_time = TimeSeries.timestamp(hybrid_cost_ts[t])[1]
                 forecast_data[ini_time] = hybrid_cost_ts[t]
             end
-            set_variable_cost!(
+            PSY.add_time_series!( # replaced function from set_variable_cost
                 c_sys5_hybrid,
                 h,
                 PSY.Deterministic("variable_cost", forecast_data),
             )
-            set_variable_cost!(
+            PSY.add_time_series!(
                 c_sys5_hybrid,
                 h,
                 PSY.SingleTimeSeries("variable_cost", hybrid_cost_single_ts),
@@ -5123,12 +5123,12 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
                 ini_time = TimeSeries.timestamp(hybrid_cost_ts[t])[1]
                 forecast_data[ini_time] = hybrid_cost_ts[t]
             end
-            set_variable_cost!(
+            PSY.add_time_series!( # replaced function from set_variable_cost
                 c_sys5_hybrid,
                 h,
                 PSY.Deterministic("variable_cost", forecast_data),
             )
-            set_variable_cost!(
+            PSY.add_time_series!(
                 c_sys5_hybrid,
                 h,
                 PSY.SingleTimeSeries("variable_cost", hybrid_cost_single_ts),
@@ -5303,7 +5303,7 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
                     forecast_data[ini_time[1]] = data
                 end
             end
-            set_variable_cost!(
+            PSY.add_time_series!( # replaced function from set_variable_cost!
                 c_sys5_hybrid,
                 h,
                 PSY.Deterministic("variable_cost", forecast_data),
