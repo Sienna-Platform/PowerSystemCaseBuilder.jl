@@ -78,3 +78,24 @@ function PowerSystems.MarketBidCost(
         ancillary_service_offers,
     )
 end
+
+# ---------------------------------------------------------------------------
+# set_variable_cost! – time series overload removed in PSY6
+#
+# Old call (generation_cost_function_data.jl):
+#   set_variable_cost!(sys, component, ::Deterministic, ::UnitSystem)
+#   set_variable_cost!(sys, component, ::SingleTimeSeries, ::UnitSystem)
+#
+# PSY6 removed the TimeSeriesData overload of set_variable_cost! for
+# StaticInjection components with MarketBidCost. Time-varying market bid
+# costs must now be attached via add_time_series! directly. The power_units
+# argument is dropped — units are carried inside the time series data itself.
+# ---------------------------------------------------------------------------
+function PowerSystems.set_variable_cost!(
+    sys::PowerSystems.System,
+    component::PowerSystems.StaticInjection,
+    data::InfrastructureSystems.TimeSeriesData,
+    power_units::PowerSystems.UnitSystem = PowerSystems.UnitSystem.NATURAL_UNITS,
+)
+    PowerSystems.add_time_series!(sys, component, data)
+end
