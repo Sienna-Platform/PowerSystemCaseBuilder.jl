@@ -161,6 +161,8 @@ include("parsers/psse_dynamic_data.jl")
 # includes
 
 include("definitions.jl")
+include("utils/psy6_compat.jl") # needs to be included before system_library.jl, but felt 
+				# the best place for this file to live was in utils/
 include("system_library.jl")
 
 include("system_build_stats.jl")

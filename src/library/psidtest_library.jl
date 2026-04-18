@@ -866,8 +866,7 @@ end
 ###########################
 
 function build_psid_test_ieee_9bus(; raw_data, kwargs...)
-    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
-    return make_system(pm_data)
+    return PSY.System(raw_data)
 end
 
 function build_psid_psse_test_constantP_load(; raw_data, kwargs...)
