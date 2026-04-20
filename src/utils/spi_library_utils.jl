@@ -16,7 +16,7 @@ Converts the forced outage rate and mean time to repair to the λ and μ paramet
 # Reference
 
 https://core.ac.uk/download/pdf/13643059.pdf
-from https://github.com/NREL-Sienna/SiennaPRASInterface.jl/blob/main/src/util/draws/draw_helper_functions.jl
+from https://github.com/Sienna-Platform/SiennaPRASInterface.jl/blob/main/src/util/draws/draw_helper_functions.jl
 """
 function rate_to_probability(for_gen::Float64, mttr::Int64)
     if (for_gen > 1.0)
