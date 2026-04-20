@@ -61,8 +61,8 @@ Constructs a container for describing, categorizing, and building a [`PowerSyste
 - `name::AbstractString`: Unique name of the `System`
 - `description::AbstractString`: Phrase describing the `System` and key distinguishing features from other systems in the catalog
 - `category::Type{<:SystemCategory}`: A subtype of [`SystemCategory`](@ref) for categorizing this `System` within the catalog
-- `raw_data::AbstractString`: A path pointing to the `System`'s data directory, `.jl` file, or parseable `.m` or `.raw` file in [`PowerSystemsTestData`](https://github.com/NREL-Sienna/PowerSystemsTestData)
-- `build_function::Function`: A custom `Function` for building this `System`. See [`src/library`](https://github.com/NREL-Sienna/PowerSystemCaseBuilder.jl/tree/main/src/library) files.
+- `raw_data::AbstractString`: A path pointing to the `System`'s data directory, `.jl` file, or parseable `.m` or `.raw` file in [`PowerSystemsTestData`](https://github.com/Sienna-Platform/PowerSystemsTestData)
+- `build_function::Function`: A custom `Function` for building this `System`. See [`src/library`](https://github.com/Sienna-Platform/PowerSystemCaseBuilder.jl/tree/main/src/library) files.
 - `download_function::Union{Nothing, Function}`: Typically unused
 - `stats::Union{Nothing, `[`SystemBuildStats`](@ref)`}`: Container for summary statistics on the build process
 - `supported_arguments::Vector{`[`SystemArgument`](@ref)`}`: Additional arguments to pass to the `build_function`

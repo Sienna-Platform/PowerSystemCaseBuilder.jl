@@ -6030,7 +6030,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
     add_component!(c_sys5_all_components, reservoir[1])
     set_downstream_turbines!(reservoir[1], [hydros[2]])
 
-    # TODO refactor as per https://github.com/NREL-Sienna/PowerSystemCaseBuilder.jl/issues/66
+    # TODO refactor as per https://github.com/Sienna-Platform/PowerSystemCaseBuilder.jl/issues/66
     if add_forecasts
         for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_all_components))
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()

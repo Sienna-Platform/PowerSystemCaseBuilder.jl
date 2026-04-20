@@ -3,7 +3,7 @@ git-tree-sha1 = "edcb5940e84a802a86ad4f2223214d33121ac044"
 lazy = true
 
     [[CaseData.download]]
-    url = "https://github.com/NREL-Sienna/PowerSystemsTestData/archive/refs/tags/4.0.2.tar.gz"
+    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/refs/tags/4.0.2.tar.gz"
     sha256 = "c844aba2ce37c1cc1bb4c496c809607f4ddb310cb76a5fdc266bf6a1345f2b51"
 
 [rts]
