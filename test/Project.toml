@@ -7,8 +7,16 @@ Downloads = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 InfrastructureSystems = "2cd47ed4-ca9b-11e9-27f2-ab636a7671f1"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+PowerFlowFileParser = "bed98974-b02e-5e2f-9ee0-a103f5c450dd"
 PowerSystemCaseBuilder = "f00506e0-b84f-492a-93c2-c0a9afc4364e"
 PowerSystems = "bcd98974-b02a-5e2f-9ee0-a103f5c450dd"
+PowerTableDataParser = "2b750c0e-0bff-11f1-9200-1befd75df6be"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TimeSeries = "9e3dc215-6440-5c97-bce1-76c03772f85e"
+
+[sources]
+InfrastructureSystems = {url = "https://github.com/NREL-Sienna/InfrastructureSystems.jl", rev = "IS4"}
+PowerFlowFileParser = {url = "https://github.com/NREL-Sienna/PowerFlowFileParser.jl", rev = "main"}
+PowerSystems = {url = "https://github.com/NREL-Sienna/PowerSystems.jl", rev = "psy6"}
+PowerTableDataParser = {url = "https://github.com/NLR-Sienna/PowerTableDataParser.jl", rev = "main"}

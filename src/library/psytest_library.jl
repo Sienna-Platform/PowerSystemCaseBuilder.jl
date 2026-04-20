@@ -3,7 +3,7 @@ function build_tamu_ACTIVSg2000_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "ACTIVSg2000", "ACTIVSg2000.RAW")
     !isfile(file_path) && throw(DataFormatError("Cannot find $file_path"))
 
-    pm_data = PSY.PowerModelsData(file_path)
+    pm_data = PowerFlowFileParser.PowerModelsData(file_path)
 
     bus_name_formatter =
         get(
@@ -15,7 +15,7 @@ function build_tamu_ACTIVSg2000_sys(; raw_data, kwargs...)
         get(sys_kwargs, :load_name_formatter, x -> strip(join(x["source_id"], "_")))
 
     # make system
-    sys = PSY.System(
+    sys = make_system(
         pm_data;
         bus_name_formatter = bus_name_formatter,
         load_name_formatter = load_name_formatter,
@@ -91,7 +91,9 @@ function build_psse_Benchmark_4ger_33_2015_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "Benchmark_4ger_33_2015.RAW")
     dyr_file = joinpath(raw_data, "psse_dyr", "Benchmark_4ger_33_2015.dyr")
-    sys = PSY.System(file_path, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(file_path)
+    sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
     return sys
 end
 
@@ -99,7 +101,9 @@ function build_psse_OMIB_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "OMIB.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "OMIB.dyr")
-    sys = PSY.System(file_path, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(file_path)
+    sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
     return sys
 end
 
@@ -107,7 +111,9 @@ function build_psse_3bus_gen_cls_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "ThreeBusNetwork.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "TestGENCLS.dyr")
-    sys = PSY.System(file_path, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(file_path)
+    sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
     return sys
 end
 
@@ -115,7 +121,9 @@ function psse_renewable_parsing_1(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "Benchmark_4ger_33_2015_RENA.RAW")
     dyr_file = joinpath(raw_data, "psse_dyr", "Benchmark_4ger_33_2015_RENA.dyr")
-    sys = PSY.System(file_path, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(file_path)
+    sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
     return sys
 end
 
@@ -123,7 +131,9 @@ function build_psse_3bus_sexs_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "ThreeBusNetwork.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "test_SEXS.dyr")
-    sys = PSY.System(file_path, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(file_path)
+    sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
     return sys
 end
 
@@ -131,12 +141,13 @@ function build_psse_original_240_case(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "240busWECC_2018_PSS33.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "240busWECC_2018_PSS.dyr")
-    sys = PSY.System(
-        file_path,
-        dyr_file;
+    pm_data = PowerFlowFileParser.PowerModelsData(file_path)
+    sys = make_system(
+        pm_data;
         bus_name_formatter = x -> string(x["name"]) * "-" * string(x["index"]),
         sys_kwargs...,
     )
+    add_dyn_injectors!(sys, dyr_file)
     return sys
 end
 
@@ -144,7 +155,9 @@ function build_psse_3bus_no_cls_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "ThreeBusNetwork.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "Test-NoCLS.dyr")
-    sys = PSY.System(file_path, dyr_file; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(file_path)
+    sys = make_system(pm_data; sys_kwargs...)
+    add_dyn_injectors!(sys, dyr_file)
     return sys
 end
 

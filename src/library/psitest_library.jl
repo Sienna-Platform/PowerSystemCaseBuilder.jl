@@ -4501,7 +4501,7 @@ end
 function build_5_bus_matpower_DA(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     data_dir = dirname(dirname(raw_data))
-    pm_data = PowerSystems.PowerModelsData(raw_data)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
 
     FORECASTS_DIR = joinpath(data_dir, "5-Bus", "5bus_ts", "7day")
 
@@ -4509,7 +4509,7 @@ function build_5_bus_matpower_DA(; raw_data, kwargs...)
         joinpath(FORECASTS_DIR, "timeseries_pointers_da_7day.json"),
     )
 
-    sys = System(pm_data; sys_kwargs...)
+    sys = make_system(pm_data; sys_kwargs...)
     reserves = [
         VariableReserve{ReserveUp}("REG1", true, 5.0, 0.1),
         VariableReserve{ReserveUp}("REG2", true, 5.0, 0.06),
@@ -4537,7 +4537,8 @@ function build_5_bus_matpower_RT(; raw_data, kwargs...)
         joinpath(FORECASTS_DIR, "timeseries_pointers_rt_7day.json"),
     )
 
-    sys = System(raw_data; sys_kwargs...)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
+    sys = make_system(pm_data; sys_kwargs...)
 
     add_time_series!(sys, tsp)
     transform_single_time_series!(sys, Hour(12), Hour(1))
@@ -4548,7 +4549,7 @@ end
 function build_5_bus_matpower_AGC(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     data_dir = dirname(dirname(raw_data))
-    pm_data = PowerSystems.PowerModelsData(raw_data)
+    pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
 
     FORECASTS_DIR = joinpath(data_dir, "5-Bus", "5bus_ts", "7day")
 
@@ -4556,7 +4557,7 @@ function build_5_bus_matpower_AGC(; raw_data, kwargs...)
         joinpath(FORECASTS_DIR, "timeseries_pointers_agc_7day.json"),
     )
 
-    sys = System(pm_data; sys_kwargs...)
+    sys = make_system(pm_data; sys_kwargs...)
 
     add_time_series!(sys, tsp)
     return sys
@@ -4565,24 +4566,24 @@ end
 function build_test_RTS_GMLC_sys(; raw_data, add_forecasts, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     if add_forecasts
-        rawsys = PSY.PowerSystemTableData(
+        rawsys = PowerTableDataParser.PowerSystemTableData(
             raw_data,
             100.0,
             joinpath(raw_data, "user_descriptors.yaml");
             timeseries_metadata_file = joinpath(raw_data, "timeseries_pointers.json"),
             generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
         )
-        sys = PSY.System(rawsys; time_series_resolution = Dates.Hour(1), sys_kwargs...)
+        sys = make_system(rawsys; time_series_resolution = Dates.Hour(1), sys_kwargs...)
         PSY.transform_single_time_series!(sys, Hour(24), Dates.Hour(24))
         return sys
     else
-        rawsys = PSY.PowerSystemTableData(
+        rawsys = PowerTableDataParser.PowerSystemTableData(
             raw_data,
             100.0,
             joinpath(raw_data, "user_descriptors.yaml");
             generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
         )
-        sys = PSY.System(rawsys; time_series_resolution = Dates.Hour(1), sys_kwargs...)
+        sys = make_system(rawsys; time_series_resolution = Dates.Hour(1), sys_kwargs...)
         return sys
     end
 end
@@ -4967,12 +4968,12 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
                 ini_time = TimeSeries.timestamp(hybrid_cost_ts[t])[1]
                 forecast_data[ini_time] = hybrid_cost_ts[t]
             end
-            set_variable_cost!(
+            PSY.add_time_series!(
                 c_sys5_hybrid,
                 h,
                 PSY.Deterministic("variable_cost", forecast_data),
             )
-            set_variable_cost!(
+            PSY.add_time_series!(
                 c_sys5_hybrid,
                 h,
                 PSY.SingleTimeSeries("variable_cost", hybrid_cost_single_ts),
@@ -5122,12 +5123,12 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
                 ini_time = TimeSeries.timestamp(hybrid_cost_ts[t])[1]
                 forecast_data[ini_time] = hybrid_cost_ts[t]
             end
-            set_variable_cost!(
+            PSY.add_time_series!(
                 c_sys5_hybrid,
                 h,
                 PSY.Deterministic("variable_cost", forecast_data),
             )
-            set_variable_cost!(
+            PSY.add_time_series!(
                 c_sys5_hybrid,
                 h,
                 PSY.SingleTimeSeries("variable_cost", hybrid_cost_single_ts),
@@ -5302,7 +5303,7 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
                     forecast_data[ini_time[1]] = data
                 end
             end
-            set_variable_cost!(
+            PSY.add_time_series!(
                 c_sys5_hybrid,
                 h,
                 PSY.Deterministic("variable_cost", forecast_data),

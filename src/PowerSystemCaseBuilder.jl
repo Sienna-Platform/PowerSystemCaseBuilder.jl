@@ -27,11 +27,21 @@ export SYSTEM_CATALOG
 
 # imports
 import InfrastructureSystems
-import InfrastructureSystems: InfrastructureSystemsType
+import InfrastructureSystems:
+    InfrastructureSystemsType,
+    get_name,
+    set_name!
 import PowerSystems
 import DataStructures: SortedDict
 import DataFrames
 import PrettyTables
+
+import PowerFlowFileParser
+import PowerTableDataParser
+
+# imports for parsers/ to work
+import Unicode: normalize
+import PowerFlowData
 
 #TimeStamp Management Imports
 import TimeSeries
@@ -43,6 +53,8 @@ import DataFrames: DataFrame
 import LazyArtifacts
 import JSON3
 import SHA
+import YAML
+import InteractiveUtils
 
 using DocStringExtensions
 
@@ -51,6 +63,7 @@ using DocStringExtensions
                                  $(DOCSTRING)
                                  """
 
+using PowerSystems
 const PSY = PowerSystems
 const IS = InfrastructureSystems
 
@@ -134,9 +147,19 @@ Category for SiennaPRASInterface.jl examples.
 """
 struct SPISystems <: SystemCategory end
 
+# Include Parsing files
+include("parsers/common.jl")
+include("parsers/enums.jl")
+include("parsers/power_system_table_data.jl")
+include("parsers/power_models_data.jl")
+include("parsers/powerflowdata_data.jl")
+include("parsers/psse_dynamic_data.jl")
+#include("parsers/psse_metadata_reimport.jl")
+
 # includes
 
 include("definitions.jl")
+include("utils/psy6_compat.jl") # must be included before system_library.jl
 include("system_library.jl")
 
 include("system_build_stats.jl")

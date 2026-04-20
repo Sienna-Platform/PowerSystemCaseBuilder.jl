@@ -235,14 +235,14 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
 end
 
 function build_5_bus_hydro_uc_sys(; add_forecasts, raw_data, sys_kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
         generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
     )
     if add_forecasts
-        c_sys5_hy_uc = PSY.System(
+        c_sys5_hy_uc = make_system(
             rawsys;
             timeseries_metadata_file = joinpath(
                 raw_data,
@@ -255,21 +255,21 @@ function build_5_bus_hydro_uc_sys(; add_forecasts, raw_data, sys_kwargs...)
         )
         PSY.transform_single_time_series!(c_sys5_hy_uc, Hour(24), Hour(24))
     else
-        c_sys5_hy_uc = PSY.System(rawsys; sys_kwargs...)
+        c_sys5_hy_uc = make_system(rawsys; sys_kwargs...)
     end
 
     return c_sys5_hy_uc
 end
 
 function build_5_bus_hydro_uc_sys_targets(; add_forecasts, raw_data, sys_kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
         generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
     )
     if add_forecasts
-        c_sys5_hy_uc = PSY.System(
+        c_sys5_hy_uc = make_system(
             rawsys;
             timeseries_metadata_file = joinpath(
                 raw_data,
@@ -282,7 +282,7 @@ function build_5_bus_hydro_uc_sys_targets(; add_forecasts, raw_data, sys_kwargs.
         )
         PSY.transform_single_time_series!(c_sys5_hy_uc, Hour(24), Hour(24))
     else
-        c_sys5_hy_uc = PSY.System(rawsys; sys_kwargs...)
+        c_sys5_hy_uc = make_system(rawsys; sys_kwargs...)
     end
     cost = HydroGenerationCost(CostCurve(LinearCurve(0.15)), 0.0)
     for hy in get_components(HydroTurbine, c_sys5_hy_uc)
@@ -293,13 +293,13 @@ end
 
 function build_5_bus_hydro_ed_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
         generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
     )
-    c_sys5_hy_ed = PSY.System(
+    c_sys5_hy_ed = make_system(
         rawsys;
         timeseries_metadata_file = joinpath(
             raw_data,
@@ -317,13 +317,13 @@ end
 
 function build_5_bus_hydro_ed_sys_targets(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
         generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
     )
-    c_sys5_hy_ed = PSY.System(
+    c_sys5_hy_ed = make_system(
         rawsys;
         timeseries_metadata_file = joinpath(
             raw_data,
@@ -345,13 +345,13 @@ end
 
 function build_5_bus_hydro_wk_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
         generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
     )
-    c_sys5_hy_wk = PSY.System(
+    c_sys5_hy_wk = make_system(
         rawsys;
         timeseries_metadata_file = joinpath(
             raw_data,
@@ -369,13 +369,13 @@ end
 
 function build_5_bus_hydro_wk_sys_targets(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         raw_data,
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
         generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
     )
-    c_sys5_hy_wk = PSY.System(
+    c_sys5_hy_wk = make_system(
         rawsys;
         timeseries_metadata_file = joinpath(
             raw_data,
@@ -400,7 +400,7 @@ function build_RTS_GMLC_DA_sys(; raw_data, kwargs...)
     RTS_SRC_DIR = joinpath(raw_data, "RTS_Data", "SourceData")
     RTS_SIIP_DIR = joinpath(raw_data, "RTS_Data", "FormattedData", "SIIP")
     MAP_DIR = joinpath(DATA_DIR, "RTS_GMLC")
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
         joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
@@ -408,7 +408,7 @@ function build_RTS_GMLC_DA_sys(; raw_data, kwargs...)
         generator_mapping_file = joinpath(MAP_DIR, "generator_mapping.yaml"),
     )
     resolution = get(sys_kwargs, :time_series_resolution, Dates.Hour(1))
-    sys = PSY.System(rawsys; time_series_resolution = resolution, sys_kwargs...)
+    sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
     interval = get(sys_kwargs, :interval, Dates.Hour(24))
     horizon = Hour(get(sys_kwargs, :horizon, 48))
     PSY.transform_single_time_series!(sys, horizon, interval)
@@ -420,7 +420,7 @@ function build_RTS_GMLC_RT_sys(; raw_data, kwargs...)
     RTS_SRC_DIR = joinpath(raw_data, "RTS_Data", "SourceData")
     RTS_SIIP_DIR = joinpath(raw_data, "RTS_Data", "FormattedData", "SIIP")
     MAP_DIR = joinpath(DATA_DIR, "RTS_GMLC")
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
         joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
@@ -428,7 +428,7 @@ function build_RTS_GMLC_RT_sys(; raw_data, kwargs...)
         generator_mapping_file = joinpath(MAP_DIR, "generator_mapping.yaml"),
     )
     resolution = get(sys_kwargs, :time_series_resolution, Dates.Minute(5))
-    sys = PSY.System(rawsys; time_series_resolution = resolution, sys_kwargs...)
+    sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
     interval = get(sys_kwargs, :interval, Dates.Minute(5))
     horizon = Hour(get(sys_kwargs, :horizon, 2))
     PSY.transform_single_time_series!(sys, horizon, interval)
@@ -440,7 +440,7 @@ function build_RTS_GMLC_DA_sys_noForecast(; raw_data, kwargs...)
     RTS_SRC_DIR = joinpath(raw_data, "RTS_Data", "SourceData")
     RTS_SIIP_DIR = joinpath(raw_data, "RTS_Data", "FormattedData", "SIIP")
     MAP_DIR = joinpath(DATA_DIR, "RTS_GMLC")
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
         joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
@@ -448,7 +448,7 @@ function build_RTS_GMLC_DA_sys_noForecast(; raw_data, kwargs...)
         generator_mapping_file = joinpath(MAP_DIR, "generator_mapping.yaml"),
     )
     resolution = get(sys_kwargs, :time_series_resolution, Dates.Hour(1))
-    sys = PSY.System(rawsys; time_series_resolution = resolution, sys_kwargs...)
+    sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
     return sys
 end
 
@@ -457,7 +457,7 @@ function build_RTS_GMLC_RT_sys_noForecast(; raw_data, kwargs...)
     RTS_SRC_DIR = joinpath(raw_data, "RTS_Data", "SourceData")
     RTS_SIIP_DIR = joinpath(raw_data, "RTS_Data", "FormattedData", "SIIP")
     MAP_DIR = joinpath(DATA_DIR, "RTS_GMLC")
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
         joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
@@ -465,7 +465,7 @@ function build_RTS_GMLC_RT_sys_noForecast(; raw_data, kwargs...)
         generator_mapping_file = joinpath(MAP_DIR, "generator_mapping.yaml"),
     )
     resolution = get(sys_kwargs, :time_series_resolution, Dates.Minute(5))
-    sys = PSY.System(rawsys; time_series_resolution = resolution, sys_kwargs...)
+    sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
     return sys
 end
 
@@ -480,7 +480,7 @@ function make_modified_RTS_GMLC_sys(
     DISPATCH_INCREASE = 2.0
     FIX_DECREASE = 0.3
 
-    rawsys = PSY.PowerSystemTableData(
+    rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
         joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
@@ -488,7 +488,7 @@ function make_modified_RTS_GMLC_sys(
         generator_mapping_file = joinpath(MAP_DIR, "generator_mapping.yaml"),
     )
 
-    sys = PSY.System(rawsys; time_series_resolution = resolution, sys_kwargs...)
+    sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
     PSY.set_units_base_system!(sys, "SYSTEM_BASE")
     res_up = PSY.get_component(PSY.VariableReserve{PSY.ReserveUp}, sys, "Flex_Up")
     res_dn = PSY.get_component(PSY.VariableReserve{PSY.ReserveDown}, sys, "Flex_Down")
@@ -510,13 +510,16 @@ function make_modified_RTS_GMLC_sys(
             PSY.remove_component!(sys, g)
             continue
         end
-        g.operation_cost.shut_down = g.operation_cost.start_up / 2.0
+        PSY.set_shut_down!(
+            PSY.get_operation_cost(g),
+            PSY.get_start_up(PSY.get_operation_cost(g)) / 2.0,
+        )
         if PSY.get_base_power(g) > 3
             continue
         end
         PSY.clear_services!(g)
-        PSY.add_service!(g, reg_reserve_dn)
-        PSY.add_service!(g, reg_reserve_up)
+        PSY.add_service!(g, reg_reserve_dn, sys)
+        PSY.add_service!(g, reg_reserve_up, sys)
     end
     #Remove units that make no sense to include
     names = [
@@ -547,7 +550,10 @@ function make_modified_RTS_GMLC_sys(
             PSY.remove_component!(sys, d)
             continue
         end
-        PSY.get_operation_cost(d).shut_down = PSY.get_operation_cost(d).start_up / 2.0
+        PSY.set_shut_down!(
+            PSY.get_operation_cost(d),
+            PSY.get_start_up(PSY.get_operation_cost(d)) / 2.0,
+        )
         if PSY.get_rating(d) < 3
             PSY.set_status!(d, false)
             PSY.set_status!(d, false)
