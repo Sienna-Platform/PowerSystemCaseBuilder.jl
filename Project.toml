@@ -26,6 +26,12 @@ TimeSeries = "9e3dc215-6440-5c97-bce1-76c03772f85e"
 Unicode = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
+[sources]
+InfrastructureSystems = {url = "https://github.com/NREL-Sienna/InfrastructureSystems.jl", rev = "IS4"}
+PowerFlowFileParser = {url = "https://github.com/NREL-Sienna/PowerFlowFileParser.jl", rev = "main"}
+PowerSystems = {url = "https://github.com/NREL-Sienna/PowerSystems.jl", rev = "psy6"}
+PowerTableDataParser = {url = "https://github.com/NLR-Sienna/PowerTableDataParser.jl", rev = "main"}
+
 [compat]
 CSV = "~0.10"
 DataFrames = "1"
