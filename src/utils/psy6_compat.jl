@@ -11,7 +11,8 @@
 # but BEFORE `system_library.jl` (which includes the artifact files).
 
 import PowerSystems: ReserveDemandCurve, ReserveDirection
-import PowerSystems: MarketBidCost, CostCurve, PiecewiseIncrementalCurve, LinearCurve, Service
+import PowerSystems:
+    MarketBidCost, CostCurve, PiecewiseIncrementalCurve, LinearCurve, Service
 
 # ---------------------------------------------------------------------------
 # ReserveDemandCurve – variable field: Nothing → ZERO_OFFER_CURVE
