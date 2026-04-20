@@ -5106,15 +5106,15 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
             end
             PSY.add_time_series!(
                 c_sys5_hybrid,
-                hy,
+                PSY.get_renewable_unit(hy),
                 PSY.Deterministic("max_active_power", forecast_data),
             )
             PSY.add_time_series!(
                 c_sys5_hybrid,
-                hy,
+                PSY.get_renewable_unit(hy),
                 PSY.SingleTimeSeries("max_active_power", ren_single_timeseries_DA[ix]),
             )
-            #PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
+            PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
         end
         for (ix, h) in enumerate(PSY.get_components(PSY.HybridSystem, c_sys5_hybrid))
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
@@ -5278,19 +5278,19 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
             #applying a patch for the time being with "hy"
             PSY.add_time_series!(
                 c_sys5_hybrid,
-                hy,
+                PSY.get_renewable_unit(hy),
                 PSY.Deterministic("max_active_power", forecast_data),
             )
             PSY.add_time_series!(
                 c_sys5_hybrid,
-                hy,
+                PSY.get_renewable_unit(hy),
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
                     scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
-            #PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
+            PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
         end
         for (ix, h) in enumerate(PSY.get_components(PSY.HybridSystem, c_sys5_hybrid))
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
