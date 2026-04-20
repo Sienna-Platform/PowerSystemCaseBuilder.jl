@@ -25,7 +25,7 @@ const ENUMS = (
     DiscreteControlledBranchStatus,
     WindingCategory,
     ImpedanceCorrectionTransformerControlMode,
-    GeneratorCostModels,
+    PSY.GeneratorCostModels,
     InputCategory,
     PrimeMovers,
     StateTypes,
@@ -36,7 +36,7 @@ const ENUMS = (
     LoadConformity,
     WindingGroupNumber,
     HydroTurbineType,
-    TransformerControlObjective,
+    PSY.TransformerControlObjective,
 )
 
 const ENUM_MAPPINGS = Dict()

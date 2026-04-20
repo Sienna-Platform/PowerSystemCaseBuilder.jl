@@ -27,7 +27,7 @@ export SYSTEM_CATALOG
 
 # imports
 import InfrastructureSystems
-import InfrastructureSystems: 
+import InfrastructureSystems:
     InfrastructureSystemsType,
     get_name,
     set_name!
@@ -150,8 +150,6 @@ struct SPISystems <: SystemCategory end
 # Include Parsing files
 include("parsers/common.jl")
 include("parsers/enums.jl")
-include("parsers/pm_io.jl")
-include("parsers/im_io.jl")
 include("parsers/power_system_table_data.jl")
 include("parsers/power_models_data.jl")
 include("parsers/powerflowdata_data.jl")
@@ -161,8 +159,7 @@ include("parsers/psse_dynamic_data.jl")
 # includes
 
 include("definitions.jl")
-include("utils/psy6_compat.jl") # needs to be included before system_library.jl, but felt 
-				# the best place for this file to live was in utils/
+include("utils/psy6_compat.jl") # must be included before system_library.jl
 include("system_library.jl")
 
 include("system_build_stats.jl")

@@ -32,9 +32,8 @@ function make_system(pm_data::PowerFlowFileParser.PowerModelsData; kwargs...)
 
     @info "Constructing System from Power Models" data["name"] data["source_type"]
 
-    filtered_kwargs = filter(kv -> !(kv.first in (:bus_name_formatter, :load_name_formatter)), kwargs)
-
-    sys = System(data["baseMVA"]; filtered_kwargs...)
+    sys_kwargs = filter_kwargs(; kwargs...)
+    sys = System(data["baseMVA"]; sys_kwargs...)
 
     source_type = data["source_type"]
 
@@ -895,9 +894,9 @@ function make_thermal_gen(
     sys_mbase::Float64,
 )
     if haskey(d, "model")
-        model = GeneratorCostModels(d["model"])
+        model = PSY.GeneratorCostModels(d["model"])
         # Input data layout: table B-4 of https://matpower.org/docs/MATPOWER-manual.pdf
-        if model == GeneratorCostModels.PIECEWISE_LINEAR
+        if model == PSY.GeneratorCostModels.PIECEWISE_LINEAR
             # For now, we make the fixed cost the y-intercept of the first segment of the
             # piecewise curve and the variable cost a PiecewiseLinearData representing
             # the data minus this fixed cost; in a future update, there will be no
@@ -911,7 +910,7 @@ function make_thermal_gen(
                 first_y - first(get_slopes(PiecewiseLinearData(points))) * first_x,
             )
             cost = PiecewiseLinearData([(x, y - fixed) for (x, y) in points])
-        elseif model == GeneratorCostModels.POLYNOMIAL
+        elseif model == PSY.GeneratorCostModels.POLYNOMIAL
             # For now, we make the variable cost a QuadraticFunctionData with all but the
             # constant term and make the fixed cost the constant term; in a future update,
             # there will be no separation between the QuadraticFunctionData and the fixed
@@ -1876,7 +1875,7 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         ac_voltage_control_from = d["ac_voltage_control_from"],
         dc_setpoint_from = d["dc_setpoint_from"],
         ac_setpoint_from = d["ac_setpoint_from"],
-        converter_loss_from = d["converter_loss_from"],
+        converter_loss_from = LinearCurve(d["converter_loss_from"]...),
         max_dc_current_from = d["max_dc_current_from"],
         rating_from = d["rating_from"],
         reactive_power_limits_from = (min = d["qminf"], max = d["qmaxf"]),
@@ -1886,7 +1885,7 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         ac_voltage_control_to = d["ac_voltage_control_to"],
         dc_setpoint_to = d["dc_setpoint_to"],
         ac_setpoint_to = d["ac_setpoint_to"],
-        converter_loss_to = d["converter_loss_to"],
+        converter_loss_to = LinearCurve(d["converter_loss_to"]...),
         max_dc_current_to = d["max_dc_current_to"],
         rating_to = d["rating_to"],
         reactive_power_limits_to = (min = d["qmint"], max = d["qmaxt"]),

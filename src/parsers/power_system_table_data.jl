@@ -45,7 +45,10 @@ function get_user_field(
 end
 
 """Return a vector of user-defined fields for the category."""
-function get_user_fields(data::PowerTableDataParser.PowerSystemTableData, category::InputCategory)
+function get_user_fields(
+    data::PowerTableDataParser.PowerSystemTableData,
+    category::InputCategory,
+)
     key = _category_key(category)
     if !haskey(data.user_descriptors, key)
         throw(DataFormatError("Invalid category=$category"))
@@ -55,7 +58,10 @@ function get_user_fields(data::PowerTableDataParser.PowerSystemTableData, catego
 end
 
 """Return the dataframe for the category."""
-function get_dataframe(data::PowerTableDataParser.PowerSystemTableData, category::InputCategory)
+function get_dataframe(
+    data::PowerTableDataParser.PowerSystemTableData,
+    category::InputCategory,
+)
     df = get(data.category_to_df, _category_key(category), DataFrames.DataFrame())
     isempty(df) && @warn("Missing $category data.")
     return df
@@ -67,7 +73,11 @@ making type conversions as necessary.
 
 Refer to the PowerSystems descriptor file for field names that will be created.
 """
-function iterate_rows(data::PowerTableDataParser.PowerSystemTableData, category; na_to_nothing = true)
+function iterate_rows(
+    data::PowerTableDataParser.PowerSystemTableData,
+    category;
+    na_to_nothing = true,
+)
     df = get_dataframe(data, category)
     field_infos = _get_field_infos(data, category, names(df))
     Channel() do channel
@@ -578,7 +588,7 @@ function services_csv_parser!(sys::System, data::PowerTableDataParser.PowerSyste
         if isnothing(device_subcategories)
             @info("Adding contributing components for $(reserve.name) by component name")
             for device in devices
-                @assert supports_services(device)
+                @assert PSY.supports_services(device)
                 _add_device!(contributing_devices, device_categories, device)
             end
         else
@@ -589,7 +599,7 @@ function services_csv_parser!(sys::System, data::PowerTableDataParser.PowerSyste
                 gen_type =
                     get_generator_type(gen.fuel, gen.unit_type, data.generator_mapping)
                 sys_gen = get_component(gen_type, sys, gen.name)
-                @assert supports_services(sys_gen)
+                @assert PSY.supports_services(sys_gen)
                 if isnothing(sys_gen)
                     error(
                         "Failed to find generator: type = $gen_type name = $(gen.name) " *
@@ -754,7 +764,11 @@ function make_cost(
     vom_data = LinearCurve(vom_cost)
 
     op_cost = ThermalGenerationCost(
-        CostCurve(var_cost, UnitSystem.NATURAL_UNITS, vom_data),
+        CostCurve(;
+            value_curve = var_cost,
+            power_units = UnitSystem.NATURAL_UNITS,
+            vom_cost = vom_data,
+        ),
         gen.fixed_cost,
         startup_cost,
         shutdown_cost,
@@ -1496,7 +1510,11 @@ struct _FieldInfo
     # TODO unit, value ranges and options
 end
 
-function _get_field_infos(data::PowerTableDataParser.PowerSystemTableData, category::InputCategory, df_names)
+function _get_field_infos(
+    data::PowerTableDataParser.PowerSystemTableData,
+    category::InputCategory,
+    df_names,
+)
     key = _category_key(category)
     if !haskey(data.user_descriptors, key)
         throw(DataFormatError("Invalid category=$category"))
@@ -1579,7 +1597,12 @@ function _get_field_infos(data::PowerTableDataParser.PowerSystemTableData, categ
 end
 
 """Reads values from dataframe row and performs necessary conversions."""
-function _read_data_row(data::PowerTableDataParser.PowerSystemTableData, row, field_infos; na_to_nothing = true)
+function _read_data_row(
+    data::PowerTableDataParser.PowerSystemTableData,
+    row,
+    field_infos;
+    na_to_nothing = true,
+)
     fields = Vector{String}()
     vals = Vector()
     for field_info in field_infos

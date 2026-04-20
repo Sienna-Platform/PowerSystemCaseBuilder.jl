@@ -1,13 +1,25 @@
 const SKIP_PM_VALIDATION = false
 
 const GENERATOR_MAPPING_FILE_PM =
-    joinpath(dirname(pathof(PowerSystemCaseBuilder)), "parsers", "generator_mapping_pm.yaml")
+    joinpath(
+        dirname(pathof(PowerSystemCaseBuilder)),
+        "parsers",
+        "generator_mapping_pm.yaml",
+    )
 
 const GENERATOR_MAPPING_FILE_CDM =
-    joinpath(dirname(pathof(PowerSystemCaseBuilder)), "parsers", "generator_mapping_cdm.yaml")
+    joinpath(
+        dirname(pathof(PowerSystemCaseBuilder)),
+        "parsers",
+        "generator_mapping_cdm.yaml",
+    )
 
 const PSSE_DYR_MAPPING_FILE =
-    joinpath(dirname(pathof(PowerSystemCaseBuilder)), "parsers", "psse_dynamic_mapping.yaml")
+    joinpath(
+        dirname(pathof(PowerSystemCaseBuilder)),
+        "parsers",
+        "psse_dynamic_mapping.yaml",
+    )
 
 const STRING2FUEL =
     Dict((normalize(string(x); casefold = true) => x) for x in instances(ThermalFuels))
@@ -88,7 +100,11 @@ end
 # in power_models_data.jl, mappings is of type DataType
 
 """Return the PowerSystems generator type for this fuel and unit_type."""
-function get_generator_type(fuel, unit_type, mappings::Union{Dict{NamedTuple, String}, Dict{NamedTuple, DataType}})
+function get_generator_type(
+    fuel,
+    unit_type,
+    mappings::Union{Dict{NamedTuple, String}, Dict{NamedTuple, DataType}},
+)
     fuel = isnothing(fuel) ? "" : uppercase(fuel)
     unit_type = uppercase(unit_type)
     generator = nothing
@@ -115,8 +131,8 @@ function get_generator_type(fuel, unit_type, mappings::Union{Dict{NamedTuple, St
 end
 
 function calculate_gen_rating(
-    active_power_limits::Union{MinMax, Nothing},
-    reactive_power_limits::Union{MinMax, Nothing},
+    active_power_limits::Union{PSY.MinMax, Nothing},
+    reactive_power_limits::Union{PSY.MinMax, Nothing},
     base_conversion::Float64,
 )
     reactive_power_max = isnothing(reactive_power_limits) ? 0.0 : reactive_power_limits.max

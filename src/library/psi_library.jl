@@ -510,13 +510,16 @@ function make_modified_RTS_GMLC_sys(
             PSY.remove_component!(sys, g)
             continue
         end
-        g.operation_cost.shut_down = g.operation_cost.start_up / 2.0
+        PSY.set_shut_down!(
+            PSY.get_operation_cost(g),
+            PSY.get_start_up(PSY.get_operation_cost(g)) / 2.0,
+        )
         if PSY.get_base_power(g) > 3
             continue
         end
         PSY.clear_services!(g)
-        PSY.add_service!(g, reg_reserve_dn)
-        PSY.add_service!(g, reg_reserve_up)
+        PSY.add_service!(g, reg_reserve_dn, sys)
+        PSY.add_service!(g, reg_reserve_up, sys)
     end
     #Remove units that make no sense to include
     names = [
@@ -547,7 +550,10 @@ function make_modified_RTS_GMLC_sys(
             PSY.remove_component!(sys, d)
             continue
         end
-        PSY.get_operation_cost(d).shut_down = PSY.get_operation_cost(d).start_up / 2.0
+        PSY.set_shut_down!(
+            PSY.get_operation_cost(d),
+            PSY.get_start_up(PSY.get_operation_cost(d)) / 2.0,
+        )
         if PSY.get_rating(d) < 3
             PSY.set_status!(d, false)
             PSY.set_status!(d, false)
