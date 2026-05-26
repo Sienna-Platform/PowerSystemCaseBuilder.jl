@@ -169,13 +169,13 @@ function build_psid_load_tutorial_omib(; raw_data, kwargs...)
         name = PSY.get_name(l),
         available = PSY.get_available(l),
         bus = PSY.get_bus(l),
-        active_power = PSY.get_constant_active_power(l, Float64),
-        reactive_power = PSY.get_constant_reactive_power(l, Float64),
+        active_power = PSY.get_constant_active_power(l, IS.SU),
+        reactive_power = PSY.get_constant_reactive_power(l, IS.SU),
         α = 0.0, # Constant Power
         β = 0.0, # Constant Power
-        base_power = PSY._get_base_power(l),
-        max_active_power = PSY.get_max_constant_active_power(l, Float64),
-        max_reactive_power = PSY.get_max_constant_reactive_power(l, Float64),
+        base_power = PSY.get_base_power(l, IS.SU),
+        max_active_power = PSY.get_max_constant_active_power(l, IS.SU),
+        max_reactive_power = PSY.get_max_constant_reactive_power(l, IS.SU),
     )
     remove_component!(sys, l)
     add_component!(sys, exp_load)

@@ -499,7 +499,7 @@ function read_branch!(
                 primary_shunt = 0.0,
                 winding_group_number = WindingGroupNumber(0),
                 rating = max_rate,
-                base_power = get_base_power(sys), # add system base power
+                base_power = get_base_power(sys, IS.NU), # add system base power
                 ext = Dict(
                     "line_to_xfr" => true,
                 ),
@@ -671,7 +671,7 @@ function read_branch!(
             tap = tap_value,
             primary_shunt = transformers.mag2[ix],
             winding_group_number = WindingGroupNumber(0),
-            base_power = get_base_power(sys),
+            base_power = get_base_power(sys, IS.NU),
             rating = max_rate,
         )
         add_component!(sys, transformer; skip_validation = SKIP_PM_VALIDATION)

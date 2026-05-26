@@ -3,39 +3,39 @@ function transform_load_to_constant_impedance(load::PSY.StandardLoad)
     active_power, reactive_power, max_active_power, max_reactive_power =
         _compute_total_load_parameters(load)
     # Set Impedance Power
-    PSY.set_impedance_active_power!(load, active_power)
-    PSY.set_impedance_reactive_power!(load, reactive_power)
-    PSY.set_max_impedance_active_power!(load, max_active_power)
-    PSY.set_max_impedance_reactive_power!(load, max_reactive_power)
+    PSY.set_impedance_active_power!(load, active_power * IS.SU)
+    PSY.set_impedance_reactive_power!(load, reactive_power * IS.SU)
+    PSY.set_max_impedance_active_power!(load, max_active_power * IS.SU)
+    PSY.set_max_impedance_reactive_power!(load, max_reactive_power * IS.SU)
     # Set everything else to zero
-    PSY.set_constant_active_power!(load, 0.0)
-    PSY.set_constant_reactive_power!(load, 0.0)
-    PSY.set_max_constant_active_power!(load, 0.0)
-    PSY.set_max_constant_reactive_power!(load, 0.0)
-    PSY.set_current_active_power!(load, 0.0)
-    PSY.set_current_reactive_power!(load, 0.0)
-    PSY.set_max_current_active_power!(load, 0.0)
-    PSY.set_max_current_reactive_power!(load, 0.0)
+    PSY.set_constant_active_power!(load, 0.0 * IS.SU)
+    PSY.set_constant_reactive_power!(load, 0.0 * IS.SU)
+    PSY.set_max_constant_active_power!(load, 0.0 * IS.SU)
+    PSY.set_max_constant_reactive_power!(load, 0.0 * IS.SU)
+    PSY.set_current_active_power!(load, 0.0 * IS.SU)
+    PSY.set_current_reactive_power!(load, 0.0 * IS.SU)
+    PSY.set_max_current_active_power!(load, 0.0 * IS.SU)
+    PSY.set_max_current_reactive_power!(load, 0.0 * IS.SU)
     return
 end
 
 function _compute_total_load_parameters(load::PSY.StandardLoad)
     @warn "Load data is transformed under the assumption of a 1.0 p.u. Voltage Magnitude"
     # Constant Power Data
-    constant_active_power = PSY.get_constant_active_power(load)
-    constant_reactive_power = PSY.get_constant_reactive_power(load)
-    max_constant_active_power = PSY.get_max_constant_active_power(load)
-    max_constant_reactive_power = PSY.get_max_constant_reactive_power(load)
+    constant_active_power = PSY.get_constant_active_power(load, IS.SU)
+    constant_reactive_power = PSY.get_constant_reactive_power(load, IS.SU)
+    max_constant_active_power = PSY.get_max_constant_active_power(load, IS.SU)
+    max_constant_reactive_power = PSY.get_max_constant_reactive_power(load, IS.SU)
     # Constant Current Data
-    current_active_power = PSY.get_current_active_power(load)
-    current_reactive_power = PSY.get_current_reactive_power(load)
-    max_current_active_power = PSY.get_max_current_active_power(load)
-    max_current_reactive_power = PSY.get_max_current_reactive_power(load)
+    current_active_power = PSY.get_current_active_power(load, IS.SU)
+    current_reactive_power = PSY.get_current_reactive_power(load, IS.SU)
+    max_current_active_power = PSY.get_max_current_active_power(load, IS.SU)
+    max_current_reactive_power = PSY.get_max_current_reactive_power(load, IS.SU)
     # Constant Admittance Data
-    impedance_active_power = PSY.get_impedance_active_power(load)
-    impedance_reactive_power = PSY.get_impedance_reactive_power(load)
-    max_impedance_active_power = PSY.get_max_impedance_active_power(load)
-    max_impedance_reactive_power = PSY.get_max_impedance_reactive_power(load)
+    impedance_active_power = PSY.get_impedance_active_power(load, IS.SU)
+    impedance_reactive_power = PSY.get_impedance_reactive_power(load, IS.SU)
+    max_impedance_active_power = PSY.get_max_impedance_active_power(load, IS.SU)
+    max_impedance_reactive_power = PSY.get_max_impedance_reactive_power(load, IS.SU)
     # Total Load Calculations
     active_power = constant_active_power + current_active_power + impedance_active_power
     reactive_power =
@@ -894,13 +894,13 @@ function build_psid_psse_test_exp_load(; kwargs...)
             name = PSY.get_name(l),
             available = PSY.get_available(l),
             bus = PSY.get_bus(l),
-            active_power = PSY.get_active_power(l, Float64),
-            reactive_power = PSY.get_reactive_power(l, Float64),
+            active_power = PSY.get_active_power(l, IS.SU),
+            reactive_power = PSY.get_reactive_power(l, IS.SU),
             active_power_coefficient = 0.0, # Constant Power
             reactive_power_coefficient = 0.0, # Constant Power
-            base_power = PSY._get_base_power(l),
-            max_active_power = PSY.get_max_active_power(l, Float64),
-            max_reactive_power = PSY.get_max_reactive_power(l, Float64),
+            base_power = PSY.get_base_power(l, IS.SU),
+            max_active_power = PSY.get_max_active_power(l, IS.SU),
+            max_reactive_power = PSY.get_max_reactive_power(l, IS.SU),
         )
         PSY.remove_component!(sys, l)
         PSY.add_component!(sys, exp_load)
