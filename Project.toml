@@ -28,7 +28,7 @@ YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
 [sources]
 InfrastructureSystems = {url = "https://github.com/NREL-Sienna/InfrastructureSystems.jl", rev = "lk/units-domain-agnostic-is4"}
-PowerFlowFileParser = {url = "https://github.com/NREL-Sienna/PowerFlowFileParser.jl", rev = "main"}
+PowerFlowFileParser = {url = "https://github.com/luke-kiernan/PowerFlowFileParser.jl", rev = "lk/units-fixes"}
 PowerSystems = {url = "https://github.com/NREL-Sienna/PowerSystems.jl", rev = "lk/units-fold-psu"}
 PowerTableDataParser = {url = "https://github.com/NLR-Sienna/PowerTableDataParser.jl", rev = "main"}
 

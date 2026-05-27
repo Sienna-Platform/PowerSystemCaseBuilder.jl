@@ -16,6 +16,6 @@ TimeSeries = "9e3dc215-6440-5c97-bce1-76c03772f85e"
 
 [sources]
 InfrastructureSystems = {rev = "lk/units-domain-agnostic-is4", url = "https://github.com/NREL-Sienna/InfrastructureSystems.jl"}
-PowerFlowFileParser = {rev = "main", url = "https://github.com/NREL-Sienna/PowerFlowFileParser.jl"}
+PowerFlowFileParser = {rev = "lk/units-fixes", url = "https://github.com/luke-kiernan/PowerFlowFileParser.jl"}
 PowerSystems = {rev = "lk/units-fold-psu", url = "https://github.com/NREL-Sienna/PowerSystems.jl"}
 PowerTableDataParser = {rev = "main", url = "https://github.com/NLR-Sienna/PowerTableDataParser.jl"}
