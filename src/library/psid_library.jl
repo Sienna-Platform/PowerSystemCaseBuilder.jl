@@ -75,9 +75,9 @@ function build_psid_wecc_9_dynamic(; raw_data, kwargs...)
     sys = make_system(pm_data; runchecks = false, sys_kwargs...)
 
     # Manually change reactance of three branches to match Sauer & Pai (2007) Figure 7.4
-    set_x!(get_component(Branch, sys, "Bus 5-Bus 4-i_1"), 0.085)
-    set_x!(get_component(Branch, sys, "Bus 9-Bus 6-i_1"), 0.17)
-    set_x!(get_component(Branch, sys, "Bus 7-Bus 8-i_1"), 0.072)
+    set_x!(get_component(Branch, sys, "Bus 5-Bus 4-i_1"), 0.085 * IS.SU)
+    set_x!(get_component(Branch, sys, "Bus 9-Bus 6-i_1"), 0.17 * IS.SU)
+    set_x!(get_component(Branch, sys, "Bus 7-Bus 8-i_1"), 0.072 * IS.SU)
 
     # Loads from raw file are constant power, consistent with Sauer & Pai (p169)
 

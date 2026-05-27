@@ -291,20 +291,23 @@ function read_loads!(
     end
     # Populate Areas and LoadZones with peak active and reactive power
     areas = get_components(Area, sys)
+    # FIXME: missing units. But which units are intended? Ambiguous.
     if ~isnothing(areas)
         for area in areas
             area_comps = get_components_in_aggregation_topology(StandardLoad, sys, area)
             if (isempty(area_comps))
-                set_peak_active_power!(area, 0.0)
-                set_peak_reactive_power!(area, 0.0)
+                set_peak_active_power!(area, 0.0, IS.NU)
+                set_peak_reactive_power!(area, 0.0, IS.NU)
             else
                 set_peak_active_power!(
                     area,
                     sum(get.(get_ext.(area_comps), "active_power_load", 0.0)),
+                    IS.NU,
                 )
                 set_peak_reactive_power!(
                     area,
                     sum(get.(get_ext.(area_comps), "reactive_power_load", 0.0)),
+                    IS.NU,
                 )
             end
         end
@@ -314,16 +317,18 @@ function read_loads!(
         for zone in zones
             zone_comps = get_components_in_aggregation_topology(StandardLoad, sys, zone)
             if (isempty(zone_comps))
-                set_peak_active_power!(zone, 0.0)
-                set_peak_reactive_power!(zone, 0.0)
+                set_peak_active_power!(zone, 0.0, IS.NU)
+                set_peak_reactive_power!(zone, 0.0, IS.NU)
             else
                 set_peak_active_power!(
                     zone,
                     sum(get.(get_ext.(zone_comps), "active_power_load", 0.0)),
+                    IS.NU,
                 )
                 set_peak_reactive_power!(
                     zone,
                     sum(get.(get_ext.(zone_comps), "reactive_power_load", 0.0)),
+                    IS.NU,
                 )
             end
         end
