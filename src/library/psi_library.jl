@@ -88,7 +88,10 @@ function build_c_sys5_pjm(; add_forecasts, raw_data, sys_kwargs...)
     peak_load = maximum(da_load_time_series_val)
     if add_forecasts
         for (ix, l) in enumerate(PSY.get_components(PowerLoad, c_sys5))
-            set_max_active_power!(l, bus_dist_fact[PSY.get_name(l)] * peak_load / 100)
+            set_max_active_power!(
+                l,
+                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
+            )
             add_time_series!(
                 c_sys5,
                 l,
@@ -209,7 +212,10 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
     peak_load = maximum(rt_load_time_series_val)
     if add_forecasts
         for (ix, l) in enumerate(PSY.get_components(PowerLoad, c_sys5))
-            set_max_active_power!(l, bus_dist_fact[PSY.get_name(l)] * peak_load / 100)
+            set_max_active_power!(
+                l,
+                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
+            )
             rt_timearray =
                 TimeArray(rt_load_time_series, rt_load_time_series_val ./ peak_load)
             rt_timearray = collapse(rt_timearray, Minute(5), first, TimeSeries.mean)
@@ -514,7 +520,7 @@ function make_modified_RTS_GMLC_sys(
             PSY.get_operation_cost(g),
             PSY.get_start_up(PSY.get_operation_cost(g)) / 2.0,
         )
-        if PSY.get_base_power(g) > 3
+        if PSY.get_base_power(g, IS.DU) > 3
             continue
         end
         PSY.clear_services!(g)
@@ -545,7 +551,7 @@ function make_modified_RTS_GMLC_sys(
         sys,
     )
         PSY.get_fuel(d) == PSY.ThermalFuels.COAL &&
-            (PSY.set_ramp_limits!(d, (up = 0.001, down = 0.001)))
+            (PSY.set_ramp_limits!(d, (up = 0.001 * IS.DU, down = 0.001 * IS.DU)))
         if PSY.get_fuel(d) == PSY.ThermalFuels.DISTILLATE_FUEL_OIL
             PSY.remove_component!(sys, d)
             continue
@@ -554,10 +560,10 @@ function make_modified_RTS_GMLC_sys(
             PSY.get_operation_cost(d),
             PSY.get_start_up(PSY.get_operation_cost(d)) / 2.0,
         )
-        if PSY.get_rating(d) < 3
+        if PSY.get_rating(d, IS.DU) < 3
             PSY.set_status!(d, false)
             PSY.set_status!(d, false)
-            PSY.set_active_power!(d, 0.0)
+            PSY.set_active_power!(d, 0.0 * IS.DU)
             continue
         end
         PSY.clear_services!(d)
@@ -587,8 +593,8 @@ function make_modified_RTS_GMLC_sys(
         PSY.RenewableDispatch,
         sys,
     )
-        rat_ = PSY.get_rating(g)
-        PSY.set_rating!(g, DISPATCH_INCREASE * rat_)
+        rat_ = PSY.get_rating(g, IS.DU)
+        PSY.set_rating!(g, DISPATCH_INCREASE * rat_ * IS.DU)
     end
 
     for g in PSY.get_components(
@@ -596,8 +602,8 @@ function make_modified_RTS_GMLC_sys(
         PSY.RenewableNonDispatch,
         sys,
     )
-        rat_ = PSY.get_rating(g)
-        PSY.set_rating!(g, FIX_DECREASE * rat_)
+        rat_ = PSY.get_rating(g, IS.DU)
+        PSY.set_rating!(g, FIX_DECREASE * rat_ * IS.DU)
     end
 
     ### Update Buses to PQ that got devices removed ###
@@ -1455,11 +1461,11 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         end
         # change scale
         if typeof(b) <: RenewableGen
-            PSY.set_base_power!(b, 1.2 * PSY.get_base_power(b))
-            PSY.set_base_power!(main_comp, 0.9 * PSY.get_base_power(b))
+            PSY.set_base_power!(b, 1.2 * PSY.get_base_power(b, IS.SU) * IS.SU)
+            PSY.set_base_power!(main_comp, 0.9 * PSY.get_base_power(b, IS.SU) * IS.SU)
         end
         if typeof(b) <: PowerLoad
-            PSY.set_base_power!(main_comp, 1.2 * PSY.get_base_power(b))
+            PSY.set_base_power!(main_comp, 1.2 * PSY.get_base_power(b, IS.SU) * IS.SU)
         end
     end
 
@@ -1511,7 +1517,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
     end
 
     for bat in get_components(EnergyReservoirStorage, main_sys)
-        set_base_power!(bat, get_base_power(bat) * 10)
+        set_base_power!(bat, get_base_power(bat, IS.SU) * 10 * IS.SU)
     end
 
     for r in get_components(
@@ -1559,10 +1565,10 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         get_initial_input(old_value_curve)
         old_y =
             get_initial_input(old_value_curve) /
-            (get_active_power_limits(g).min * get_base_power(g))
+            (get_active_power_limits(g, IS.SU).min * PSY.get_base_power(g, IS.SU))
         new_first_input =
-            (old_y + direction * cost_noise) * get_active_power_limits(g).min *
-            get_base_power(g)
+            (old_y + direction * cost_noise) * get_active_power_limits(g, IS.SU).min *
+            PSY.get_base_power(g, IS.SU)
         new_slopes[1] = old_slopes[1] + direction * cost_noise
         @assert new_slopes[1] > 0.0
         for ix in 2:length(old_slopes)

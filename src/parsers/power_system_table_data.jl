@@ -705,10 +705,10 @@ function make_generator(
         @error "Skipping unsupported generator" gen.name gen_type
     end
 
-    if abs(get_base_power(generator)) <= 1e-6
+    if abs(get_base_power(generator, IS.DU)) <= 1e-6
         @warn "Generator $(summary(generator)) has base power of zero: changing device " *
               "base power to match system base power, $(data.base_power)"
-        set_base_power!(generator, data.base_power)
+        set_base_power!(generator, data.base_power * IS.DU)
     end
 
     return generator, reservoirs
@@ -766,7 +766,7 @@ function make_cost(
     op_cost = ThermalGenerationCost(
         CostCurve(;
             value_curve = var_cost,
-            power_units = UnitSystem.NATURAL_UNITS,
+            power_units = IS.NU,
             vom_cost = vom_data,
         ),
         gen.fixed_cost,
@@ -818,7 +818,7 @@ function make_cost(
     vom_data = LinearCurve(vom_cost)
     var_cost = CostCurve(;
         value_curve = LinearCurve(0.0),
-        power_units = UnitSystem.NATURAL_UNITS,
+        power_units = IS.NU,
         vom_cost = vom_data,
     )
     op_cost = RenewableGenerationCost(var_cost)
@@ -838,7 +838,7 @@ function make_cost(
     vom_data = LinearCurve(vom_cost)
     var_cost = CostCurve(;
         value_curve = cost_pairs,
-        power_units = UnitSystem.NATURAL_UNITS,
+        power_units = IS.NU,
         vom_cost = vom_data,
     )
     op_cost = RenewableGenerationCost(var_cost)
@@ -1160,20 +1160,20 @@ function make_thermal_generator_multistart(
         available = get_available(thermal_gen),
         status = get_status(thermal_gen),
         bus = get_bus(thermal_gen),
-        active_power = get_active_power(thermal_gen),
-        reactive_power = get_reactive_power(thermal_gen),
-        rating = get_rating(thermal_gen),
+        active_power = get_active_power(thermal_gen, IS.DU),
+        reactive_power = get_reactive_power(thermal_gen, IS.DU),
+        rating = get_rating(thermal_gen, IS.DU),
         prime_mover_type = get_prime_mover_type(thermal_gen),
         fuel = get_fuel(thermal_gen),
-        active_power_limits = get_active_power_limits(thermal_gen),
-        reactive_power_limits = get_reactive_power_limits(thermal_gen),
+        active_power_limits = get_active_power_limits(thermal_gen, IS.DU),
+        reactive_power_limits = get_reactive_power_limits(thermal_gen, IS.DU),
         ramp_limits = get_ramp_limits(thermal_gen),
         power_trajectory = power_trajectory,
         time_limits = get_time_limits(thermal_gen),
         start_time_limits = startup_timelimits,
         start_types = start_types,
         operation_cost = op_cost,
-        base_power = get_base_power(thermal_gen),
+        base_power = get_base_power(thermal_gen, IS.DU),
         time_at_status = get_time_at_status(thermal_gen),
         must_run = get_must_run(thermal_gen),
     )

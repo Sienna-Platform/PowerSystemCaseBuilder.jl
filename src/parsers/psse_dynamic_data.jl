@@ -119,15 +119,15 @@ end
 
 function _make_source(g::StaticInjection, r::Float64, x::Float64, sys_base::Float64)
     # Transform Z_source to System Base
-    machine_base = get_base_power(g)
+    machine_base = get_base_power(g, IS.SU)
     r_sysbase = r * (sys_base / machine_base)
     x_sysbase = x * (sys_base / machine_base)
     return Source(;
         name = get_name(g),
         available = true,
         bus = get_bus(g),
-        active_power = get_active_power(g),
-        reactive_power = get_reactive_power(g),
+        active_power = get_active_power(g, IS.SU),
+        reactive_power = get_reactive_power(g, IS.SU),
         R_th = r_sysbase,
         X_th = x_sysbase,
     )
@@ -525,7 +525,7 @@ function _add_dyn_injectors!(
                 @warn "No series reactance found. Setting it to 1e-6"
                 x = 1e-6
             end
-            s = _make_source(g, r, x, get_base_power(sys))
+            s = _make_source(g, r, x, get_base_power(sys, IS.NU))
             remove_component!(typeof(g), sys, _name)
             add_component!(sys, s)
         elseif all(.!ismissing.(temp_dict[_id]))
@@ -545,7 +545,7 @@ function _add_dyn_injectors!(
                     set_Xd_p!(machine, x)
                     if get_H(shaft) == 0.0
                         @info "Machine at bus $(_num), id $(_id) has zero inertia. Modeling it as Voltage Source"
-                        s = _make_source(g, r, x, get_base_power(sys))
+                        s = _make_source(g, r, x, get_base_power(sys, IS.NU))
                         remove_component!(typeof(g), sys, _name)
                         add_component!(sys, s)
                         # Don't add DynamicComponent in case of adding Source

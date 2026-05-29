@@ -2179,7 +2179,10 @@ function build_c_sys5_events(; add_forecasts, raw_data, sys_kwargs...)
     peak_load = maximum(da_load_time_series_val)
     if add_forecasts
         for (ix, l) in enumerate(PSY.get_components(PowerLoad, c_sys5))
-            set_max_active_power!(l, bus_dist_fact[PSY.get_name(l)] * peak_load / 100)
+            set_max_active_power!(
+                l,
+                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
+            )
             add_time_series!(
                 c_sys5,
                 l,
@@ -2318,7 +2321,10 @@ function build_c_sys5_events_rt(; add_forecasts, raw_data, sys_kwargs...)
     peak_load = maximum(rt_load_time_series_val)
     if add_forecasts
         for (ix, l) in enumerate(PSY.get_components(PowerLoad, c_sys5))
-            set_max_active_power!(l, bus_dist_fact[PSY.get_name(l)] * peak_load / 100)
+            set_max_active_power!(
+                l,
+                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
+            )
             rt_timearray =
                 TimeArray(rt_load_time_series, rt_load_time_series_val ./ peak_load)
             rt_timearray = collapse(rt_timearray, Minute(5), first, TimeSeries.mean)
@@ -2415,9 +2421,9 @@ function build_c_sys5_reg(; add_forecasts, raw_data, kwargs...)
     for g in PSY.get_components(PSY.Generator, c_sys5_reg)
         droop =
             if isa(g, PSY.ThermalStandard)
-                0.04 * PSY.get_base_power(g)
+                0.04 * PSY.get_base_power(g, IS.SU)
             else
-                0.05 * PSY.get_base_power(g)
+                0.05 * PSY.get_base_power(g, IS.SU)
             end
         p_factor = (up = 1.0, dn = 1.0)
         t = PSY.RegulationDevice(g; participation_factor = p_factor, droop = droop)
@@ -6289,10 +6295,10 @@ function build_c_sys5_radial(; raw_data, kwargs...)
     copy_time_series!(load_ext1, load_bus3)
     copy_time_series!(load_ext2, load_bus3)
 
-    set_active_power!(load_bus3, 1.0)
-    set_max_active_power!(load_bus3, 1.0)
-    set_reactive_power!(load_bus3, 0.3287)
-    set_max_reactive_power!(load_bus3, 0.3287)
+    set_active_power!(load_bus3, 1.0 * IS.SU)
+    set_max_active_power!(load_bus3, 1.0 * IS.SU)
+    set_reactive_power!(load_bus3, 0.3287 * IS.SU)
+    set_max_reactive_power!(load_bus3, 0.3287 * IS.SU)
     return new_sys
 end
 
@@ -6479,7 +6485,10 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
     peak_load = maximum(da_load_time_series_val)
     if add_forecasts
         for (ix, l) in enumerate(PSY.get_components(PowerLoad, sys))
-            set_max_active_power!(l, bus_dist_fact[PSY.get_name(l)] * peak_load / 100)
+            set_max_active_power!(
+                l,
+                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
+            )
             add_time_series!(
                 sys,
                 l,
