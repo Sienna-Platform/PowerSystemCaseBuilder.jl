@@ -1479,7 +1479,11 @@ const SYSTEM_CATALOG = [
         name = "psse_modified_14bus_off_nominal_icd",
         description = "Modified 14-bus PSS/E system with transformer tap/angle settings off-nominal, activating impedance correction tables with correction factors ≠ 1.0",
         category = PSSEParsingTestSystems,
-        raw_data = joinpath(DATA_DIR, "psse_raw", "psse_modified_14bus_off_nominal_icd.raw"),
+        raw_data = joinpath(
+            DATA_DIR,
+            "psse_raw",
+            "psse_modified_14bus_off_nominal_icd.raw",
+        ),
         build_function = build_psse_modified_14bus_sys,
     ),
     SystemDescriptor(;
