@@ -4,7 +4,7 @@ import DataStructures: OrderedDict
 using DocumenterInterLinks
 
 links = InterLinks(
-    "PowerSystems" => "https://nrel-sienna.github.io/PowerSystems.jl/stable/",
+    "PowerSystems" => "https://sienna-platform.github.io/PowerSystems.jl/stable/",
     "Pkg" => "https://pkgdocs.julialang.org/v1/",
 )
 
@@ -44,7 +44,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/NREL-Sienna/PowerSystemCaseBuilder.jl.git",
+    repo = "github.com/Sienna-Platform/PowerSystemCaseBuilder.jl.git",
     target = "build",
     branch = "gh-pages",
     devbranch = "main",

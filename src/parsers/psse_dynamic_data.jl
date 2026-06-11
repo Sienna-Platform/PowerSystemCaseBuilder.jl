@@ -119,7 +119,7 @@ end
 
 function _make_source(g::StaticInjection, r::Float64, x::Float64, sys_base::Float64)
     # Transform Z_source to System Base
-    machine_base = get_base_power(g, IS.SU)
+    machine_base = get_base_power(g, IS.NU)
     r_sysbase = r * (sys_base / machine_base)
     x_sysbase = x * (sys_base / machine_base)
     return Source(;

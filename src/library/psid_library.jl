@@ -173,7 +173,7 @@ function build_psid_load_tutorial_omib(; raw_data, kwargs...)
         reactive_power = PSY.get_constant_reactive_power(l, IS.SU),
         α = 0.0, # Constant Power
         β = 0.0, # Constant Power
-        base_power = PSY.get_base_power(l, IS.SU),
+        base_power = PSY.get_base_power(l, IS.NU),
         max_active_power = PSY.get_max_constant_active_power(l, IS.SU),
         max_reactive_power = PSY.get_max_constant_reactive_power(l, IS.SU),
     )

@@ -88,7 +88,7 @@ abstract type SystemCategory <: PowerSystemCaseBuilderType end
 
 """
 Category of [`PowerSystems.System`](@extref)s for
-[`PowerSystems.jl`](https://nrel-sienna.github.io/PowerSystems.jl/stable/) package testing.
+[`PowerSystems.jl`](https://sienna-platform.github.io/PowerSystems.jl/stable/) package testing.
 
 !!! warning
     Not all `System`s are functional.
@@ -111,7 +111,7 @@ struct MatpowerTestSystems <: SystemCategory end
 
 """
 Category of [`PowerSystems.System`](@extref)s for
-[`PowerSimulations.jl`](https://nrel-sienna.github.io/PowerSimulations.jl/stable/) package testing.
+[`PowerSimulations.jl`](https://sienna-platform.github.io/PowerSimulations.jl/stable/) package testing.
     
 !!! warning
     Not all `System`s are functional.
@@ -120,7 +120,7 @@ struct PSITestSystems <: SystemCategory end
 
 """
 Category of [`PowerSystems.System`](@extref)s for
-[`PowerSimulationsDynamics.jl`](https://nrel-sienna.github.io/PowerSimulationsDynamics.jl/stable/)
+[`PowerSimulationsDynamics.jl`](https://sienna-platform.github.io/PowerSimulationsDynamics.jl/stable/)
 package testing.
 
 !!! warning
@@ -130,14 +130,14 @@ struct PSIDTestSystems <: SystemCategory end
 
 """
 Category of example [`PowerSystems.System`](@extref)s for running
-    [`PowerSimulations.jl`](https://nrel-sienna.github.io/PowerSimulations.jl/stable/)
+    [`PowerSimulations.jl`](https://sienna-platform.github.io/PowerSimulations.jl/stable/)
     operations problems and simulations.
 """
 struct PSISystems <: SystemCategory end
 
 """
 Category of example [`PowerSystems.System`](@extref)s for running
-    [`PowerSimulationsDynamics.jl`](https://nrel-sienna.github.io/PowerSimulationsDynamics.jl/stable/)
+    [`PowerSimulationsDynamics.jl`](https://sienna-platform.github.io/PowerSimulationsDynamics.jl/stable/)
     simulations.
 """
 struct PSIDSystems <: SystemCategory end

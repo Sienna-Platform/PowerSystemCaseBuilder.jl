@@ -1469,6 +1469,24 @@ const SYSTEM_CATALOG = [
         build_function = build_pti,
     ),
     SystemDescriptor(;
+        name = "psse_modified_14bus_nominal_icd",
+        description = "Modified 14-bus PSS/E system with 2W and 3W transformers carrying impedance correction tables at nominal tap settings (all correction factors = 1.0)",
+        category = PSSEParsingTestSystems,
+        raw_data = joinpath(DATA_DIR, "psse_raw", "psse_modified_14bus_nominal_icd.raw"),
+        build_function = build_psse_modified_14bus_sys,
+    ),
+    SystemDescriptor(;
+        name = "psse_modified_14bus_off_nominal_icd",
+        description = "Modified 14-bus PSS/E system with transformer tap/angle settings off-nominal, activating impedance correction tables with correction factors ≠ 1.0",
+        category = PSSEParsingTestSystems,
+        raw_data = joinpath(
+            DATA_DIR,
+            "psse_raw",
+            "psse_modified_14bus_off_nominal_icd.raw",
+        ),
+        build_function = build_psse_modified_14bus_sys,
+    ),
+    SystemDescriptor(;
         name = "psse_14_network_reduction_test_system",
         description = "PSSE network reduction test system",
         category = PSSEParsingTestSystems,

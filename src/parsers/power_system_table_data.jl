@@ -705,10 +705,10 @@ function make_generator(
         @error "Skipping unsupported generator" gen.name gen_type
     end
 
-    if abs(get_base_power(generator, IS.DU)) <= 1e-6
+    if abs(get_base_power(generator, IS.NU)) <= 1e-6
         @warn "Generator $(summary(generator)) has base power of zero: changing device " *
               "base power to match system base power, $(data.base_power)"
-        set_base_power!(generator, data.base_power * IS.DU)
+        set_base_power!(generator, data.base_power)
     end
 
     return generator, reservoirs
@@ -740,7 +740,7 @@ function make_cost(
     startup_cost, shutdown_cost = calculate_uc_cost(data, gen, fuel_price)
     fuel_offtake = LinearCurve(0.0)
     op_cost = ThermalGenerationCost(
-        FuelCurve(var_cost, UnitSystem.NATURAL_UNITS, fuel_price, fuel_offtake, vom_data),
+        FuelCurve(var_cost, IS.NU, fuel_price, fuel_offtake, vom_data),
         fixed * fuel_price,
         startup_cost,
         shutdown_cost,
@@ -786,7 +786,7 @@ function make_cost(
     cost_pairs = get_cost_pairs(gen, cost_colnames)
     var_cost, fixed = create_pwinc_cost(gen, cost_pairs)
     op_cost = HydroGenerationCost(
-        FuelCurve(var_cost, UnitSystem.NATURAL_UNITS, fuel_price),
+        FuelCurve(var_cost, IS.NU, fuel_price),
         fixed * fuel_price)
     return op_cost
 end
@@ -800,7 +800,7 @@ function make_cost(
     cost_pairs = get_cost_pairs(gen, cost_colnames)
     var_cost = create_pwl_cost(gen, cost_pairs)
     op_cost = HydroGenerationCost(
-        CostCurve(var_cost, UnitSystem.NATURAL_UNITS),
+        CostCurve(var_cost, IS.NU),
         gen.fixed_cost)
     return op_cost
 end
@@ -1173,7 +1173,7 @@ function make_thermal_generator_multistart(
         start_time_limits = startup_timelimits,
         start_types = start_types,
         operation_cost = op_cost,
-        base_power = get_base_power(thermal_gen, IS.DU),
+        base_power = get_base_power(thermal_gen, IS.NU),
         time_at_status = get_time_at_status(thermal_gen),
         must_run = get_must_run(thermal_gen),
     )

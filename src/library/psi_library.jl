@@ -501,9 +501,15 @@ function make_modified_RTS_GMLC_sys(
     PSY.remove_component!(sys, res_dn)
     PSY.remove_component!(sys, res_up)
     reg_reserve_up = PSY.get_component(PSY.VariableReserve, sys, "Reg_Up")
-    PSY.set_requirement!(reg_reserve_up, 1.75 * PSY.get_requirement(reg_reserve_up))
+    PSY.set_requirement!(
+        reg_reserve_up,
+        1.75 * PSY.get_requirement(reg_reserve_up, IS.SU) * IS.SU,
+    )
     reg_reserve_dn = PSY.get_component(PSY.VariableReserve, sys, "Reg_Down")
-    PSY.set_requirement!(reg_reserve_dn, 1.75 * PSY.get_requirement(reg_reserve_dn))
+    PSY.set_requirement!(
+        reg_reserve_dn,
+        1.75 * PSY.get_requirement(reg_reserve_dn, IS.SU) * IS.SU,
+    )
     spin_reserve_R1 = PSY.get_component(PSY.VariableReserve, sys, "Spin_Up_R1")
     spin_reserve_R2 = PSY.get_component(PSY.VariableReserve, sys, "Spin_Up_R2")
     spin_reserve_R3 = PSY.get_component(PSY.VariableReserve, sys, "Spin_Up_R3")
@@ -520,7 +526,7 @@ function make_modified_RTS_GMLC_sys(
             PSY.get_operation_cost(g),
             PSY.get_start_up(PSY.get_operation_cost(g)) / 2.0,
         )
-        if PSY.get_base_power(g, IS.DU) > 3
+        if PSY.get_base_power(g, IS.NU) > 3
             continue
         end
         PSY.clear_services!(g)
@@ -1461,11 +1467,11 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         end
         # change scale
         if typeof(b) <: RenewableGen
-            PSY.set_base_power!(b, 1.2 * PSY.get_base_power(b, IS.SU) * IS.SU)
-            PSY.set_base_power!(main_comp, 0.9 * PSY.get_base_power(b, IS.SU) * IS.SU)
+            PSY.set_base_power!(b, 1.2 * PSY.get_base_power(b, IS.NU))
+            PSY.set_base_power!(main_comp, 0.9 * PSY.get_base_power(b, IS.NU))
         end
         if typeof(b) <: PowerLoad
-            PSY.set_base_power!(main_comp, 1.2 * PSY.get_base_power(b, IS.SU) * IS.SU)
+            PSY.set_base_power!(main_comp, 1.2 * PSY.get_base_power(b, IS.NU))
         end
     end
 
@@ -1517,7 +1523,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
     end
 
     for bat in get_components(EnergyReservoirStorage, main_sys)
-        set_base_power!(bat, get_base_power(bat, IS.SU) * 10 * IS.SU)
+        set_base_power!(bat, get_base_power(bat, IS.NU) * 10)
     end
 
     for r in get_components(
@@ -1565,10 +1571,10 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         get_initial_input(old_value_curve)
         old_y =
             get_initial_input(old_value_curve) /
-            (get_active_power_limits(g, IS.SU).min * PSY.get_base_power(g, IS.SU))
+            (get_active_power_limits(g, IS.SU).min * PSY.get_base_power(g, IS.NU))
         new_first_input =
             (old_y + direction * cost_noise) * get_active_power_limits(g, IS.SU).min *
-            PSY.get_base_power(g, IS.SU)
+            PSY.get_base_power(g, IS.NU)
         new_slopes[1] = old_slopes[1] + direction * cost_noise
         @assert new_slopes[1] > 0.0
         for ix in 2:length(old_slopes)

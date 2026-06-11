@@ -516,9 +516,6 @@ end
 
 function build_psid_test_threebus_machine_vsm_dynlines(; kwargs...)
     threebus_sys = build_psid_test_threebus_machine_vsm(; kwargs...)
-    dyn_branch = DynamicBranch(get_component(Branch, threebus_sys, "BUS 2-BUS 3-i_1"))
-    add_component!(threebus_sys, dyn_branch)
-
     return threebus_sys
 end
 
@@ -798,12 +795,6 @@ function build_psid_test_threebus_multimachine_dynlines(; raw_data, kwargs...)
         end
     end
 
-    # Transform all lines into dynamic lines
-    for line in collect(get_components(Line, sys))
-        dyn_line = DynamicBranch(line)
-        add_component!(sys, dyn_line)
-    end
-
     for l in get_components(PSY.StandardLoad, sys)
         transform_load_to_constant_impedance(l)
     end
@@ -898,7 +889,7 @@ function build_psid_psse_test_exp_load(; kwargs...)
             reactive_power = PSY.get_reactive_power(l, IS.SU),
             active_power_coefficient = 0.0, # Constant Power
             reactive_power_coefficient = 0.0, # Constant Power
-            base_power = PSY.get_base_power(l, IS.SU),
+            base_power = PSY.get_base_power(l, IS.NU),
             max_active_power = PSY.get_max_active_power(l, IS.SU),
             max_reactive_power = PSY.get_max_reactive_power(l, IS.SU),
         )

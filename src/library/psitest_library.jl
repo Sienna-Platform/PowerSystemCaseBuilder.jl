@@ -2421,9 +2421,9 @@ function build_c_sys5_reg(; add_forecasts, raw_data, kwargs...)
     for g in PSY.get_components(PSY.Generator, c_sys5_reg)
         droop =
             if isa(g, PSY.ThermalStandard)
-                0.04 * PSY.get_base_power(g, IS.SU)
+                0.04 * PSY.get_base_power(g, IS.NU)
             else
-                0.05 * PSY.get_base_power(g, IS.SU)
+                0.05 * PSY.get_base_power(g, IS.NU)
             end
         p_factor = (up = 1.0, dn = 1.0)
         t = PSY.RegulationDevice(g; participation_factor = p_factor, droop = droop)
@@ -5113,15 +5113,15 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
             end
             PSY.add_time_series!(
                 c_sys5_hybrid,
-                hy,
+                PSY.get_renewable_unit(hy),
                 PSY.Deterministic("max_active_power", forecast_data),
             )
             PSY.add_time_series!(
                 c_sys5_hybrid,
-                hy,
+                PSY.get_renewable_unit(hy),
                 PSY.SingleTimeSeries("max_active_power", ren_single_timeseries_DA[ix]),
             )
-            #PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
+            PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
         end
         for (ix, h) in enumerate(PSY.get_components(PSY.HybridSystem, c_sys5_hybrid))
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
@@ -5285,19 +5285,19 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
             #applying a patch for the time being with "hy"
             PSY.add_time_series!(
                 c_sys5_hybrid,
-                hy,
+                PSY.get_renewable_unit(hy),
                 PSY.Deterministic("max_active_power", forecast_data),
             )
             PSY.add_time_series!(
                 c_sys5_hybrid,
-                hy,
+                PSY.get_renewable_unit(hy),
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
                     scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
-            #PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
+            PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
         end
         for (ix, h) in enumerate(PSY.get_components(PSY.HybridSystem, c_sys5_hybrid))
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
@@ -6037,7 +6037,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
     add_component!(c_sys5_all_components, reservoir[1])
     set_downstream_turbines!(reservoir[1], [hydros[2]])
 
-    # TODO refactor as per https://github.com/NREL-Sienna/PowerSystemCaseBuilder.jl/issues/66
+    # TODO refactor as per https://github.com/Sienna-Platform/PowerSystemCaseBuilder.jl/issues/66
     if add_forecasts
         for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_all_components))
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
