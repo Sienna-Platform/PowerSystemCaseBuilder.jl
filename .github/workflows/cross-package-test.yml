@@ -33,8 +33,13 @@ jobs:
         run: |
           using Pkg
           try
-            # Force it to use this PR's version of the package
-            Pkg.develop(PackageSpec(path="."))  # resolver may fail with main deps
+            # Force it to use this PR's version of the package.
+            # Develop in the test environment only (not the main project) so that
+            # Aqua's stale_deps check does not flag PowerSystemCaseBuilder as an
+            # unused dependency in the downstream package's main Project.toml.
+            Pkg.activate("downstream/test")
+            Pkg.develop(PackageSpec(path="."))  # resolver may fail with test deps
+            Pkg.activate("downstream")
             Pkg.update()
             Pkg.test()  # resolver may fail with test time deps
           catch err
