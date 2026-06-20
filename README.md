@@ -20,11 +20,11 @@ For information on using the package, see the [stable documentation](https://sie
 ## Development
 
 Contributions to the development and enhancement of PowerSystemCaseBuilder are welcome. Please see
-[CONTRIBUTING.md](https://github.com/NREL/PowerSystemCaseBuilder.jl/blob/main/CONTRIBUTING.md) for
+[CONTRIBUTING.md](https://github.com/Sienna-Platform/PowerSystemCaseBuilder.jl/blob/main/CONTRIBUTING.md) for
 code contribution guidelines.
 
 ## License
 
-PowerSystems is released under a BSD [license](https://github.com/NREL/PowerSystems.jl/blob/main/LICENSE).
+PowerSystems is released under a BSD [license](https://github.com/Sienna-Platform/PowerSystems.jl/blob/main/LICENSE).
 PowerSystems has been developed as part of the Scalable Integrated Infrastructure Planning (SIIP)
 initiative at the U.S. Department of Energy's National Laboratory of the Rockies (formerly known as NREL) ([NLR](https://www.nrel.gov/)) Software Record SWR-23-105.
