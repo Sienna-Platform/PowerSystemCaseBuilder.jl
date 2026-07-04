@@ -1242,7 +1242,7 @@ function _make_hydro_reservoirs(
         outflow = 1.0,
         level_targets = reservoir_data.storage_target,
         intake_elevation = 0.0,
-        head_to_volume_factor = LinearCurve(1.0),
+        head_to_volume_factor = LinearFunctionData(1.0),
         operation_cost = HydroReservoirCost(),
         level_data_type = ReservoirDataType.ENERGY,
     )
@@ -1268,7 +1268,7 @@ function _make_hydro_reservoirs(
             outflow = 1.0,
             level_targets = reservoir_data.storage_target,
             intake_elevation = 0.0,
-            head_to_volume_factor = LinearCurve(1.0),
+            head_to_volume_factor = LinearFunctionData(1.0),
             operation_cost = HydroReservoirCost(),
             level_data_type = ReservoirDataType.ENERGY,
         )
