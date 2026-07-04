@@ -153,7 +153,7 @@ function convert_to_hydropump!(d::EnergyReservoirStorage, sys::System)
         outflow = 0.0,
         level_targets = d.storage_target,
         intake_elevation = 0.0,
-        head_to_volume_factor = LinearCurve(0.0),
+        head_to_volume_factor = LinearFunctionData(0.0),
         operation_cost = reservoir_cost,
         level_data_type = ReservoirDataType.ENERGY,
     )

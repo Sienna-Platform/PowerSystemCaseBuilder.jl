@@ -9,7 +9,7 @@ function _get_generic_hydro_reservoir_pair(node)
         level_targets = nothing,
         intake_elevation = 0.0,
         initial_level = 0.5,
-        head_to_volume_factor = LinearCurve(0.0),
+        head_to_volume_factor = LinearFunctionData(0.0),
         operation_cost = HydroReservoirCost(),
     )
 
