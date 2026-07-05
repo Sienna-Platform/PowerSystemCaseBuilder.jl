@@ -152,11 +152,70 @@ function make_system(
         get(kwargs, :timeseries_metadata_file, getfield(data, :timeseries_metadata_file))
 
     if !isnothing(timeseries_metadata_file)
-        add_time_series!(sys, timeseries_metadata_file; resolution = time_series_resolution)
+        _add_time_series_from_pointers!(
+            sys,
+            timeseries_metadata_file;
+            resolution = time_series_resolution,
+        )
     end
 
     check(sys)
     return sys
+end
+
+"""
+Read a `timeseries_pointers.json` metadata file and attach the referenced time series
+by reading each CSV directly and constructing `SingleTimeSeries` objects.
+
+This replaces the former file-metadata ingestion in InfrastructureSystems. The raw CSV
+values are stored directly (the legacy `scaling_factor_multiplier` / `normalization_factor`
+mechanism has been removed), so the stored data are the actual per-device quantities.
+The CSVs use `Year, Month, Day, Period` index columns followed by one value column per
+`component_name`.
+"""
+function _add_time_series_from_pointers!(
+    sys::System,
+    metadata_file::AbstractString;
+    resolution = nothing,
+)
+    entries = JSON3.read(read(metadata_file, String))
+    base_dir = dirname(metadata_file)
+    csv_cache = Dict{String, DataFrames.DataFrame}()
+    seen = Set{Tuple{Base.UUID, String}}()
+    associations = IS.TimeSeriesAssociation[]
+    for entry in entries
+        String(entry.type) == "SingleTimeSeries" || continue
+        entry_res = Dates.Second(entry.resolution)
+        if !isnothing(resolution) && entry_res != Dates.Second(resolution)
+            continue
+        end
+        component_name = String(entry.component_name)
+        name = String(entry.name)
+        component = get_component(Component, sys, component_name)
+        isnothing(component) && continue
+        # The old file-metadata parser deduplicated (component, name) assignments;
+        # the rust store rejects duplicate associations, so skip repeats here.
+        key = (IS.get_uuid(component), name)
+        key in seen && continue
+        push!(seen, key)
+
+        path = normpath(joinpath(base_dir, String(entry.data_file)))
+        df = get!(() -> CSV.read(path, DataFrames.DataFrame), csv_cache, path)
+        col = Symbol(component_name)
+        DataFrames.hasproperty(df, col) || continue
+
+        values = Float64.(df[!, col])
+        initial_timestamp =
+            Dates.DateTime(df[1, :Year], df[1, :Month], df[1, :Day]) +
+            (df[1, :Period] - 1) * entry_res
+        ta = TimeSeries.TimeArray(
+            range(initial_timestamp; step = entry_res, length = length(values)),
+            values,
+        )
+        push!(associations, IS.TimeSeriesAssociation(component, SingleTimeSeries(name, ta)))
+    end
+    isempty(associations) || bulk_add_time_series!(sys, associations)
+    return
 end
 
 """
