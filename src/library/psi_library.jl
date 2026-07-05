@@ -1344,7 +1344,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
             name_ = PSY.get_name(b)
             main_comp = PSY.get_component(component_type, main_sys, name_)
 
-            IS.assign_new_uuid!(twin_sys.data, b)
+            IS.assign_new_id!(twin_sys.data, b)
             PSY.remove_component!(twin_sys, b)
             # change name
             PSY.set_name!(b, name_ * "_twin")
@@ -1363,7 +1363,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         name_ = PSY.get_name(b)
         main_comp = PSY.get_component(PSY.ACBus, main_sys, name_)
 
-        IS.assign_new_uuid!(twin_sys.data, b)
+        IS.assign_new_id!(twin_sys.data, b)
         PSY.remove_component!(twin_sys, b)
         # change name
         PSY.set_name!(b, name_ * "_twin")
@@ -1388,7 +1388,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         name_ = PSY.get_name(b)
         main_comp = PSY.get_component(typeof(b), main_sys, name_)
 
-        IS.assign_new_uuid!(twin_sys.data, b)
+        IS.assign_new_id!(twin_sys.data, b)
         PSY.remove_component!(twin_sys, b)
         # change name
         PSY.set_name!(b, name_ * "_twin")
@@ -1421,7 +1421,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         name_ = PSY.get_name(srvc)
         main_comp = PSY.get_component(PSY.Service, main_sys, name_)
 
-        IS.assign_new_uuid!(twin_sys.data, srvc)
+        IS.assign_new_id!(twin_sys.data, srvc)
         PSY.remove_component!(twin_sys, srvc)
         # change name
         PSY.set_name!(srvc, name_ * "_twin")
@@ -1439,7 +1439,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         name_ = PSY.get_name(b)
         main_comp = PSY.get_component(typeof(b), main_sys, name_)
         PSY.clear_services!(b)
-        IS.assign_new_uuid!(twin_sys.data, b)
+        IS.assign_new_id!(twin_sys.data, b)
         PSY.remove_component!(twin_sys, b)
         # change name
         PSY.set_name!(b, name_ * "_twin")
@@ -1986,7 +1986,6 @@ function build_118_bus_DA(; kwargs...)
         local solar_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = solar_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
         )
         push!(solar_DA_TS, solar_TS)
     end
@@ -1999,7 +1998,6 @@ function build_118_bus_DA(; kwargs...)
         local wind_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = wind_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
         )
         push!(wind_DA_TS, wind_TS)
     end
@@ -2011,7 +2009,6 @@ function build_118_bus_DA(; kwargs...)
         local load_time_series = SingleTimeSeries(;
             name = "max_active_power",
             data = load_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
         )
         push!(load_TS, load_time_series)
     end
@@ -2095,7 +2092,6 @@ function build_118_bus_RT(; kwargs...)
         local solar_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = solar_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
         )
         push!(solar_RT_TS, solar_TS)
     end
@@ -2108,7 +2104,6 @@ function build_118_bus_RT(; kwargs...)
         local wind_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = wind_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
         )
         push!(wind_RT_TS, wind_TS)
     end
@@ -2120,7 +2115,6 @@ function build_118_bus_RT(; kwargs...)
         local load_time_series = SingleTimeSeries(;
             name = "max_active_power",
             data = load_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
         )
         push!(load_TS, load_time_series)
     end

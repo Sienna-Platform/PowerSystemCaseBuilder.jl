@@ -9,7 +9,7 @@ systems
 # Accepted Key Words
 - `print_stat::Bool = false`: Print statistics about the system build process
 - `force_build::Bool`: `true` runs entire build process, `false` (Default) uses deserializiation if possible
-- `assign_new_uuids::Bool`: Assign new UUIDs to the system and all components if
+- `assign_new_ids::Bool`: Assign new UUIDs to the system and all components if
    deserialization is used. Default is `true`.
 - `skip_serialization::Bool`: Default is `false`
 - `system_catalog::SystemCatalog`: Defaults to the `PowerSystemCaseBuilder.jl` catalog of `System`s
@@ -19,7 +19,7 @@ function build_system(
     name::String,
     print_stat::Bool = false;
     force_build::Bool = false,
-    assign_new_uuids::Bool = true,
+    assign_new_ids::Bool = true,
     skip_serialization::Bool = false,
     system_catalog::SystemCatalog = SystemCatalog(SYSTEM_CATALOG),
     kwargs...,
@@ -44,7 +44,7 @@ function build_system(
         sys_kwargs,
         print_stat;
         force_build,
-        assign_new_uuids,
+        assign_new_ids,
         skip_serialization,
     )
 end
@@ -56,7 +56,7 @@ function _build_system(
     sys_args::Dict{Symbol, <:Any},
     print_stat::Bool = false;
     force_build::Bool = false,
-    assign_new_uuids::Bool = true,
+    assign_new_ids::Bool = true,
     skip_serialization::Bool = false,
 )
     # We skip serialization/de-serialization if sys_args are passed because we currently
@@ -91,7 +91,7 @@ function _build_system(
         start = time()
         # time_series_in_memory = get(kwargs, :time_series_in_memory, false)
         file_path = get_serialized_filepath(name, case_args)
-        sys = PSY.System(file_path; assign_new_uuids = assign_new_uuids, sys_args...)
+        sys = PSY.System(file_path; assign_new_ids = assign_new_ids, sys_args...)
         PSY.get_runchecks(sys)
         # update_stats!(sys_descriptor, time() - start)
     end

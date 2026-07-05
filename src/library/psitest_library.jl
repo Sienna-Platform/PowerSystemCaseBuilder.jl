@@ -61,7 +61,6 @@ function build_c_sys14(; add_forecasts, add_single_time_series, raw_data, kwargs
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     single_timeseries_DA14[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -104,7 +103,6 @@ function build_c_sys14_dc(; add_forecasts, add_single_time_series, raw_data, kwa
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     single_timeseries_DA14[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -146,7 +144,6 @@ function build_c_sys5(; add_forecasts, add_single_time_series, raw_data, kwargs.
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -189,7 +186,6 @@ function build_c_sys5_ml(; add_forecasts, add_single_time_series, raw_data, kwar
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -239,7 +235,6 @@ function build_c_sys5_re(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -265,7 +260,6 @@ function build_c_sys5_re(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -363,7 +357,6 @@ function build_c_sys5_re_fuel_cost(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -389,7 +382,6 @@ function build_c_sys5_re_fuel_cost(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -517,7 +509,6 @@ function build_c_sys5_re_only(; add_forecasts, add_single_time_series, raw_data,
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -543,7 +534,6 @@ function build_c_sys5_re_only(; add_forecasts, add_single_time_series, raw_data,
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -593,7 +583,6 @@ function build_c_sys5_hy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -619,7 +608,6 @@ function build_c_sys5_hy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -710,7 +698,6 @@ function build_c_sys5_hy_turbine_energy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -879,7 +866,6 @@ function build_c_sys5_hy_turbine_head(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -1010,7 +996,6 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -1184,7 +1169,6 @@ function build_c_sys5_hy_cascading_turbine_head(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -1307,7 +1291,6 @@ function build_c_sys5_hyd(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         elseif add_forecasts
@@ -1476,7 +1459,6 @@ function build_c_sys5_hyd_ems(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         elseif add_forecasts
@@ -1643,7 +1625,6 @@ function build_c_sys5_bat(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -1765,7 +1746,6 @@ function build_c_sys5_hydro_pump_energy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -1932,7 +1912,6 @@ function build_c_sys5_il(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         elseif add_forecasts
@@ -1956,7 +1935,6 @@ function build_c_sys5_il(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_DA;
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         elseif add_forecasts
@@ -2045,7 +2023,6 @@ function build_c_sys5_dc(; add_forecasts, add_single_time_series, raw_data, kwar
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -2199,7 +2176,6 @@ function build_c_sys5_events(; add_forecasts, raw_data, sys_kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_DA;
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         end
@@ -2344,7 +2320,6 @@ function build_c_sys5_events_rt(; add_forecasts, raw_data, sys_kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_RT;
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         end
@@ -2611,7 +2586,6 @@ function build_c_sys5_uc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -2712,7 +2686,6 @@ function build_c_sys5_uc_non_spin(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -2845,7 +2818,6 @@ function build_c_sys5_uc_re(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -2893,7 +2865,6 @@ function build_c_sys5_uc_re(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_DA;
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -3005,7 +2976,6 @@ function build_c_sys5_ed(; add_forecasts, add_single_time_series, add_reserves, 
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_RT[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -3061,7 +3031,6 @@ function build_c_sys5_ed(; add_forecasts, add_single_time_series, add_reserves, 
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_RT;
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -3189,7 +3158,6 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -3315,7 +3283,6 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         elseif add_forecasts
@@ -3340,7 +3307,6 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_DA;
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         elseif add_forecasts
@@ -3392,7 +3358,6 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -3518,7 +3483,6 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         elseif add_forecasts
@@ -3543,7 +3507,6 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_DA;
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         elseif add_forecasts
@@ -3595,7 +3558,6 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_RT[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -3651,7 +3613,6 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -3760,7 +3721,6 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_RT;
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -3845,7 +3805,6 @@ function build_c_sys5_hy_ems_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_RT[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -3901,7 +3860,6 @@ function build_c_sys5_hy_ems_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -4010,7 +3968,6 @@ function build_c_sys5_hy_ems_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_RT;
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -4097,7 +4054,6 @@ function build_c_sys5_phes_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_RT[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -4153,7 +4109,6 @@ function build_c_sys5_phes_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -4268,7 +4223,6 @@ function build_c_sys5_phes_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_RT;
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -4363,7 +4317,6 @@ function build_c_sys5_pglib(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         else
@@ -4658,7 +4611,6 @@ function build_c_sys5_bat_ems(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         end
@@ -4679,7 +4631,6 @@ function build_c_sys5_bat_ems(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         end
@@ -4920,7 +4871,6 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         end
@@ -5080,7 +5030,6 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         end
@@ -5239,7 +5188,6 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_RT[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         end
@@ -5264,7 +5212,6 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         end
@@ -5294,7 +5241,6 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
             PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
@@ -6056,7 +6002,6 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         end
@@ -6096,7 +6041,6 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "storage_target",
                     storage_target_single_ts_DA;
-                    scaling_factor_multiplier = PSY.get_storage_capacity,
                 ),
             )
         end
@@ -6118,7 +6062,6 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "inflow",
                     hydro_single_timeseries_DA;
-                    scaling_factor_multiplier = PSY.get_storage_capacity,
                 ),
             )
         end
@@ -6140,7 +6083,6 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "hydro_budget",
                     hydro_budget_single_ts_DA;
-                    scaling_factor_multiplier = PSY.get_storage_capacity,
                 ),
             )
         end
@@ -6180,7 +6122,6 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    scaling_factor_multiplier = PSY.get_max_active_power,
                 ),
             )
         end
