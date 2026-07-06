@@ -8,7 +8,6 @@ export SystemDescriptor
 export SystemCatalog
 export PSYTestSystems
 export PSITestSystems
-export SIIPExampleSystems
 export PSIDTestSystems
 export PSSEParsingTestSystems
 export MatpowerTestSystems
