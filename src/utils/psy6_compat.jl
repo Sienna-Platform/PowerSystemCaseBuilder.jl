@@ -13,6 +13,7 @@
 import PowerSystems: ReserveDemandCurve, ReserveDirection
 import PowerSystems:
     MarketBidCost, CostCurve, PiecewiseIncrementalCurve, LinearCurve, Service
+import PowerSystems: HydroReservoir
 
 # ---------------------------------------------------------------------------
 # ReserveDemandCurve – variable field: Nothing → ZERO_OFFER_CURVE
@@ -99,4 +100,55 @@ function PowerSystems.set_variable_cost!(
     power_units::PowerSystems.UnitSystem = PowerSystems.UnitSystem.NATURAL_UNITS,
 )
     PowerSystems.add_time_series!(sys, component, data)
+end
+
+# ---------------------------------------------------------------------------
+# HydroReservoir – head_to_volume_factor: ValueCurve → FunctionData (PSY #1710)
+#
+# Old calls (data_5bus_pu.jl):
+#   HydroReservoir(; ..., head_to_volume_factor = LinearCurve(302376.2), ...)
+#
+# PSY6 changed head_to_volume_factor from a ValueCurve to a FunctionData.
+# The generated keyword constructor forwards to the untyped positional
+# constructor, so this typed overload intercepts the old LinearCurve argument
+# and unwraps it to its underlying LinearFunctionData.
+# ---------------------------------------------------------------------------
+function PowerSystems.HydroReservoir(
+    name,
+    available,
+    storage_level_limits,
+    initial_level,
+    spillage_limits,
+    inflow,
+    outflow,
+    level_targets,
+    intake_elevation,
+    head_to_volume_factor::LinearCurve,
+    upstream_turbines,
+    downstream_turbines,
+    upstream_reservoirs,
+    operation_cost,
+    level_data_type,
+    ext,
+    internal,
+)
+    HydroReservoir(
+        name,
+        available,
+        storage_level_limits,
+        initial_level,
+        spillage_limits,
+        inflow,
+        outflow,
+        level_targets,
+        intake_elevation,
+        InfrastructureSystems.get_function_data(head_to_volume_factor),
+        upstream_turbines,
+        downstream_turbines,
+        upstream_reservoirs,
+        operation_cost,
+        level_data_type,
+        ext,
+        internal,
+    )
 end
