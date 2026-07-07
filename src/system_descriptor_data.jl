@@ -1455,6 +1455,20 @@ const SYSTEM_CATALOG = [
         build_function = build_pti,
     ),
     SystemDescriptor(;
+        name = "psse_controlled_tap_v33_test_system",
+        description = "PSSE v33 system with a voltage-controlling TapTransformer (exercises tap_limits, number_of_tap_positions, regulated_bus_number, voltage_setpoint)",
+        category = PSSEParsingTestSystems,
+        raw_data = joinpath(DATA_DIR, "psse_raw", "psse_controlled_tap_test_v33.raw"),
+        build_function = build_pti,
+    ),
+    SystemDescriptor(;
+        name = "psse_controlled_tap_v35_test_system",
+        description = "PSSE v35 system with a voltage-controlling TapTransformer (exercises tap_limits, number_of_tap_positions, regulated_bus_number, voltage_setpoint)",
+        category = PSSEParsingTestSystems,
+        raw_data = joinpath(DATA_DIR, "psse_raw", "psse_controlled_tap_test_v35.raw"),
+        build_function = build_pti,
+    ),
+    SystemDescriptor(;
         name = "psse_14_zero_impedance_branch_test_system",
         description = "PSSE zero impedance branch test system",
         category = PSSEParsingTestSystems,
