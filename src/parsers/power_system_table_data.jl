@@ -164,14 +164,28 @@ function make_system(
 end
 
 """
+Resolve the component supertype referenced by a pointer entry's `category` field. Names
+are only unique within a concrete type, so `get_component(Component, ...)` is ambiguous
+when e.g. a load and a bus share a name; narrowing to the entry's category disambiguates.
+Falls back to the abstract `Component` for the generic `"Component"` category or any
+unrecognized value.
+"""
+function _pointer_component_type(category::AbstractString)
+    sym = Symbol(category)
+    isdefined(PowerSystems, sym) || return Component
+    T = getproperty(PowerSystems, sym)
+    return T isa Type ? T : Component
+end
+
+"""
 Read a `timeseries_pointers.json` metadata file and attach the referenced time series
 by reading each CSV directly and constructing `SingleTimeSeries` objects.
 
 This replaces the former file-metadata ingestion in InfrastructureSystems. The raw CSV
 values are stored directly (the legacy `scaling_factor_multiplier` / `normalization_factor`
 mechanism has been removed), so the stored data are the actual per-device quantities.
-The CSVs use `Year, Month, Day, Period` index columns followed by one value column per
-`component_name`.
+The CSVs use either a single `DateTime` index column or `Year, Month, Day, Period` index
+columns, followed by one value column per `component_name`.
 """
 function _add_time_series_from_pointers!(
     sys::System,
@@ -181,7 +195,7 @@ function _add_time_series_from_pointers!(
     entries = JSON3.read(read(metadata_file, String))
     base_dir = dirname(metadata_file)
     csv_cache = Dict{String, DataFrames.DataFrame}()
-    seen = Set{Tuple{Base.UUID, String}}()
+    seen = Set{Tuple{Int, String}}()
     associations = IS.TimeSeriesAssociation[]
     for entry in entries
         String(entry.type) == "SingleTimeSeries" || continue
@@ -191,11 +205,12 @@ function _add_time_series_from_pointers!(
         end
         component_name = String(entry.component_name)
         name = String(entry.name)
-        component = get_component(Component, sys, component_name)
+        component_type = _pointer_component_type(String(entry.category))
+        component = get_component(component_type, sys, component_name)
         isnothing(component) && continue
         # The old file-metadata parser deduplicated (component, name) assignments;
         # the rust store rejects duplicate associations, so skip repeats here.
-        key = (IS.get_uuid(component), name)
+        key = (IS.get_id(component), name)
         key in seen && continue
         push!(seen, key)
 
@@ -205,9 +220,14 @@ function _add_time_series_from_pointers!(
         DataFrames.hasproperty(df, col) || continue
 
         values = Float64.(df[!, col])
-        initial_timestamp =
+        # Index format varies across test-data CSVs: most use a single `DateTime`
+        # column, some use `Year, Month, Day, Period` columns.
+        initial_timestamp = if DataFrames.hasproperty(df, :DateTime)
+            Dates.DateTime(df[1, :DateTime])
+        else
             Dates.DateTime(df[1, :Year], df[1, :Month], df[1, :Day]) +
             (df[1, :Period] - 1) * entry_res
+        end
         ta = TimeSeries.TimeArray(
             range(initial_timestamp; step = entry_res, length = length(values)),
             values,
