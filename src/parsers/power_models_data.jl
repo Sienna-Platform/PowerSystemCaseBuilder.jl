@@ -259,7 +259,7 @@ function _attach_single_ict!(
 end
 
 """
-Attaches the corresponding ICT data to a Transformer2W component.
+Attaches the corresponding ICT data to a TwoWindingTransformer component.
 """
 function _attach_impedance_correction_tables!(
     sys::System,
@@ -281,7 +281,7 @@ function _attach_impedance_correction_tables!(
 end
 
 """
-Attaches the corresponding ICT data to a Transformer3W component.
+Attaches the corresponding ICT data to a ThreeWindingTransformer component.
 """
 function _attach_impedance_correction_tables!(
     sys::System,
@@ -1112,18 +1112,30 @@ const _SHIFT_TO_GROUP_MAP = Dict{Float64, WindingGroupNumber}(
     30.0 => WindingGroupNumber.GROUP_11,
 )
 
+"""
+Resolve the [`WindingGroupNumber`](@ref) from the phase-shift angle stored under
+`angle_key` (radians). Stores the result in `d[group_key]` (kept for backward
+compatibility with dict consumers) and returns it so the caller can use it
+directly.
+"""
 function _add_vector_control_group(d::Dict, angle_key::String, group_key::String)
     angle = d[angle_key]
-    for (angle_key_deg, group) in _SHIFT_TO_GROUP_MAP
+    group = WindingGroupNumber.UNDEFINED
+    for (angle_key_deg, candidate) in _SHIFT_TO_GROUP_MAP
         if isapprox(rad2deg(angle), angle_key_deg)
-            d[group_key] = group
-            return
+            group = candidate
+            break
         end
     end
-    d[group_key] = WindingGroupNumber.UNDEFINED
-    return
+    d[group_key] = group
+    return group
 end
 
+# Under the unified transformer data model every transformer record (2W or 3W)
+# maps to a `TwoWindingTransformer` / `ThreeWindingTransformer`; tap changing and
+# phase shifting are winding data (`tap`, `α`, `control`), not distinct types.
+# These type-inference helpers therefore only distinguish Line / switch /
+# transformer.
 function get_branch_type_matpower(
     d::Dict,
 )
@@ -1135,16 +1147,7 @@ function get_branch_type_matpower(
     end
 
     is_transformer || return Line
-
-    _add_vector_control_group(d, "shift", "group_number")
-
-    if d["group_number"] == WindingGroupNumber.UNDEFINED
-        return PhaseShiftingTransformer
-    elseif tap != 1.0
-        return TapTransformer
-    else
-        return Transformer2W
-    end
+    return TwoWindingTransformer
 end
 
 function get_branch_type_psse(
@@ -1160,25 +1163,12 @@ function get_branch_type_psse(
     if !is_transformer
         if (tap != 0.0) && (tap != 1.0)
             @warn "Transformer $d has tap ratio $tap, which is not 0.0 or 1.0; this is not a valid value for a Line. Parsing entry as a Transformer"
-            is_transformer = true
-            _add_vector_control_group(d, "shift", "group_number")
         else
             return Line
         end
     end
 
-    _add_vector_control_group(d, "shift", "group_number")
-    is_tap_controllable, is_alpha_controllable = _determine_control_modes(d, "COD1", "tap")
-    if d["group_number"] == WindingGroupNumber.UNDEFINED || is_alpha_controllable
-        return PhaseShiftingTransformer
-    elseif (is_tap_controllable || (tap != 1.0)) &&
-           d["group_number"] != WindingGroupNumber.UNDEFINED
-        return TapTransformer
-    elseif !is_tap_controllable && d["group_number"] != WindingGroupNumber.UNDEFINED
-        return Transformer2W
-    else
-        error("Couldn't infer the branch type for branch $d")
-    end
+    return TwoWindingTransformer
 end
 
 function make_branch(
@@ -1186,8 +1176,7 @@ function make_branch(
     d::Dict,
     bus_f::ACBus,
     bus_t::ACBus,
-    source_type::String;
-    kwargs...,
+    source_type::String,
 )
     if source_type == "matpower"
         branch_type = get_branch_type_matpower(d)
@@ -1205,12 +1194,8 @@ function make_branch(
         )
     elseif branch_type == DiscreteControlledACBranch
         value = _make_switch_from_zero_impedance_line(name, d, bus_f, bus_t)
-    elseif branch_type == Transformer2W
-        value = make_transformer_2w(name, d, bus_f, bus_t; kwargs...)
-    elseif branch_type == TapTransformer
-        value = make_tap_transformer(name, d, bus_f, bus_t; kwargs...)
-    elseif branch_type == PhaseShiftingTransformer
-        value = make_phase_shifting_transformer(name, d, bus_f, bus_t; kwargs...)
+    elseif branch_type == TwoWindingTransformer
+        value = make_transformer_2w(name, d, bus_f, bus_t)
     elseif branch_type == Line
         value = make_line(name, d, bus_f, bus_t)
     else
@@ -1339,12 +1324,95 @@ function read_switch_breaker!(
     end
 end
 
+"""
+Build the per-winding [`TransformerControl`](@ref) from a PowerModels transformer
+dict `d` for winding `suffix` (1/2/3), mirroring the PSS/E per-winding control
+block (COD/CONT/RMA/RMI/VMA/VMI/NTP).
+
+`COD == -99` (or a missing `COD` key) means the control block is undefined, so
+`nothing` is returned. Any other COD — including `0` (FIXED) and negative
+(disabled) codes — is preserved as data. Matpower records carry no COD keys, so
+control is always `nothing` there (the `get` defaults handle it).
+"""
+function _make_transformer_control(d::Dict, suffix::Int)
+    cod = get(d, "COD$suffix", -99)
+    cod == -99 && return nothing
+    # RMI/RMA and VMI/VMA are the lower/upper edges of a band. Some (typically
+    # synthetic) PSS/E data has them numerically inverted by rounding
+    # (e.g. frankenstein_70.raw has VMA1 = 0.984 < VMI1 = 0.985); warn and
+    # normalize the ordering so a valid band is produced rather than tripping
+    # `TransformerControl`'s `min <= max` check. The warning surfaces genuinely
+    # corrupt bands on actively-controlled windings instead of hiding them.
+    record = string(get(d, "name", get(d, "source_id", "unknown")))
+    rmi, rma = get(d, "RMI$suffix", 0.9), get(d, "RMA$suffix", 1.1)
+    if rmi > rma
+        @warn "Transformer record $record winding $suffix has inverted control limits RMI$suffix = $rmi > RMA$suffix = $rma; normalizing to (min = $rma, max = $rmi)."
+        rmi, rma = rma, rmi
+    end
+    vmi, vma = get(d, "VMI$suffix", 0.9), get(d, "VMA$suffix", 1.1)
+    if vmi > vma
+        @warn "Transformer record $record winding $suffix has inverted controlled-quantity limits VMI$suffix = $vmi > VMA$suffix = $vma; normalizing to (min = $vma, max = $vmi)."
+        vmi, vma = vma, vmi
+    end
+    return TransformerControl(;
+        objective = TransformerControlObjective(cod),
+        regulated_bus_number = get(d, "CONT$suffix", 0),
+        limits = (min = rmi, max = rma),
+        controlled_quantity_limits = (min = vmi, max = vma),
+        number_of_tap_positions = get(d, "NTP$suffix", 33),
+    )
+end
+
+"""
+Build a [`TransformerWinding`](@ref) from a PowerModels transformer dict `d`,
+mapping the per-winding keys named by the keyword arguments. Shared by the 2W
+maker (one winding) and the 3W maker (three windings). The vector group number is
+derived from the phase-shift angle under `angle_key` (see
+[`_add_vector_control_group`](@ref)); ratings are resolved by the caller.
+"""
+function _make_transformer_winding(
+    d::Dict,
+    arc::Arc;
+    tap_key::String,
+    angle_key::String,
+    group_key::String,
+    control_suffix::Int,
+    available::Bool,
+    rating,
+    rating_b = nothing,
+    rating_c = nothing,
+    base_power,
+    base_voltage,
+    active_power_flow,
+    reactive_power_flow,
+)
+    return TransformerWinding(;
+        arc = arc,
+        tap = get(d, tap_key, 1.0),
+        α = d[angle_key],
+        winding_group_number = _add_vector_control_group(d, angle_key, group_key),
+        control = _make_transformer_control(d, control_suffix),
+        available = available,
+        rating = rating,
+        rating_b = rating_b,
+        rating_c = rating_c,
+        active_power_flow = active_power_flow,
+        reactive_power_flow = reactive_power_flow,
+        base_power = base_power,
+        base_voltage = base_voltage,
+    )
+end
+
+# matpower files frequently leave bus base voltages unspecified (baseKV = 0);
+# represent that as `nothing` (unknown) rather than a literal 0, which the
+# transformer winding validation (base_voltage must be positive) rejects.
+_base_voltage_or_nothing(v) = iszero(v) ? nothing : v
+
 function make_transformer_2w(
     name::String,
     d::Dict,
     bus_f::ACBus,
-    bus_t::ACBus;
-    kwargs...,
+    bus_t::ACBus,
 )
     pf = get(d, "pf", 0.0)
     qf = get(d, "qf", 0.0)
@@ -1354,23 +1422,44 @@ function make_transformer_2w(
         available_value = false
     end
 
-    return Transformer2W(;
-        name = name,
+    # `d["base_power"]` is the winding (device) base; the 2W model requires the
+    # parent `base_power` to equal the winding `base_power` (see the
+    # `TwoWindingTransformer`/`TransformerWinding` invariant), so the same value
+    # is used for both.
+    base_power = d["base_power"]
+
+    # BASE CONVENTION: `br_r`/`br_x` reach this maker already expressed in device
+    # base on `base_power` (PowerFlowFileParser converts PSSE data to device base
+    # in `psse.jl`, and `make_per_unit!` does not touch `br_r`/`br_x`; for
+    # matpower `base_power == system base` so device base == system base). The new
+    # `TwoWindingTransformer.r`/`x` fields also store device base on `base_power`,
+    # so no rebasing is applied here.
+    winding = _make_transformer_winding(
+        d,
+        Arc(bus_f, bus_t);
+        tap_key = "tap",
+        angle_key = "shift",
+        group_key = "group_number",
+        control_suffix = 1,
         available = available_value,
+        rating = _get_rating("TwoWindingTransformer", name, d, "rate_a"),
+        rating_b = _get_rating("TwoWindingTransformer", name, d, "rate_b"),
+        rating_c = _get_rating("TwoWindingTransformer", name, d, "rate_c"),
+        base_power = base_power,
+        # for psse inputs, this may differ from the buses' base voltages
+        base_voltage = _base_voltage_or_nothing(d["base_voltage_from"]),
         active_power_flow = pf,
         reactive_power_flow = qf,
-        arc = Arc(bus_f, bus_t),
+    )
+
+    return TwoWindingTransformer(;
+        name = name,
+        winding = winding,
         r = d["br_r"],
         x = d["br_x"],
-        primary_shunt = d["g_fr"] + im * d["b_fr"],
-        winding_group_number = d["group_number"],
-        rating = _get_rating("Transformer2W", name, d, "rate_a"),
-        rating_b = _get_rating("Transformer2W", name, d, "rate_b"),
-        rating_c = _get_rating("Transformer2W", name, d, "rate_c"),
-        base_power = d["base_power"],
-        # for psse inputs, these numbers may be different than the buses' base voltages
-        base_voltage_primary = d["base_voltage_from"],
-        base_voltage_secondary = d["base_voltage_to"],
+        magnetizing_shunt = Complex(d["g_fr"], d["b_fr"]),
+        base_power = base_power,
+        base_voltage_secondary = _base_voltage_or_nothing(d["base_voltage_to"]),
         ext = get(d, "ext", Dict{String, Any}()),
     )
 end
@@ -1385,26 +1474,62 @@ function make_3w_transformer(
 )
     pf = get(d, "pf", 0.0)
     qf = get(d, "qf", 0.0)
-    return Transformer3W(;
+
+    # Each winding's device (winding) base power is the pairwise base of the pair
+    # whose first index is that winding: primary -> base_power_12,
+    # secondary -> base_power_23, tertiary -> base_power_13. The pairwise
+    # impedances (r_12/x_12, ...) are already on their respective pair device
+    # bases (PowerFlowFileParser converts/passes them through unchanged), matching
+    # the `ThreeWindingTransformer` field semantics, so no rebasing is applied.
+    primary_winding = _make_transformer_winding(
+        d,
+        Arc(bus_primary, star_bus);
+        tap_key = "primary_turns_ratio",
+        angle_key = "primary_phase_shift_angle",
+        group_key = "primary_group_number",
+        control_suffix = 1,
+        available = Bool(d["available_primary"]),
+        rating = _get_rating("ThreeWindingTransformer", name, d, "rating_primary"),
+        base_power = d["base_power_12"],
+        base_voltage = d["base_voltage_primary"],
+        active_power_flow = pf,
+        reactive_power_flow = qf,
+    )
+    secondary_winding = _make_transformer_winding(
+        d,
+        Arc(bus_secondary, star_bus);
+        tap_key = "secondary_turns_ratio",
+        angle_key = "secondary_phase_shift_angle",
+        group_key = "secondary_group_number",
+        control_suffix = 2,
+        available = Bool(d["available_secondary"]),
+        rating = _get_rating("ThreeWindingTransformer", name, d, "rating_secondary"),
+        base_power = d["base_power_23"],
+        base_voltage = d["base_voltage_secondary"],
+        active_power_flow = pf,
+        reactive_power_flow = qf,
+    )
+    tertiary_winding = _make_transformer_winding(
+        d,
+        Arc(bus_tertiary, star_bus);
+        tap_key = "tertiary_turns_ratio",
+        angle_key = "tertiary_phase_shift_angle",
+        group_key = "tertiary_group_number",
+        control_suffix = 3,
+        available = Bool(d["available_tertiary"]),
+        rating = _get_rating("ThreeWindingTransformer", name, d, "rating_tertiary"),
+        base_power = d["base_power_13"],
+        base_voltage = d["base_voltage_tertiary"],
+        active_power_flow = pf,
+        reactive_power_flow = qf,
+    )
+
+    return ThreeWindingTransformer(;
         name = name,
-        available = d["available"],
-        primary_star_arc = Arc(bus_primary, star_bus),
-        secondary_star_arc = Arc(bus_secondary, star_bus),
-        tertiary_star_arc = Arc(bus_tertiary, star_bus),
+        primary_winding = primary_winding,
+        secondary_winding = secondary_winding,
+        tertiary_winding = tertiary_winding,
         star_bus = star_bus,
-        active_power_flow_primary = pf,
-        reactive_power_flow_primary = qf,
-        active_power_flow_secondary = pf,
-        reactive_power_flow_secondary = qf,
-        active_power_flow_tertiary = pf,
-        reactive_power_flow_tertiary = qf,
-        r_primary = d["r_primary"],
-        x_primary = d["x_primary"],
-        r_secondary = d["r_secondary"],
-        x_secondary = d["x_secondary"],
-        r_tertiary = d["r_tertiary"],
-        x_tertiary = d["x_tertiary"],
-        rating = d["rating"],
         r_12 = d["r_12"],
         x_12 = d["x_12"],
         r_23 = d["r_23"],
@@ -1414,201 +1539,8 @@ function make_3w_transformer(
         base_power_12 = d["base_power_12"],
         base_power_23 = d["base_power_23"],
         base_power_13 = d["base_power_13"],
-        base_voltage_primary = d["base_voltage_primary"],
-        base_voltage_secondary = d["base_voltage_secondary"],
-        base_voltage_tertiary = d["base_voltage_tertiary"],
-        g = d["g"],
-        b = d["b"],
-        primary_turns_ratio = d["primary_turns_ratio"],
-        secondary_turns_ratio = d["secondary_turns_ratio"],
-        tertiary_turns_ratio = d["tertiary_turns_ratio"],
-        available_primary = d["available_primary"],
-        available_secondary = d["available_secondary"],
-        available_tertiary = d["available_tertiary"],
-        rating_primary = _get_rating("Transformer3W", name, d, "rating_primary"),
-        rating_secondary = _get_rating("Transformer3W", name, d, "rating_secondary"),
-        rating_tertiary = _get_rating("Transformer3W", name, d, "rating_tertiary"),
-        primary_group_number = d["primary_group_number"],
-        secondary_group_number = d["secondary_group_number"],
-        tertiary_group_number = d["tertiary_group_number"],
-        control_objective_primary = get(d, "COD1", -99),
-        control_objective_secondary = get(d, "COD2", -99),
-        control_objective_tertiary = get(d, "COD3", -99),
+        magnetizing_shunt = Complex(d["g"], d["b"]),
         ext = get(d, "ext", Dict{String, Any}()),
-    )
-end
-
-function make_3w_phase_shifting_transformer(
-    name::String,
-    d::Dict,
-    bus_primary::ACBus,
-    bus_secondary::ACBus,
-    bus_tertiary::ACBus,
-    star_bus::ACBus,
-)
-    pf = get(d, "pf", 0.0)
-    qf = get(d, "qf", 0.0)
-    return PhaseShiftingTransformer3W(;
-        name = name,
-        available = d["available"],
-        primary_star_arc = Arc(bus_primary, star_bus),
-        secondary_star_arc = Arc(bus_secondary, star_bus),
-        tertiary_star_arc = Arc(bus_tertiary, star_bus),
-        star_bus = star_bus,
-        active_power_flow_primary = pf,
-        reactive_power_flow_primary = qf,
-        active_power_flow_secondary = pf,
-        reactive_power_flow_secondary = qf,
-        active_power_flow_tertiary = pf,
-        reactive_power_flow_tertiary = qf,
-        r_primary = d["r_primary"],
-        x_primary = d["x_primary"],
-        r_secondary = d["r_secondary"],
-        x_secondary = d["x_secondary"],
-        r_tertiary = d["r_tertiary"],
-        x_tertiary = d["x_tertiary"],
-        rating = d["rating"],
-        r_12 = d["r_12"],
-        x_12 = d["x_12"],
-        r_23 = d["r_23"],
-        x_23 = d["x_23"],
-        r_13 = d["r_13"],
-        x_13 = d["x_13"],
-        α_primary = d["primary_phase_shift_angle"],
-        α_secondary = d["secondary_phase_shift_angle"],
-        α_tertiary = d["tertiary_phase_shift_angle"],
-        base_power_12 = d["base_power_12"],
-        base_power_23 = d["base_power_23"],
-        base_power_13 = d["base_power_13"],
-        base_voltage_primary = d["base_voltage_primary"],
-        base_voltage_secondary = d["base_voltage_secondary"],
-        base_voltage_tertiary = d["base_voltage_tertiary"],
-        g = d["g"],
-        b = d["b"],
-        primary_turns_ratio = d["primary_turns_ratio"],
-        secondary_turns_ratio = d["secondary_turns_ratio"],
-        tertiary_turns_ratio = d["tertiary_turns_ratio"],
-        available_primary = d["available_primary"],
-        available_secondary = d["available_secondary"],
-        available_tertiary = d["available_tertiary"],
-        rating_primary = _get_rating(
-            "PhaseShiftingTransformer3W",
-            name,
-            d,
-            "rating_primary",
-        ),
-        rating_secondary = _get_rating(
-            "PhaseShiftingTransformer3W",
-            name,
-            d,
-            "rating_secondary",
-        ),
-        rating_tertiary = _get_rating(
-            "PhaseShiftingTransformer3W",
-            name,
-            d,
-            "rating_tertiary",
-        ),
-        control_objective_primary = get(d, "COD1", -99),
-        control_objective_secondary = get(d, "COD2", -99),
-        control_objective_tertiary = get(d, "COD3", -99),
-        ext = d["ext"],
-    )
-end
-
-function make_tap_transformer(
-    name::String,
-    d::Dict,
-    bus_f::ACBus,
-    bus_t::ACBus;
-    kwargs...,
-)
-    pf = get(d, "pf", 0.0)
-    qf = get(d, "qf", 0.0)
-    available_value = d["br_status"] == 1
-    if get_bustype(bus_f) == ACBusTypes.ISOLATED ||
-       get_bustype(bus_t) == ACBusTypes.ISOLATED
-        available_value = false
-    end
-
-    ext = haskey(d, "ext") ? d["ext"] : Dict{String, Any}()
-    control_objective_formatter =
-        get(kwargs, :transformer_control_objective_formatter, nothing)
-    control_objective = if control_objective_formatter !== nothing
-        result = control_objective_formatter(name)
-        result !== nothing ? result : get(d, "COD1", -99)
-    else
-        get(d, "COD1", -99)
-    end
-
-    return TapTransformer(;
-        name = name,
-        available = available_value,
-        active_power_flow = pf,
-        reactive_power_flow = qf,
-        arc = Arc(bus_f, bus_t),
-        r = d["br_r"],
-        x = d["br_x"],
-        tap = d["tap"],
-        primary_shunt = d["g_fr"] + im * d["b_fr"],
-        winding_group_number = d["group_number"],
-        base_power = d["base_power"],
-        rating = _get_rating("TapTransformer", name, d, "rate_a"),
-        rating_b = _get_rating("TapTransformer", name, d, "rate_b"),
-        rating_c = _get_rating("TapTransformer", name, d, "rate_c"),
-        # for psse inputs, these numbers may be different than the buses' base voltages
-        base_voltage_primary = d["base_voltage_from"],
-        base_voltage_secondary = d["base_voltage_to"],
-        control_objective = control_objective,
-        ext = ext,
-    )
-end
-
-function make_phase_shifting_transformer(
-    name::String,
-    d::Dict,
-    bus_f::ACBus,
-    bus_t::ACBus;
-    kwargs...,
-)
-    pf = get(d, "pf", 0.0)
-    qf = get(d, "qf", 0.0)
-    available_value = d["br_status"] == 1
-    if get_bustype(bus_f) == ACBusTypes.ISOLATED ||
-       get_bustype(bus_t) == ACBusTypes.ISOLATED
-        available_value = false
-    end
-
-    ext = haskey(d, "ext") ? d["ext"] : Dict{String, Any}()
-    control_objective_formatter =
-        get(kwargs, :transformer_control_objective_formatter, nothing)
-    control_objective = if control_objective_formatter !== nothing
-        result = control_objective_formatter(name)
-        result !== nothing ? result : get(d, "COD1", -99)
-    else
-        get(d, "COD1", -99)
-    end
-
-    return PhaseShiftingTransformer(;
-        name = name,
-        available = available_value,
-        active_power_flow = pf,
-        reactive_power_flow = qf,
-        arc = Arc(bus_f, bus_t),
-        r = d["br_r"],
-        x = d["br_x"],
-        tap = d["tap"],
-        primary_shunt = d["g_fr"] + im * d["b_fr"],
-        α = d["shift"],
-        base_power = d["base_power"],
-        rating = _get_rating("PhaseShiftingTransformer", name, d, "rate_a"),
-        rating_b = _get_rating("PhaseShiftingTransformer", name, d, "rate_b"),
-        rating_c = _get_rating("PhaseShiftingTransformer", name, d, "rate_c"),
-        # for psse inputs, these numbers may be different than the buses' base voltages
-        base_voltage_primary = d["base_voltage_from"],
-        base_voltage_secondary = d["base_voltage_to"],
-        control_objective = control_objective,
-        ext = ext,
     )
 end
 
@@ -1631,7 +1563,7 @@ function read_branch!(
         bus_f = bus_number_to_bus[d["f_bus"]]
         bus_t = bus_number_to_bus[d["t_bus"]]
         name = _get_name(d, bus_f, bus_t)
-        value = make_branch(name, d, bus_f, bus_t, source_type; kwargs...)
+        value = make_branch(name, d, bus_f, bus_t, source_type)
 
         if !isnothing(value)
             add_component!(sys, value; skip_validation = SKIP_PM_VALIDATION)
@@ -1675,102 +1607,18 @@ function read_3w_transformer!(
         star_bus = bus_number_to_bus[d["star_bus"]]
 
         name = _get_name(d, bus_primary, bus_secondary, bus_tertiary)
-        three_winding_transformer_type = get_three_winding_transformer_type(d)
-        if three_winding_transformer_type == PhaseShiftingTransformer3W
-            value = make_3w_phase_shifting_transformer(
-                name,
-                d,
-                bus_primary,
-                bus_secondary,
-                bus_tertiary,
-                star_bus,
-            )
-        elseif three_winding_transformer_type == Transformer3W
-            value = make_3w_transformer(
-                name,
-                d,
-                bus_primary,
-                bus_secondary,
-                bus_tertiary,
-                star_bus,
-            )
-        else
-            error(
-                "Unsupported three winding transformer type $three_winding_transformer_type",
-            )
-        end
+        value = make_3w_transformer(
+            name,
+            d,
+            bus_primary,
+            bus_secondary,
+            bus_tertiary,
+            star_bus,
+        )
 
         add_component!(sys, value; skip_validation = SKIP_PM_VALIDATION)
 
         _attach_impedance_correction_tables!(sys, value, name, d, ict_instances)
-    end
-end
-
-function _determine_control_modes(d::Dict, control_flag::String, tap_key::String)
-    control_code = get(d, control_flag, -99)
-    tap = d[tap_key]
-
-    is_tap_controllable = false
-    is_alpha_controllable = false
-
-    # There is no control
-    if control_code == 0
-        is_tap_controllable = false
-        is_alpha_controllable = false
-        # Reactive Power Control
-    elseif control_code ∈ [1, -1]
-        is_tap_controllable = true
-        is_alpha_controllable = false
-        # Voltage Control
-    elseif control_code ∈ [2, -2]
-        is_tap_controllable = true
-        is_alpha_controllable = false
-        # Active Power Control
-    elseif control_code ∈ [3, -3]
-        is_tap_controllable = true
-        is_alpha_controllable = true
-        # DC Line Control
-    elseif control_code ∈ [4, -4]
-        is_tap_controllable = true
-        is_alpha_controllable = true
-        # Asymmetric Active Power Control
-    elseif control_code ∈ [5, -5]
-        is_tap_controllable = true
-        is_alpha_controllable = true
-    elseif control_code == -99
-        @warn "Can't determine control objective for the transformer from the $(control_flag) field for $d"
-        if d["shift"] != 0.0
-            is_alpha_controllable = true
-        elseif (tap != 0.0) || (tap != 1.0)
-            is_tap_controllable = true
-        else
-            @warn "Can't determine control objective for the other fields. Will return a Transformer2W"
-        end
-    else
-        error(d)
-    end
-    return is_tap_controllable, is_alpha_controllable
-end
-
-function get_three_winding_transformer_type(d::Dict)
-    _add_vector_control_group(d, "primary_phase_shift_angle", "primary_group_number")
-    _add_vector_control_group(d, "secondary_phase_shift_angle", "secondary_group_number")
-    _add_vector_control_group(d, "tertiary_phase_shift_angle", "tertiary_group_number")
-    # NOTE: with current three winding transformer type hierarchy, tap controllable and not controllable three winding transformers are Transformer3W
-    _, primary_is_alpha_controllable =
-        _determine_control_modes(d, "COD1", "primary_turns_ratio")
-    _, secondary_is_alpha_controllable =
-        _determine_control_modes(d, "COD2", "secondary_turns_ratio")
-    _, tertiary_is_alpha_controllable =
-        _determine_control_modes(d, "COD3", "tertiary_turns_ratio")
-    if d["primary_group_number"] == WindingGroupNumber.UNDEFINED ||
-       d["secondary_group_number"] == WindingGroupNumber.UNDEFINED ||
-       d["tertiary_group_number"] == WindingGroupNumber.UNDEFINED ||
-       primary_is_alpha_controllable || secondary_is_alpha_controllable ||
-       tertiary_is_alpha_controllable
-        return PhaseShiftingTransformer3W
-    else
-        return Transformer3W
     end
 end
 
@@ -1871,8 +1719,16 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         g = d["r"] == 0.0 ? 0.0 : 1.0 / d["r"],
         dc_current = get(d, "if", 0.0),
         reactive_power_from = get(d, "qf", 0.0),
-        dc_voltage_control_from = d["dc_voltage_control_from"],
-        ac_voltage_control_from = d["ac_voltage_control_from"],
+        dc_control_from = if d["dc_voltage_control_from"]
+            VSCDCControlModes.DC_VOLTAGE
+        else
+            VSCDCControlModes.DC_POWER
+        end,
+        ac_control_from = if d["ac_voltage_control_from"]
+            VSCACControlModes.AC_VOLTAGE
+        else
+            VSCACControlModes.AC_REACTIVE_POWER
+        end,
         dc_setpoint_from = d["dc_setpoint_from"],
         ac_setpoint_from = d["ac_setpoint_from"],
         converter_loss_from = d["converter_loss_from"],
@@ -1880,14 +1736,26 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         rating_from = d["rating_from"],
         reactive_power_limits_from = (min = d["qminf"], max = d["qmaxf"]),
         power_factor_weighting_fraction_from = d["power_factor_weighting_fraction_from"],
+        remote_bus_control_from = get(get(d, "ext", Dict()), "REMOT_FROM", 0),
+        rmpct_from = get(get(d, "ext", Dict()), "RMPCT_FROM", 100.0),
         reactive_power_to = get(d, "qt", 0.0),
-        dc_voltage_control_to = d["dc_voltage_control_to"],
-        ac_voltage_control_to = d["ac_voltage_control_to"],
+        dc_control_to = if d["dc_voltage_control_to"]
+            VSCDCControlModes.DC_VOLTAGE
+        else
+            VSCDCControlModes.DC_POWER
+        end,
+        ac_control_to = if d["ac_voltage_control_to"]
+            VSCACControlModes.AC_VOLTAGE
+        else
+            VSCACControlModes.AC_REACTIVE_POWER
+        end,
         dc_setpoint_to = d["dc_setpoint_to"],
         ac_setpoint_to = d["ac_setpoint_to"],
         converter_loss_to = d["converter_loss_to"],
         max_dc_current_to = d["max_dc_current_to"],
         rating_to = d["rating_to"],
+        remote_bus_control_to = get(get(d, "ext", Dict()), "REMOT_TO", 0),
+        rmpct_to = get(get(d, "ext", Dict()), "RMPCT_TO", 100.0),
         reactive_power_limits_to = (min = d["qmint"], max = d["qmaxt"]),
         power_factor_weighting_fraction_to = d["power_factor_weighting_fraction_to"],
         ext = get(d, "ext", Dict{String, Any}()),

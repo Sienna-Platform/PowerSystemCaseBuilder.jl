@@ -486,24 +486,37 @@ function read_branch!(
         max_rate = max(branches.rate_a[ix], branches.rate_b[ix], branches.rate_c[ix])
 
         if get_base_voltage(bus_from) != get_base_voltage(bus_to)
-            @warn("bad line data $branch_name. Transforming this Line to Transformer2W.")
+            @warn(
+                "bad line data $branch_name. Transforming this Line to TwoWindingTransformer."
+            )
             # Method needed for NTPS to make this data into a transformer
             transformer_name = "transformer-$(get_name(bus_from))-$(get_name(bus_to))~$(branches.ckt[ix])"
-            transformer = Transformer2W(;
-                name = transformer_name,
-                available = branches.st[ix] > 0 ? true : false,
+            # System base is used as the winding (device) base, so r/x pass through
+            # unchanged; the 2W invariant requires the parent and winding base_power
+            # to match.
+            base_power = get_base_power(sys, IS.NU)
+            winding = TransformerWinding(;
+                arc = Arc(bus_from, bus_to),
+                tap = 1.0,
+                α = 0.0,
+                winding_group_number = WindingGroupNumber(0),
+                control = nothing,
+                available = branches.st[ix] > 0,
+                rating = max_rate,
                 active_power_flow = 0.0,
                 reactive_power_flow = 0.0,
-                arc = Arc(bus_from, bus_to),
+                base_power = base_power,
+                base_voltage = get_base_voltage(bus_from),
+            )
+            transformer = TwoWindingTransformer(;
+                name = transformer_name,
+                winding = winding,
                 r = branches.r[ix],
                 x = branches.x[ix],
-                primary_shunt = 0.0,
-                winding_group_number = WindingGroupNumber(0),
-                rating = max_rate,
-                base_power = get_base_power(sys, IS.NU), # add system base power
-                ext = Dict(
-                    "line_to_xfr" => true,
-                ),
+                magnetizing_shunt = 0.0 + 0.0im,
+                base_power = base_power,
+                base_voltage_secondary = get_base_voltage(bus_to),
+                ext = Dict{String, Any}("line_to_xfr" => true),
             )
             add_component!(sys, transformer; skip_validation = SKIP_PM_VALIDATION)
 
@@ -661,19 +674,31 @@ function read_branch!(
             end
         end
 
-        transformer = TapTransformer(;
-            name = transformer_name,
-            available = transformers.stat[ix] > 0 ? true : false,
+        # br_r/br_x are expressed on system base above, and system base is used as
+        # the winding (device) base, so no rebasing is needed; the 2W invariant
+        # requires the parent and winding base_power to match.
+        base_power = get_base_power(sys, IS.NU)
+        winding = TransformerWinding(;
+            arc = Arc(bus_i, bus_j),
+            tap = tap_value,
+            α = 0.0,
+            winding_group_number = WindingGroupNumber(0),
+            control = nothing,
+            available = transformers.stat[ix] > 0,
+            rating = max_rate,
             active_power_flow = 0.0,
             reactive_power_flow = 0.0,
-            arc = Arc(bus_i, bus_j),
+            base_power = base_power,
+            base_voltage = get_base_voltage(bus_i),
+        )
+        transformer = TwoWindingTransformer(;
+            name = transformer_name,
+            winding = winding,
             r = br_r,
             x = br_x,
-            tap = tap_value,
-            primary_shunt = transformers.mag2[ix],
-            winding_group_number = WindingGroupNumber(0),
-            base_power = get_base_power(sys, IS.NU),
-            rating = max_rate,
+            magnetizing_shunt = Complex(transformers.mag2[ix], 0.0),
+            base_power = base_power,
+            base_voltage_secondary = get_base_voltage(bus_j),
         )
         add_component!(sys, transformer; skip_validation = SKIP_PM_VALIDATION)
     end

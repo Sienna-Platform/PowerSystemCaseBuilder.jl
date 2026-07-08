@@ -230,7 +230,7 @@ function get_branch_type(
 
     is_transformer || return Line
 
-    return tap == 1.0 ? Transformer2W : TapTransformer
+    return TwoWindingTransformer
 end
 
 """
@@ -271,33 +271,34 @@ function branch_csv_parser!(sys::System, data::PowerTableDataParser.PowerSystemT
                     max = branch.max_angle_limits,
                 ),
             )
-        elseif branch_type == Transformer2W
-            value = Transformer2W(;
-                name = name,
-                available = available,
-                active_power_flow = pf,
-                reactive_power_flow = qf,
+        elseif branch_type == TwoWindingTransformer
+            # Table data has no COD/control-mode columns, so the winding is
+            # always uncontrolled (`control = nothing`) and carries no vector
+            # group information (`winding_group_number` stays `UNDEFINED`, as
+            # in the pre-refactor `Transformer2W`/`TapTransformer` paths this
+            # replaces). `tap` unifies the old two-type split: it was implicitly
+            # `1.0` for `Transformer2W` and explicit for `TapTransformer`, both
+            # of which `branch.tap` already captures correctly. The parent and
+            # winding `base_power` are both `data.base_power` to preserve the
+            # `TwoWindingTransformer`/`TransformerWinding` invariant.
+            winding = TransformerWinding(;
                 arc = connection_points,
-                r = branch.r,
-                x = branch.x,
-                primary_shunt = branch.primary_shunt,
-                winding_group_number = WindingGroupNumber.UNDEFINED,
-                rating = branch.rate,
-                base_power = data.base_power, # use system base power
-            )
-        elseif branch_type == TapTransformer
-            value = TapTransformer(;
-                name = name,
-                available = available,
-                active_power_flow = pf,
-                reactive_power_flow = qf,
-                arc = connection_points,
-                r = branch.r,
-                x = branch.x,
-                primary_shunt = branch.primary_shunt,
-                winding_group_number = WindingGroupNumber.UNDEFINED,
                 tap = branch.tap,
+                winding_group_number = WindingGroupNumber.UNDEFINED,
+                control = nothing,
+                available = available,
                 rating = branch.rate,
+                active_power_flow = pf,
+                reactive_power_flow = qf,
+                base_power = data.base_power,
+                base_voltage = get_base_voltage(bus_from),
+            )
+            value = TwoWindingTransformer(;
+                name = name,
+                winding = winding,
+                r = branch.r,
+                x = branch.x,
+                magnetizing_shunt = branch.primary_shunt,
                 base_power = data.base_power, # use system base power
             )
         else
