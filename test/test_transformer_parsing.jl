@@ -1,6 +1,5 @@
-# Field-level assertions for transformer parsing under the unified PSY transformer
-# data model (TwoWindingTransformer / ThreeWindingTransformer with per-winding
-# TransformerWinding + TransformerControl).
+# Field-level assertions for transformer parsing (TwoWindingTransformer /
+# ThreeWindingTransformer with per-winding TransformerWinding + TransformerControl).
 #
 # All literal expectations below are derived directly from the raw PSS/E fixture
 # text (see the inline "raw:" citations), never from the parser output.
@@ -20,8 +19,8 @@
     t2ws = collect(get_components(TwoWindingTransformer, sys))
     @test length(t2ws) == 3
 
-    # Phase shifting is winding data, not a type. Two of the three 2W records
-    # carry a nonzero winding angle (raw ANG1): "TRAFO 2W 3" = 50.0 deg and
+    # Phase shifting is winding data (raw ANG1); shifters are found by angle. Two
+    # of the three 2W records carry a nonzero winding angle: "TRAFO 2W 3" = 50.0 deg and
     # "TRAFO 2W 2" = -60.0 deg; "TRAFO 2W 1" = 0.0 deg is not phase shifting.
     phase_shifting_2w = filter(t -> PSY.is_phase_shifting(PSY.get_winding(t)), t2ws)
     @test length(phase_shifting_2w) == 2
@@ -53,7 +52,6 @@
                 @test get_number_of_tap_positions(c) >= 0
             end
         end
-        # pairwise impedances populated; star bus attached and reachable
         @test PSY.get_x_12(t, DU) != 0.0
         @test PSY.get_star_bus(t) in get_components(ACBus, sys)
         @test all(w -> PSY.get_arc(w) in get_components(Arc, sys), get_windings(t))
@@ -178,9 +176,7 @@ end
     @test PSY.get_available(w_a7)
     # parent/winding base_power invariant (both set from the table's system base)
     @test PSY._get_base_power(t_a7) == PSY.get_base_power(w_a7)
-    # base_voltage defaults from the from-bus (103 "Adler" = 138 kV), mirroring
-    # the pre-refactor `Transformer2W`/`TapTransformer` `base_voltage_primary`
-    # default.
+    # base_voltage defaults from the from-bus (103 "Adler" = 138 kV).
     @test PSY.get_base_voltage(w_a7) == 138.0
     # B = 0 for every transformer row in this fixture, so magnetizing_shunt
     # (mapped straight from `primary_shunt`) is a pure-real zero.

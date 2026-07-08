@@ -1114,9 +1114,8 @@ const _SHIFT_TO_GROUP_MAP = Dict{Float64, WindingGroupNumber}(
 
 """
 Resolve the [`WindingGroupNumber`](@ref) from the phase-shift angle stored under
-`angle_key` (radians). Stores the result in `d[group_key]` (kept for backward
-compatibility with dict consumers) and returns it so the caller can use it
-directly.
+`angle_key` (radians). Stores the result in `d[group_key]` (dict consumers read it
+there) and returns it so the caller can use it directly.
 """
 function _add_vector_control_group(d::Dict, angle_key::String, group_key::String)
     angle = d[angle_key]
@@ -1131,11 +1130,9 @@ function _add_vector_control_group(d::Dict, angle_key::String, group_key::String
     return group
 end
 
-# Under the unified transformer data model every transformer record (2W or 3W)
-# maps to a `TwoWindingTransformer` / `ThreeWindingTransformer`; tap changing and
-# phase shifting are winding data (`tap`, `α`, `control`), not distinct types.
-# These type-inference helpers therefore only distinguish Line / switch /
-# transformer.
+# Tap changing and phase shifting are winding data (`tap`, `α`, `control`), not
+# distinct component types, so these type-inference helpers only distinguish
+# Line / switch / transformer.
 function get_branch_type_matpower(
     d::Dict,
 )
@@ -1431,9 +1428,9 @@ function make_transformer_2w(
     # BASE CONVENTION: `br_r`/`br_x` reach this maker already expressed in device
     # base on `base_power` (PowerFlowFileParser converts PSSE data to device base
     # in `psse.jl`, and `make_per_unit!` does not touch `br_r`/`br_x`; for
-    # matpower `base_power == system base` so device base == system base). The new
-    # `TwoWindingTransformer.r`/`x` fields also store device base on `base_power`,
-    # so no rebasing is applied here.
+    # matpower `base_power == system base` so device base == system base).
+    # `TwoWindingTransformer.r`/`x` also store device base on `base_power`, so no
+    # rebasing is applied here.
     winding = _make_transformer_winding(
         d,
         Arc(bus_f, bus_t);

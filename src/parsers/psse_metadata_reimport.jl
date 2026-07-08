@@ -205,9 +205,8 @@ function parse_export_metadata_dict(md::Dict)
     area_name_map = reverse_dict(md["area_mapping"])
     get!(area_name_map, 1, "1")
     area_name_formatter = name -> area_name_map[name]
-    # The COD override (`transformer_control_objective_formatter`, built from
-    # md["transformer_control_objective_mapping"]) was retired by the transformer
-    # refactor: control objectives now parse directly from first-class COD keys.
+    # Control objectives parse directly from first-class COD keys, so there is no
+    # metadata COD override formatter.
     sys_kwargs = Dict(
         :area_name_formatter => area_name_formatter,
         :loadzone_name_formatter => loadzone_name_formatter,

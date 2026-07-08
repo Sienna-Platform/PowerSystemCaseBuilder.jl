@@ -273,13 +273,10 @@ function branch_csv_parser!(sys::System, data::PowerTableDataParser.PowerSystemT
             )
         elseif branch_type == TwoWindingTransformer
             # Table data has no COD/control-mode columns, so the winding is
-            # always uncontrolled (`control = nothing`) and carries no vector
-            # group information (`winding_group_number` stays `UNDEFINED`, as
-            # in the pre-refactor `Transformer2W`/`TapTransformer` paths this
-            # replaces). `tap` unifies the old two-type split: it was implicitly
-            # `1.0` for `Transformer2W` and explicit for `TapTransformer`, both
-            # of which `branch.tap` already captures correctly. The parent and
-            # winding `base_power` are both `data.base_power` to preserve the
+            # uncontrolled (`control = nothing`) with no vector group
+            # (`winding_group_number` stays `UNDEFINED`). `branch.tap` already
+            # carries the tap ratio. The parent and winding `base_power` are both
+            # `data.base_power` to preserve the
             # `TwoWindingTransformer`/`TransformerWinding` invariant.
             winding = TransformerWinding(;
                 arc = connection_points,
