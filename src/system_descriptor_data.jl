@@ -1630,8 +1630,8 @@ const SYSTEM_CATALOG = [
         name = "PSSE 30 Test System",
         description = "PSSE 30 Test system",
         category = PSSEParsingTestSystems,
-        raw_data = joinpath(DATA_DIR, "psse_raw", "synthetic_data_v30.raw"),
-        build_function = build_pti_30,
+        raw_data = joinpath(DATA_DIR, "psse_raw", "11BUS_KUNDUR_30.raw"),
+        build_function = build_pti,
     ),
     SystemDescriptor(;
         name = "psse_Benchmark_4ger_33_2015_sys",

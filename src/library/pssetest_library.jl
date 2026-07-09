@@ -20,12 +20,6 @@ function build_pti(; raw_data, kwargs...)
     return sys
 end
 
-function build_pti_30(; raw_data, kwargs...)
-    sys_kwargs = filter_kwargs(; kwargs...)
-    sys = make_system(PowerFlowFileParser.PowerFlowDataNetwork(raw_data), sys_kwargs...)
-    return sys
-end
-
 function build_psse_modified_14bus_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     sys = make_system(
