@@ -1381,6 +1381,13 @@ const SYSTEM_CATALOG = [
         build_function = build_pti,
     ),
     SystemDescriptor(;
+        name = "pti_facts_shunt_sys",
+        description = "PSSE 3-bus system with a FACTS shunt (FACTS/VSC record) for parser tests",
+        category = PSSEParsingTestSystems,
+        raw_data = joinpath(DATA_DIR, "psse_raw", "facts_shunt.raw"),
+        build_function = build_pti,
+    ),
+    SystemDescriptor(;
         name = "pti_modified_case14_sys",
         description = "PSSE Modified 14-bus Test system",
         category = PSSEParsingTestSystems,
