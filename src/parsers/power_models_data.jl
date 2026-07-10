@@ -1419,10 +1419,8 @@ function make_transformer_2w(
         available_value = false
     end
 
-    # `d["base_power"]` is the winding (device) base; the 2W model requires the
-    # parent `base_power` to equal the winding `base_power` (see the
-    # `TwoWindingTransformer`/`TransformerWinding` invariant), so the same value
-    # is used for both.
+    # `d["base_power"]` is the winding (device) base, which is the transformer's
+    # device base.
     base_power = d["base_power"]
 
     # BASE CONVENTION: `br_r`/`br_x` reach this maker already expressed in device
@@ -1455,7 +1453,6 @@ function make_transformer_2w(
         r = d["br_r"],
         x = d["br_x"],
         magnetizing_shunt = Complex(d["g_fr"], d["b_fr"]),
-        base_power = base_power,
         base_voltage_secondary = _base_voltage_or_nothing(d["base_voltage_to"]),
         ext = get(d, "ext", Dict{String, Any}()),
     )

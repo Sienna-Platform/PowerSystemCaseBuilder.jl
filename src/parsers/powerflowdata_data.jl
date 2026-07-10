@@ -492,8 +492,7 @@ function read_branch!(
             # Method needed for NTPS to make this data into a transformer
             transformer_name = "transformer-$(get_name(bus_from))-$(get_name(bus_to))~$(branches.ckt[ix])"
             # System base is used as the winding (device) base, so r/x pass through
-            # unchanged; the 2W invariant requires the parent and winding base_power
-            # to match.
+            # unchanged.
             base_power = get_base_power(sys, IS.NU)
             winding = TransformerWinding(;
                 arc = Arc(bus_from, bus_to),
@@ -514,7 +513,6 @@ function read_branch!(
                 r = branches.r[ix],
                 x = branches.x[ix],
                 magnetizing_shunt = 0.0 + 0.0im,
-                base_power = base_power,
                 base_voltage_secondary = get_base_voltage(bus_to),
                 ext = Dict{String, Any}("line_to_xfr" => true),
             )
@@ -675,8 +673,7 @@ function read_branch!(
         end
 
         # br_r/br_x are expressed on system base above, and system base is used as
-        # the winding (device) base, so no rebasing is needed; the 2W invariant
-        # requires the parent and winding base_power to match.
+        # the winding (device) base, so no rebasing is needed.
         base_power = get_base_power(sys, IS.NU)
         winding = TransformerWinding(;
             arc = Arc(bus_i, bus_j),
@@ -697,7 +694,6 @@ function read_branch!(
             r = br_r,
             x = br_x,
             magnetizing_shunt = Complex(transformers.mag2[ix], 0.0),
-            base_power = base_power,
             base_voltage_secondary = get_base_voltage(bus_j),
         )
         add_component!(sys, transformer; skip_validation = SKIP_PM_VALIDATION)

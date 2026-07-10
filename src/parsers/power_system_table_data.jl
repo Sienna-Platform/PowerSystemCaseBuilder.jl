@@ -275,9 +275,7 @@ function branch_csv_parser!(sys::System, data::PowerTableDataParser.PowerSystemT
             # Table data has no COD/control-mode columns, so the winding is
             # uncontrolled (`control = nothing`) with no vector group
             # (`winding_group_number` stays `UNDEFINED`). `branch.tap` already
-            # carries the tap ratio. The parent and winding `base_power` are both
-            # `data.base_power` to preserve the
-            # `TwoWindingTransformer`/`TransformerWinding` invariant.
+            # carries the tap ratio. The winding `base_power` is `data.base_power`.
             winding = TransformerWinding(;
                 arc = connection_points,
                 tap = branch.tap,
@@ -296,7 +294,6 @@ function branch_csv_parser!(sys::System, data::PowerTableDataParser.PowerSystemT
                 r = branch.r,
                 x = branch.x,
                 magnetizing_shunt = branch.primary_shunt,
-                base_power = data.base_power, # use system base power
             )
         else
             error("Unsupported branch type $branch_type")
