@@ -38,6 +38,44 @@ const SYSTEM_CATALOG = [
         ],
     ),
     SystemDescriptor(;
+        name = "c_sys14_hvdc_vsc",
+        description = "14-bus system with a TwoTerminalVSCLine replacing the bus 2-3 AC line",
+        category = PSITestSystems,
+        raw_data = joinpath(DATA_DIR, "psy_data", "data_14bus_pu.jl"),
+        build_function = build_c_sys14_hvdc_vsc,
+        supported_arguments = [
+            SystemArgument(;
+                name = :add_forecasts,
+                default = true,
+                allowed_values = Set([true, false]),
+            ),
+            SystemArgument(;
+                name = :add_single_time_series,
+                default = false,
+                allowed_values = Set([true, false]),
+            ),
+        ],
+    ),
+    SystemDescriptor(;
+        name = "c_sys14_hvdc_lcc",
+        description = "14-bus system with a TwoTerminalLCCLine replacing the bus 2-3 AC line",
+        category = PSITestSystems,
+        raw_data = joinpath(DATA_DIR, "psy_data", "data_14bus_pu.jl"),
+        build_function = build_c_sys14_hvdc_lcc,
+        supported_arguments = [
+            SystemArgument(;
+                name = :add_forecasts,
+                default = true,
+                allowed_values = Set([true, false]),
+            ),
+            SystemArgument(;
+                name = :add_single_time_series,
+                default = false,
+                allowed_values = Set([true, false]),
+            ),
+        ],
+    ),
+    SystemDescriptor(;
         name = "c_sys5",
         description = "5-Bus system",
         category = PSITestSystems,
@@ -1340,6 +1378,13 @@ const SYSTEM_CATALOG = [
         description = "PSSE 14-bus Test system",
         category = PSSEParsingTestSystems,
         raw_data = joinpath(DATA_DIR, "psse_raw", "case14.raw"),
+        build_function = build_pti,
+    ),
+    SystemDescriptor(;
+        name = "pti_facts_shunt_sys",
+        description = "PSSE 3-bus system with a FACTS shunt (FACTS/VSC record) for parser tests",
+        category = PSSEParsingTestSystems,
+        raw_data = joinpath(DATA_DIR, "psse_raw", "facts_shunt.raw"),
         build_function = build_pti,
     ),
     SystemDescriptor(;

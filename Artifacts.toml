@@ -1,15 +1,15 @@
 [CaseData]
-git-tree-sha1 = "c33ea1792d4054033464aad6d48a2ed199b73460"
+git-tree-sha1 = "46c4d945eccafafc734f5140ebe3228911184b34"
 lazy = true
 
     [[CaseData.download]]
-    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/refs/tags/4.0.4.tar.gz"
-    sha256 = "495397fbb54511801113688e27e3af0e5a7a737edb81eaaa8b8af868b2bf1f54"
+    sha256 = "94e62aef12c56fd1062be772719ffea668b7f12a2695beeb07b25dd3869cc7c1"
+    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/refs/tags/4.0.5.tar.gz"
 
 [rts]
 git-tree-sha1 = "c257b2c37b981f261fdc328b0fb9b96436a96537"
 lazy = true
 
     [[rts.download]]
-    url = "https://github.com/GridMod/RTS-GMLC/archive/refs/tags/v0.2.3.tar.gz"
     sha256 = "993429b8dc5f096e62479ca3b8551d52a53941322b452c825d12881cda915eae"
+    url = "https://github.com/GridMod/RTS-GMLC/archive/refs/tags/v0.2.3.tar.gz"
