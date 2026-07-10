@@ -136,7 +136,12 @@ function _replace_2_3_line_with_hvdc!(sys::PSY.System, converter)
     return sys
 end
 
-function build_c_sys14_hvdc_vsc(; add_forecasts, add_single_time_series, raw_data, kwargs...)
+function build_c_sys14_hvdc_vsc(;
+    add_forecasts,
+    add_single_time_series,
+    raw_data,
+    kwargs...,
+)
     sys_kwargs = filter_kwargs(; kwargs...)
     nodes = nodes14()
     c_sys14_hvdc_vsc = PSY.System(
@@ -201,7 +206,12 @@ function build_c_sys14_hvdc_vsc(; add_forecasts, add_single_time_series, raw_dat
     return c_sys14_hvdc_vsc
 end
 
-function build_c_sys14_hvdc_lcc(; add_forecasts, add_single_time_series, raw_data, kwargs...)
+function build_c_sys14_hvdc_lcc(;
+    add_forecasts,
+    add_single_time_series,
+    raw_data,
+    kwargs...,
+)
     sys_kwargs = filter_kwargs(; kwargs...)
     nodes = nodes14()
     c_sys14_hvdc_lcc = PSY.System(
