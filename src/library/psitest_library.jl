@@ -121,6 +121,171 @@ function build_c_sys14_dc(; add_forecasts, add_single_time_series, raw_data, kwa
     return c_sys14_dc
 end
 
+function _replace_2_3_line_with_hvdc!(sys::PSY.System, converter)
+    line_2_3 = only(
+        PSY.get_components(
+            l ->
+                PSY.get_number(PSY.get_from(PSY.get_arc(l))) == 2 &&
+                    PSY.get_number(PSY.get_to(PSY.get_arc(l))) == 3,
+            PSY.Line,
+            sys,
+        ),
+    )
+    PSY.remove_component!(sys, line_2_3)
+    PSY.add_component!(sys, converter)
+    return sys
+end
+
+function build_c_sys14_hvdc_vsc(; add_forecasts, add_single_time_series, raw_data, kwargs...)
+    sys_kwargs = filter_kwargs(; kwargs...)
+    nodes = nodes14()
+    c_sys14_hvdc_vsc = PSY.System(
+        100.0,
+        nodes,
+        thermal_generators14(nodes),
+        loads14(nodes),
+        branches14(nodes);
+        time_series_in_memory = get(sys_kwargs, :time_series_in_memory, true),
+        sys_kwargs...,
+    )
+
+    vsc = PSY.TwoTerminalVSCLine(;
+        name = "VSC_2_3",
+        available = true,
+        arc = PSY.Arc(nodes[2], nodes[3]),
+        active_power_flow = 0.4,
+        rating = 2.0,
+        active_power_limits_from = (min = -2.0, max = 2.0),
+        active_power_limits_to = (min = -2.0, max = 2.0),
+        g = 50.0,
+        # from converter: DC-voltage control (DC slack), reactive-power setpoint
+        dc_control_from = PSY.VSCDCControlModes.DC_VOLTAGE,
+        ac_control_from = PSY.VSCACControlModes.AC_REACTIVE_POWER,
+        dc_setpoint_from = 1.05,
+        reactive_power_from = 0.05,
+        # to converter: DC-power control, reactive-power setpoint
+        dc_control_to = PSY.VSCDCControlModes.DC_POWER,
+        ac_control_to = PSY.VSCACControlModes.AC_REACTIVE_POWER,
+        dc_setpoint_to = 0.4,
+        reactive_power_to = 0.1,
+    )
+    _replace_2_3_line_with_hvdc!(c_sys14_hvdc_vsc, vsc)
+
+    forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
+    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys14_hvdc_vsc))
+        for t in 1:2
+            ini_time = TimeSeries.timestamp(timeseries_DA14[t][ix])[1]
+            forecast_data[ini_time] = timeseries_DA14[t][ix]
+        end
+        if add_single_time_series
+            PSY.add_time_series!(
+                c_sys14_hvdc_vsc,
+                l,
+                PSY.SingleTimeSeries(
+                    "max_active_power",
+                    single_timeseries_DA14[ix];
+                    scaling_factor_multiplier = PSY.get_max_active_power,
+                ),
+            )
+        else
+            if add_forecasts
+                PSY.add_time_series!(
+                    c_sys14_hvdc_vsc,
+                    l,
+                    PSY.Deterministic("max_active_power", forecast_data),
+                )
+            end
+        end
+    end
+
+    return c_sys14_hvdc_vsc
+end
+
+function build_c_sys14_hvdc_lcc(; add_forecasts, add_single_time_series, raw_data, kwargs...)
+    sys_kwargs = filter_kwargs(; kwargs...)
+    nodes = nodes14()
+    c_sys14_hvdc_lcc = PSY.System(
+        100.0,
+        nodes,
+        thermal_generators14(nodes),
+        loads14(nodes),
+        branches14(nodes);
+        time_series_in_memory = get(sys_kwargs, :time_series_in_memory, true),
+        sys_kwargs...,
+    )
+
+    lcc = PSY.TwoTerminalLCCLine(;
+        name = "LCC_2_3",
+        available = true,
+        arc = PSY.Arc(nodes[2], nodes[3]),
+        active_power_flow = 0.0,
+        r = 0.05,
+        transfer_setpoint = 50.0,
+        scheduled_dc_voltage = 230.0,
+        rectifier_bridges = 1,
+        rectifier_delay_angle_limits = (min = 0.0, max = pi / 2),
+        rectifier_rc = 0.0,
+        rectifier_xc = 0.05,
+        rectifier_base_voltage = 69.0,
+        inverter_bridges = 1,
+        # Keep operation conditions off the clamp.
+        inverter_extinction_angle_limits = (min = deg2rad(17), max = pi / 2),
+        inverter_rc = 0.0,
+        inverter_xc = 0.08,
+        inverter_base_voltage = 69.0,
+        power_mode = true,
+        switch_mode_voltage = 0.0,
+        compounding_resistance = 0.0,
+        min_compounding_voltage = 0.0,
+        rectifier_transformer_ratio = 1.0,
+        rectifier_tap_setting = 1.0,
+        rectifier_tap_limits = (min = 0.5, max = 1.5),
+        rectifier_tap_step = 0.05,
+        rectifier_delay_angle = 0.01,
+        rectifier_capacitor_reactance = 0.0,
+        inverter_transformer_ratio = 1.0,
+        inverter_tap_setting = 1.0,
+        inverter_tap_limits = (min = 0.5, max = 1.5),
+        inverter_tap_step = 0.05,
+        inverter_extinction_angle = deg2rad(17),
+        inverter_capacitor_reactance = 0.0,
+        active_power_limits_from = (min = 0.0, max = 0.0),
+        active_power_limits_to = (min = 0.0, max = 0.0),
+        reactive_power_limits_from = (min = 0.0, max = 0.0),
+        reactive_power_limits_to = (min = 0.0, max = 0.0),
+    )
+    _replace_2_3_line_with_hvdc!(c_sys14_hvdc_lcc, lcc)
+
+    forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
+    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys14_hvdc_lcc))
+        for t in 1:2
+            ini_time = TimeSeries.timestamp(timeseries_DA14[t][ix])[1]
+            forecast_data[ini_time] = timeseries_DA14[t][ix]
+        end
+        if add_single_time_series
+            PSY.add_time_series!(
+                c_sys14_hvdc_lcc,
+                l,
+                PSY.SingleTimeSeries(
+                    "max_active_power",
+                    single_timeseries_DA14[ix];
+                    scaling_factor_multiplier = PSY.get_max_active_power,
+                ),
+            )
+        else
+            if add_forecasts
+                PSY.add_time_series!(
+                    c_sys14_hvdc_lcc,
+                    l,
+                    PSY.Deterministic("max_active_power", forecast_data),
+                )
+            end
+        end
+    end
+
+    return c_sys14_hvdc_lcc
+end
+
 function build_c_sys5(; add_forecasts, add_single_time_series, raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     nodes = nodes5()
