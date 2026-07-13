@@ -217,24 +217,151 @@ function _add_time_series_from_pointers!(
         path = normpath(joinpath(base_dir, String(entry.data_file)))
         df = get!(() -> CSV.read(path, DataFrames.DataFrame), csv_cache, path)
         col = Symbol(component_name)
-        DataFrames.hasproperty(df, col) || continue
 
-        values = Float64.(df[!, col])
-        # Index format varies across test-data CSVs: most use a single `DateTime`
-        # column, some use `Year, Month, Day, Period` columns.
-        initial_timestamp = if DataFrames.hasproperty(df, :DateTime)
-            Dates.DateTime(df[1, :DateTime])
+        values, initial_timestamp = if DataFrames.hasproperty(df, col)
+            # Column-per-component layout: one row per timestep. The index is either a
+            # single `DateTime` column or `Year, Month, Day, Period` columns.
+            its = if DataFrames.hasproperty(df, :DateTime)
+                Dates.DateTime(df[1, :DateTime])
+            else
+                Dates.DateTime(df[1, :Year], df[1, :Month], df[1, :Day]) +
+                (df[1, :Period] - 1) * entry_res
+            end
+            (Float64.(df[!, col]), its)
         else
-            Dates.DateTime(df[1, :Year], df[1, :Month], df[1, :Day]) +
-            (df[1, :Period] - 1) * entry_res
+            # Pivoted layout: one row per day with a column per period and no column
+            # named after the component (the file holds a single component's series).
+            wide = _read_period_pivoted_csv(df)
+            isnothing(wide) && continue
+            wide
         end
-        ta = TimeSeries.TimeArray(
-            range(initial_timestamp; step = entry_res, length = length(values)),
-            values,
-        )
+        timestamps = range(initial_timestamp; step = entry_res, length = length(values))
+        ta = TimeSeries.TimeArray(timestamps, values)
         push!(associations, IS.TimeSeriesAssociation(component, SingleTimeSeries(name, ta)))
+
+        # A pointer on an AggregationTopology (a LoadZone/Area) with a max-power
+        # multiplier does not describe that topology's own device series: it is a
+        # normalized zonal *shape* that every load in the zone shares, each scaling it by
+        # its own peak. The legacy `scaling_factor_multiplier` applied that scaling lazily
+        # on read; now that raw values are stored directly, materialize one series per
+        # load here instead — otherwise the loads end up with no time series at all.
+        #
+        # `normalization_factor` is the topology's own peak, so the topology's raw series
+        # pushed above is already correctly scaled and is left alone.
+        _fan_out_aggregation_time_series!(
+            associations,
+            seen,
+            sys,
+            component,
+            entry,
+            name,
+            values,
+            timestamps,
+        )
     end
     isempty(associations) || bulk_add_time_series!(sys, associations)
+    return
+end
+
+"""
+Read a period-pivoted forecast CSV: one row per day, indexed by `Year, Month, Day`, with
+one column per period of that day (`1, 2, ... 24`) rather than a column named after the
+component. Such a file holds exactly one component's series, so the periods are flattened
+row-major into a single vector.
+
+Returns `(values, initial_timestamp)`, or `nothing` if `df` is not in this layout.
+"""
+function _read_period_pivoted_csv(df)
+    period_cols = filter(!isnothing ∘ _period_index, DataFrames.names(df))
+    isempty(period_cols) && return nothing
+    all(c -> DataFrames.hasproperty(df, Symbol(c)), ("Year", "Month", "Day")) ||
+        return nothing
+    sort!(period_cols; by = _period_index)
+
+    values = Float64[]
+    sizehint!(values, DataFrames.nrow(df) * length(period_cols))
+    for row in 1:DataFrames.nrow(df)
+        for c in period_cols
+            push!(values, Float64(df[row, Symbol(c)]))
+        end
+    end
+    initial_timestamp = Dates.DateTime(df[1, :Year], df[1, :Month], df[1, :Day])
+    return (values, initial_timestamp)
+end
+
+# A column is a period column iff its name is a bare integer (e.g. "1" ... "24").
+_period_index(name) = tryparse(Int, String(name))
+
+# The multipliers that mean "this zonal profile is shared by the loads in the zone,
+# scaled by each load's own peak", mapped to the per-load getter that supplies the scale.
+const _AGGREGATION_LOAD_SCALERS = Dict(
+    "get_max_active_power" => get_max_active_power,
+    "get_max_reactive_power" => get_max_reactive_power,
+)
+
+"""
+Materialize the per-load series implied by an `AggregationTopology` time series pointer.
+
+RTS-style pointers attach a load profile to a `LoadZone`/`Area` with
+`scaling_factor_multiplier = get_max_active_power` and a `normalization_factor` equal to
+the topology's peak. That combination means: normalize the profile to 0-1, then give every
+load on a bus in the topology its own series scaled by that load's peak. The legacy
+multiplier applied the scaling lazily on read; raw values are now stored directly, so the
+per-load values are computed and stored here. No-op for any other pointer.
+"""
+function _fan_out_aggregation_time_series!(
+    associations,
+    seen,
+    sys::System,
+    component,
+    entry,
+    name::AbstractString,
+    values::Vector{Float64},
+    timestamps,
+)
+    component isa AggregationTopology || return
+    sfm = get(entry, :scaling_factor_multiplier, nothing)
+    isnothing(sfm) && return
+    scaler = get(_AGGREGATION_LOAD_SCALERS, String(sfm), nothing)
+    isnothing(scaler) && return
+
+    normalization = get(entry, :normalization_factor, nothing)
+    if isnothing(normalization) || !(normalization isa Number) || iszero(normalization)
+        @warn "Cannot fan out $(summary(component)) time series '$name' to its loads: " *
+              "normalization_factor is missing or zero"
+        return
+    end
+    profile = values ./ Float64(normalization)
+
+    bus_ids = Set(IS.get_id(bus) for bus in get_buses(sys, component))
+    for load in get_components(ElectricLoad, sys)
+        IS.get_id(get_bus(load)) in bus_ids || continue
+        key = (IS.get_id(load), name)
+        key in seen && continue
+
+        # Natural units: the stored values are the load's actual MW / MVAr, matching the
+        # raw device quantities every other pointer stores.
+        peak = try
+            scaler(load, PowerSystems.NU)
+        catch err
+            err isa ArgumentError || rethrow()
+            # Some ElectricLoads have no peak power to scale a profile by — a
+            # `FixedAdmittance` is a voltage-dependent shunt, not a rated load — and the
+            # accessor throws for them. Those legitimately take no load profile.
+            @debug "Skipping $(summary(load)): no max power to scale '$name' by"
+            continue
+        end
+
+        push!(seen, key)
+        scaled = profile .* peak
+        push!(
+            associations,
+            IS.TimeSeriesAssociation(
+                load,
+                SingleTimeSeries(name, TimeSeries.TimeArray(timestamps, scaled)),
+            ),
+        )
+    end
     return
 end
 
