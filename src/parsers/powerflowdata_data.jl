@@ -494,26 +494,24 @@ function read_branch!(
             # System base is used as the winding (device) base, so r/x pass through
             # unchanged.
             base_power = get_base_power(sys, IS.NU)
-            winding = TransformerWinding(;
+            circuit = TransformerCircuit(;
                 arc = Arc(bus_from, bus_to),
                 tap = 1.0,
                 α = 0.0,
                 winding_group_number = WindingGroupNumber(0),
-                control = nothing,
                 available = branches.st[ix] > 0,
+                r = branches.r[ix],
+                x = branches.x[ix],
                 rating = max_rate,
                 active_power_flow = 0.0,
                 reactive_power_flow = 0.0,
                 base_power = base_power,
-                base_voltage = get_base_voltage(bus_from),
+                base_voltage_primary = get_base_voltage(bus_from),
+                base_voltage_secondary = get_base_voltage(bus_to),
             )
             transformer = TwoWindingTransformer(;
                 name = transformer_name,
-                winding = winding,
-                r = branches.r[ix],
-                x = branches.x[ix],
-                magnetizing_shunt = 0.0 + 0.0im,
-                base_voltage_secondary = get_base_voltage(bus_to),
+                circuit = circuit,
                 ext = Dict{String, Any}("line_to_xfr" => true),
             )
             add_component!(sys, transformer; skip_validation = SKIP_PM_VALIDATION)
@@ -567,7 +565,9 @@ function read_branch!(
         bus_i = bus_number_to_bus[transformers.i[ix]]
         bus_j = bus_number_to_bus[transformers.j[ix]]
         if transformers.k[ix] > 0
-            @error "Three-winding transformer from PowerFlowData inputs not implemented. Data will be ignored"
+            # v30 sections beyond branches/2W transformers are not parsed by this
+            # legacy path; records are skipped with a warning.
+            @warn "Three-winding transformer from PowerFlowData inputs not implemented. Data will be ignored"
             continue
         else
             to_from_name = "$(get_name(bus_i))-$(get_name(bus_j))"
@@ -675,26 +675,25 @@ function read_branch!(
         # br_r/br_x are expressed on system base above, and system base is used as
         # the winding (device) base, so no rebasing is needed.
         base_power = get_base_power(sys, IS.NU)
-        winding = TransformerWinding(;
+        circuit = TransformerCircuit(;
             arc = Arc(bus_i, bus_j),
             tap = tap_value,
             α = 0.0,
             winding_group_number = WindingGroupNumber(0),
-            control = nothing,
             available = transformers.stat[ix] > 0,
+            r = br_r,
+            x = br_x,
             rating = max_rate,
             active_power_flow = 0.0,
             reactive_power_flow = 0.0,
             base_power = base_power,
-            base_voltage = get_base_voltage(bus_i),
+            base_voltage_primary = get_base_voltage(bus_i),
+            base_voltage_secondary = get_base_voltage(bus_j),
         )
         transformer = TwoWindingTransformer(;
             name = transformer_name,
-            winding = winding,
-            r = br_r,
-            x = br_x,
+            circuit = circuit,
             magnetizing_shunt = Complex(transformers.mag2[ix], 0.0),
-            base_voltage_secondary = get_base_voltage(bus_j),
         )
         add_component!(sys, transformer; skip_validation = SKIP_PM_VALIDATION)
     end
@@ -742,7 +741,9 @@ function read_switched_shunt!(
     bus_number_to_bus::Dict{Int, ACBus};
     kwargs...,
 )
-    @error "SwitchedShunts parsing from PSS/e v30 files not implemented. Data will be ignored"
+    # v30 sections beyond branches/2W transformers are not parsed by this legacy
+    # path; records are skipped with a warning.
+    @warn "SwitchedShunts parsing from PSS/e v30 files not implemented. Data will be ignored"
     return
 end
 
@@ -783,7 +784,9 @@ function read_dcline!(
     bus_number_to_bus::Dict{Int, ACBus};
     kwargs...,
 )
-    @error "TwoTerminalDCLines parsing from PSS/e v30 files not implemented. Data will be ignored"
+    # v30 sections beyond branches/2W transformers are not parsed by this legacy
+    # path; records are skipped with a warning.
+    @warn "TwoTerminalDCLines parsing from PSS/e v30 files not implemented. Data will be ignored"
     return
 end
 
@@ -804,7 +807,9 @@ function read_dcline!(
     bus_number_to_bus::Dict{Int, ACBus};
     kwargs...,
 )
-    @error "VSCDCLines parsing from PSS/e files not implemented. Data will be ignored"
+    # v30 sections beyond branches/2W transformers are not parsed by this legacy
+    # path; records are skipped with a warning.
+    @warn "VSCDCLines parsing from PSS/e files not implemented. Data will be ignored"
     return
 end
 
@@ -815,7 +820,9 @@ function read_dcline!(
     bus_number_to_bus::Dict{Int, ACBus};
     kwargs...,
 )
-    @error "MultiTerminalDCLines parsing from PSS/e files v30 not implemented. Data will be ignored"
+    # v30 sections beyond branches/2W transformers are not parsed by this legacy
+    # path; records are skipped with a warning.
+    @warn "MultiTerminalDCLines parsing from PSS/e files v30 not implemented. Data will be ignored"
     return
 end
 
@@ -826,6 +833,6 @@ function read_dcline!(
     bus_number_to_bus::Dict{Int, ACBus};
     kwargs...,
 )
-    @error "MultiTerminalDCLines parsing from PSS/e files v30 not implemented. Data will be ignored"
+    @error "MultiTerminalDCLines parsing from PSS/e files v33 not implemented. Data will be ignored"
     return
 end

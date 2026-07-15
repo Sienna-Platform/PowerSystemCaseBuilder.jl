@@ -272,27 +272,28 @@ function branch_csv_parser!(sys::System, data::PowerTableDataParser.PowerSystemT
                 ),
             )
         elseif branch_type == TwoWindingTransformer
-            # Table data has no COD/control-mode columns, so the winding is
-            # uncontrolled (`control = nothing`) with no vector group
-            # (`winding_group_number` stays `UNDEFINED`). `branch.tap` already
-            # carries the tap ratio. The winding `base_power` is `data.base_power`.
-            winding = TransformerWinding(;
+            # Table data has no COD/control-mode columns, so the circuit is
+            # uncontrolled (`control_objective` stays `UNDEFINED`) with no vector
+            # group (`winding_group_number` stays `UNDEFINED`). `branch.tap`
+            # already carries the tap ratio. The circuit `base_power` is
+            # `data.base_power`.
+            circuit = TransformerCircuit(;
                 arc = connection_points,
                 tap = branch.tap,
                 winding_group_number = WindingGroupNumber.UNDEFINED,
-                control = nothing,
                 available = available,
+                r = branch.r,
+                x = branch.x,
                 rating = branch.rate,
                 active_power_flow = pf,
                 reactive_power_flow = qf,
                 base_power = data.base_power,
-                base_voltage = get_base_voltage(bus_from),
+                base_voltage_primary = get_base_voltage(bus_from),
+                base_voltage_secondary = get_base_voltage(bus_to),
             )
             value = TwoWindingTransformer(;
                 name = name,
-                winding = winding,
-                r = branch.r,
-                x = branch.x,
+                circuit = circuit,
                 magnetizing_shunt = branch.primary_shunt,
             )
         else

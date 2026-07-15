@@ -1322,23 +1322,23 @@ function read_switch_breaker!(
 end
 
 """
-Build the per-winding [`TransformerControl`](@ref) from a PowerModels transformer
-dict `d` for winding `suffix` (1/2/3), mirroring the PSS/E per-winding control
-block (COD/CONT/RMA/RMI/VMA/VMI/NTP).
+Resolve the flat per-winding control fields from a PowerModels transformer dict
+`d` for winding `suffix` (1/2/3), mirroring the PSS/E per-winding control block
+(COD/CONT/RMA/RMI/VMA/VMI/NTP). Returns a NamedTuple of the winding's flattened
+control keyword arguments.
 
-`COD == -99` (or a missing `COD` key) means the control block is undefined, so
-`nothing` is returned. Any other COD — including `0` (FIXED) and negative
+`COD == -99` (or a missing `COD` key) yields `control_objective = UNDEFINED`, the
+null state (no control block). Any other COD — including `0` (FIXED) and negative
 (disabled) codes — is preserved as data. Matpower records carry no COD keys, so
-control is always `nothing` there (the `get` defaults handle it).
+`control_objective` stays `UNDEFINED` there (the `get` defaults handle it).
 """
-function _make_transformer_control(d::Dict, suffix::Int)
+function _transformer_control_fields(d::Dict, suffix::Int)
     cod = get(d, "COD$suffix", -99)
-    cod == -99 && return nothing
     # RMI/RMA and VMI/VMA are the lower/upper edges of a band. Some (typically
     # synthetic) PSS/E data has them numerically inverted by rounding
     # (e.g. frankenstein_70.raw has VMA1 = 0.984 < VMI1 = 0.985); warn and
     # normalize the ordering so a valid band is produced rather than tripping
-    # `TransformerControl`'s `min <= max` check. The warning surfaces genuinely
+    # the attach-time band-ordering check. The warning surfaces genuinely
     # corrupt bands on actively-controlled windings instead of hiding them.
     record = string(get(d, "name", get(d, "source_id", "unknown")))
     rmi, rma = get(d, "RMI$suffix", 0.9), get(d, "RMA$suffix", 1.1)
@@ -1351,23 +1351,23 @@ function _make_transformer_control(d::Dict, suffix::Int)
         @warn "Transformer record $record winding $suffix has inverted controlled-quantity limits VMI$suffix = $vmi > VMA$suffix = $vma; normalizing to (min = $vma, max = $vmi)."
         vmi, vma = vma, vmi
     end
-    return TransformerControl(;
-        objective = TransformerControlObjective(cod),
+    return (
+        control_objective = TransformerControlObjective(cod),
         regulated_bus_number = get(d, "CONT$suffix", 0),
-        limits = (min = rmi, max = rma),
+        control_limits = (min = rmi, max = rma),
         controlled_quantity_limits = (min = vmi, max = vma),
         number_of_tap_positions = get(d, "NTP$suffix", 33),
     )
 end
 
 """
-Build a [`TransformerWinding`](@ref) from a PowerModels transformer dict `d`,
+Build a [`TransformerCircuit`](@ref) from a PowerModels transformer dict `d`,
 mapping the per-winding keys named by the keyword arguments. Shared by the 2W
-maker (one winding) and the 3W maker (three windings). The vector group number is
+maker (one circuit) and the 3W maker (three circuits). The vector group number is
 derived from the phase-shift angle under `angle_key` (see
 [`_add_vector_control_group`](@ref)); ratings are resolved by the caller.
 """
-function _make_transformer_winding(
+function _make_transformer_circuit(
     d::Dict,
     arc::Arc;
     tap_key::String,
@@ -1375,20 +1375,30 @@ function _make_transformer_winding(
     group_key::String,
     control_suffix::Int,
     available::Bool,
+    r,
+    x,
     rating,
     rating_b = nothing,
     rating_c = nothing,
     base_power,
-    base_voltage,
+    base_voltage_primary,
+    base_voltage_secondary,
     active_power_flow,
     reactive_power_flow,
 )
-    return TransformerWinding(;
+    control = _transformer_control_fields(d, control_suffix)
+    return TransformerCircuit(;
         arc = arc,
         tap = get(d, tap_key, 1.0),
         α = d[angle_key],
         winding_group_number = _add_vector_control_group(d, angle_key, group_key),
-        control = _make_transformer_control(d, control_suffix),
+        r = r,
+        x = x,
+        control_objective = control.control_objective,
+        regulated_bus_number = control.regulated_bus_number,
+        control_limits = control.control_limits,
+        controlled_quantity_limits = control.controlled_quantity_limits,
+        number_of_tap_positions = control.number_of_tap_positions,
         available = available,
         rating = rating,
         rating_b = rating_b,
@@ -1396,7 +1406,8 @@ function _make_transformer_winding(
         active_power_flow = active_power_flow,
         reactive_power_flow = reactive_power_flow,
         base_power = base_power,
-        base_voltage = base_voltage,
+        base_voltage_primary = base_voltage_primary,
+        base_voltage_secondary = base_voltage_secondary,
     )
 end
 
@@ -1427,9 +1438,9 @@ function make_transformer_2w(
     # base on `base_power` (PowerFlowFileParser converts PSSE data to device base
     # in `psse.jl`, and `make_per_unit!` does not touch `br_r`/`br_x`; for
     # matpower `base_power == system base` so device base == system base).
-    # `TwoWindingTransformer.r`/`x` also store device base on `base_power`, so no
-    # rebasing is applied here.
-    winding = _make_transformer_winding(
+    # The circuit's `r`/`x` store the series impedance in device base on
+    # `base_power`, so no rebasing is applied here.
+    circuit = _make_transformer_circuit(
         d,
         Arc(bus_f, bus_t);
         tap_key = "tap",
@@ -1437,23 +1448,23 @@ function make_transformer_2w(
         group_key = "group_number",
         control_suffix = 1,
         available = available_value,
+        r = d["br_r"],
+        x = d["br_x"],
         rating = _get_rating("TwoWindingTransformer", name, d, "rate_a"),
         rating_b = _get_rating("TwoWindingTransformer", name, d, "rate_b"),
         rating_c = _get_rating("TwoWindingTransformer", name, d, "rate_c"),
         base_power = base_power,
         # for psse inputs, this may differ from the buses' base voltages
-        base_voltage = _base_voltage_or_nothing(d["base_voltage_from"]),
+        base_voltage_primary = _base_voltage_or_nothing(d["base_voltage_from"]),
+        base_voltage_secondary = _base_voltage_or_nothing(d["base_voltage_to"]),
         active_power_flow = pf,
         reactive_power_flow = qf,
     )
 
     return TwoWindingTransformer(;
         name = name,
-        winding = winding,
-        r = d["br_r"],
-        x = d["br_x"],
+        circuit = circuit,
         magnetizing_shunt = Complex(d["g_fr"], d["b_fr"]),
-        base_voltage_secondary = _base_voltage_or_nothing(d["base_voltage_to"]),
         ext = get(d, "ext", Dict{String, Any}()),
     )
 end
@@ -1471,11 +1482,15 @@ function make_3w_transformer(
 
     # Each winding's device (winding) base power is the pairwise base of the pair
     # whose first index is that winding: primary -> base_power_12,
-    # secondary -> base_power_23, tertiary -> base_power_13. The pairwise
-    # impedances (r_12/x_12, ...) are already on their respective pair device
-    # bases (PowerFlowFileParser converts/passes them through unchanged), matching
-    # the `ThreeWindingTransformer` field semantics, so no rebasing is applied.
-    primary_winding = _make_transformer_winding(
+    # secondary -> base_power_23, tertiary -> base_power_31. The star-leg
+    # impedances (r_primary/x_primary, ...) reach this maker already on their
+    # respective winding device bases (PowerFlowFileParser performs the
+    # delta->star conversion), matching the circuit field semantics, so no
+    # rebasing is applied. The magnetizing shunt is transformer-level and lives
+    # on the parent (PRIMARY = winding-1 terminal side). The star side has no
+    # distinct base voltage, so each circuit's secondary base voltage defaults
+    # to its primary.
+    primary_circuit = _make_transformer_circuit(
         d,
         Arc(bus_primary, star_bus);
         tap_key = "primary_turns_ratio",
@@ -1483,13 +1498,16 @@ function make_3w_transformer(
         group_key = "primary_group_number",
         control_suffix = 1,
         available = Bool(d["available_primary"]),
+        r = d["r_primary"],
+        x = d["x_primary"],
         rating = _get_rating("ThreeWindingTransformer", name, d, "rating_primary"),
         base_power = d["base_power_12"],
-        base_voltage = d["base_voltage_primary"],
+        base_voltage_primary = d["base_voltage_primary"],
+        base_voltage_secondary = d["base_voltage_primary"],
         active_power_flow = pf,
         reactive_power_flow = qf,
     )
-    secondary_winding = _make_transformer_winding(
+    secondary_circuit = _make_transformer_circuit(
         d,
         Arc(bus_secondary, star_bus);
         tap_key = "secondary_turns_ratio",
@@ -1497,13 +1515,16 @@ function make_3w_transformer(
         group_key = "secondary_group_number",
         control_suffix = 2,
         available = Bool(d["available_secondary"]),
+        r = d["r_secondary"],
+        x = d["x_secondary"],
         rating = _get_rating("ThreeWindingTransformer", name, d, "rating_secondary"),
         base_power = d["base_power_23"],
-        base_voltage = d["base_voltage_secondary"],
+        base_voltage_primary = d["base_voltage_secondary"],
+        base_voltage_secondary = d["base_voltage_secondary"],
         active_power_flow = pf,
         reactive_power_flow = qf,
     )
-    tertiary_winding = _make_transformer_winding(
+    tertiary_circuit = _make_transformer_circuit(
         d,
         Arc(bus_tertiary, star_bus);
         tap_key = "tertiary_turns_ratio",
@@ -1511,29 +1532,32 @@ function make_3w_transformer(
         group_key = "tertiary_group_number",
         control_suffix = 3,
         available = Bool(d["available_tertiary"]),
+        r = d["r_tertiary"],
+        x = d["x_tertiary"],
         rating = _get_rating("ThreeWindingTransformer", name, d, "rating_tertiary"),
-        base_power = d["base_power_13"],
-        base_voltage = d["base_voltage_tertiary"],
+        base_power = d["base_power_31"],
+        base_voltage_primary = d["base_voltage_tertiary"],
+        base_voltage_secondary = d["base_voltage_tertiary"],
         active_power_flow = pf,
         reactive_power_flow = qf,
     )
 
     return ThreeWindingTransformer(;
         name = name,
-        primary_winding = primary_winding,
-        secondary_winding = secondary_winding,
-        tertiary_winding = tertiary_winding,
+        primary_circuit = primary_circuit,
+        secondary_circuit = secondary_circuit,
+        tertiary_circuit = tertiary_circuit,
+        magnetizing_shunt = Complex(d["g"], d["b"]),
         star_bus = star_bus,
         r_12 = d["r_12"],
         x_12 = d["x_12"],
         r_23 = d["r_23"],
         x_23 = d["x_23"],
-        r_13 = d["r_13"],
-        x_13 = d["x_13"],
+        r_31 = d["r_31"],
+        x_31 = d["x_31"],
         base_power_12 = d["base_power_12"],
         base_power_23 = d["base_power_23"],
-        base_power_13 = d["base_power_13"],
-        magnetizing_shunt = Complex(d["g"], d["b"]),
+        base_power_31 = d["base_power_31"],
         ext = get(d, "ext", Dict{String, Any}()),
     )
 end
