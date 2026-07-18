@@ -451,6 +451,22 @@ function read_bus!(sys::System, data::Dict; kwargs...)
             to_area = get_component(Area, sys, area_to_name)
 
             name = "$(area_from_name)_$(area_to_name)_$(transfer_id)"
+
+            if isnothing(from_area) || isnothing(to_area)
+                missing_areas = join(
+                    filter(
+                        !isnothing,
+                        [
+                            isnothing(from_area) ? area_from_name : nothing,
+                            isnothing(to_area) ? area_to_name : nothing,
+                        ],
+                    ),
+                    ", ",
+                )
+                @warn "Inter-area transfer record $k references undefined area(s) $missing_areas; skipping AreaInterchange $name"
+                continue
+            end
+
             available = true
             active_power_flow = d["power_transfer"]
             flow_limits = (from_to = -INFINITE_BOUND, to_from = INFINITE_BOUND)
@@ -1796,6 +1812,10 @@ function read_vscline!(
 
     for (d_key, d) in data["vscline"]
         d["name"] = get(d, "name", d_key)
+        if !haskey(bus_number_to_bus, d["f_bus"]) || !haskey(bus_number_to_bus, d["t_bus"])
+            @warn "VSC line $d_key references undefined bus(es) (from = $(d["f_bus"]), to = $(d["t_bus"])); skipping"
+            continue
+        end
         bus_f = bus_number_to_bus[d["f_bus"]]
         bus_t = bus_number_to_bus[d["t_bus"]]
         name = _get_name(d, bus_f, bus_t)

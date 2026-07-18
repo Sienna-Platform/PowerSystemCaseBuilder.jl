@@ -41,7 +41,6 @@ import PowerTableDataParser
 
 # imports for parsers/ to work
 import Unicode: normalize
-import PowerFlowData
 
 #TimeStamp Management Imports
 import TimeSeries
@@ -152,7 +151,6 @@ include("parsers/common.jl")
 include("parsers/enums.jl")
 include("parsers/power_system_table_data.jl")
 include("parsers/power_models_data.jl")
-include("parsers/powerflowdata_data.jl")
 include("parsers/psse_dynamic_data.jl")
 #include("parsers/psse_metadata_reimport.jl")
 

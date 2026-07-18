@@ -22,7 +22,15 @@ end
 
 function build_pti_30(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = make_system(PowerFlowFileParser.PowerFlowDataNetwork(raw_data), sys_kwargs...)
+    # synthetic_data_v30.raw carries a 3-winding transformer record (CW=1) with
+    # tertiary WINDV3 = 13.8 -- a literal 1380% tap, outside PSY's valid transformer
+    # tap range. The fixture exists to exercise v30 record-format parsing, not data
+    # sanity, so validation is deliberately skipped here.
+    sys = make_system(
+        PowerFlowFileParser.PowerModelsData(raw_data);
+        runchecks = false,
+        sys_kwargs...,
+    )
     return sys
 end
 
