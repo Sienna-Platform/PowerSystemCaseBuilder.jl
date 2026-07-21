@@ -1871,10 +1871,16 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         g = d["r"] == 0.0 ? 0.0 : 1.0 / d["r"],
         dc_current = get(d, "if", 0.0),
         reactive_power_from = get(d, "qf", 0.0),
-        dc_control_from = d["dc_voltage_control_from"] ? VSCDCControlModes.DC_VOLTAGE :
-                          VSCDCControlModes.DC_POWER,
-        ac_control_from = d["ac_voltage_control_from"] ? VSCACControlModes.AC_VOLTAGE :
-                          VSCACControlModes.AC_REACTIVE_POWER,
+        dc_control_from = if d["dc_voltage_control_from"]
+            VSCDCControlModes.DC_VOLTAGE
+        else
+            VSCDCControlModes.DC_POWER
+        end,
+        ac_control_from = if d["ac_voltage_control_from"]
+            VSCACControlModes.AC_VOLTAGE
+        else
+            VSCACControlModes.AC_REACTIVE_POWER
+        end,
         dc_setpoint_from = d["dc_setpoint_from"],
         ac_setpoint_from = d["ac_setpoint_from"],
         converter_loss_from = d["converter_loss_from"],
@@ -1883,10 +1889,16 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         reactive_power_limits_from = (min = d["qminf"], max = d["qmaxf"]),
         power_factor_weighting_fraction_from = d["power_factor_weighting_fraction_from"],
         reactive_power_to = get(d, "qt", 0.0),
-        dc_control_to = d["dc_voltage_control_to"] ? VSCDCControlModes.DC_VOLTAGE :
-                        VSCDCControlModes.DC_POWER,
-        ac_control_to = d["ac_voltage_control_to"] ? VSCACControlModes.AC_VOLTAGE :
-                        VSCACControlModes.AC_REACTIVE_POWER,
+        dc_control_to = if d["dc_voltage_control_to"]
+            VSCDCControlModes.DC_VOLTAGE
+        else
+            VSCDCControlModes.DC_POWER
+        end,
+        ac_control_to = if d["ac_voltage_control_to"]
+            VSCACControlModes.AC_VOLTAGE
+        else
+            VSCACControlModes.AC_REACTIVE_POWER
+        end,
         dc_setpoint_to = d["dc_setpoint_to"],
         ac_setpoint_to = d["ac_setpoint_to"],
         converter_loss_to = d["converter_loss_to"],
