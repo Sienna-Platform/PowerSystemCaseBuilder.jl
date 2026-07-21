@@ -495,7 +495,6 @@ function make_modified_RTS_GMLC_sys(
     )
 
     sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
-    PSY.set_units_base_system!(sys, "SYSTEM_BASE")
     res_up = PSY.get_component(PSY.VariableReserve{PSY.ReserveUp}, sys, "Flex_Up")
     res_dn = PSY.get_component(PSY.VariableReserve{PSY.ReserveDown}, sys, "Flex_Down")
     PSY.remove_component!(sys, res_dn)

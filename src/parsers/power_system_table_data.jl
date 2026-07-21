@@ -128,7 +128,6 @@ function make_system(
         filter(kv -> kv.first !== :timeseries_metadata_file, kwargs)...,
         #kwargs...,
     )
-    set_units_base_system!(sys, IS.UnitSystem.DEVICE_BASE)
 
     loadzone_csv_parser!(sys, data)
     bus_csv_parser!(sys, data)
