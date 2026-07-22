@@ -95,7 +95,6 @@ function _build_system(
         PSY.get_runchecks(sys)
         # update_stats!(sys_descriptor, time() - start)
     end
-    PSY.set_units_base_system!(sys, "SYSTEM_BASE")
     print_stat ? print_stats(sys_descriptor) : nothing
     return sys
 end
