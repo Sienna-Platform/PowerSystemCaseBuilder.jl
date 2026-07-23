@@ -1,6 +1,6 @@
 name = "PowerSystemCaseBuilder"
 uuid = "f00506e0-b84f-492a-93c2-c0a9afc4364e"
-version = "2.3.0"
+version = "2.4.0"
 authors = ["SIENNA TEAM"]
 
 [deps]
