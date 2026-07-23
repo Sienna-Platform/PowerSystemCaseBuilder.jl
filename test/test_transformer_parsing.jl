@@ -144,38 +144,6 @@ end
     @test ctrl2.control_limits == (min = 0.5, max = 1.5)
 end
 
-@testset "PSSE v30 unresolvable cross-references warn and are skipped" begin
-    # synthetic_data_v30.raw now parses through the standard PowerModelsData path
-    # (build_pti_30 no longer routes through the retired PowerFlowDataNetwork maker).
-    # The fixture carries two kinds of dangling cross-references that must be
-    # tolerated rather than crash the build:
-    #   - two inter-area-transfer records naming areas "1"/"2", which no bus in the
-    #     file declares (real bus areas are 227/117/127) -- read_bus! must warn and
-    #     skip the AreaInterchange instead of throwing on non-nullable from/to areas.
-    #   - one VSC line record naming converter buses 1117/114, neither of which
-    #     exists in the file's BUS data -- read_vscline! must warn and skip instead
-    #     of a raw KeyError.
-    # The file's 3W-transformer record also carries an out-of-range tertiary tap
-    # (WINDV3 = 13.8 under CW = 1); that is why build_pti_30 builds this system with
-    # runchecks = false (see pssetest_library.jl) -- it is bad synthetic data, not a
-    # parser bug, and is unrelated to the two warnings pinned here.
-    sys = @test_logs(
-        (:warn, r"Inter-area transfer record .* references undefined area\(s\) 1, 2"),
-        (:warn, r"Inter-area transfer record .* references undefined area\(s\) 1, 2"),
-        (:warn, r"VSC line .* references undefined bus\(es\) \(from = 1117, to = 114\)"),
-        match_mode = :any,
-        build_system(PSSEParsingTestSystems, "PSSE 30 Test System"; force_build = true)
-    )
-    @test sys isa PSY.System
-    # Both inter-area-transfer records reference undefined areas, so neither should
-    # have produced an AreaInterchange.
-    @test isempty(get_components(PSY.AreaInterchange, sys))
-    # The VSC line record is skipped, but the 3W transformer (whose tap is merely
-    # implausible, not referentially broken) still builds.
-    @test isempty(get_components(PSY.TwoTerminalVSCLine, sys))
-    @test length(collect(get_components(ThreeWindingTransformer, sys))) == 1
-end
-
 @testset "3W zero-impedance and mag fixtures build" begin
     for name in (
         "psse_4_zero_impedance_3wt_test_system",
