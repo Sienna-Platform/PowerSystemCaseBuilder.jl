@@ -229,7 +229,7 @@ function get_branch_type(
 
     is_transformer || return Line
 
-    return tap == 1.0 ? Transformer2W : TapTransformer
+    return TwoWindingTransformer
 end
 
 """
@@ -270,34 +270,30 @@ function branch_csv_parser!(sys::System, data::PowerTableDataParser.PowerSystemT
                     max = branch.max_angle_limits,
                 ),
             )
-        elseif branch_type == Transformer2W
-            value = Transformer2W(;
-                name = name,
-                available = available,
-                active_power_flow = pf,
-                reactive_power_flow = qf,
+        elseif branch_type == TwoWindingTransformer
+            # Table data has no COD/control-mode columns, so the circuit is
+            # uncontrolled (`control_objective` stays `UNDEFINED`) with no vector
+            # group (`winding_group_number` stays `UNDEFINED`). `branch.tap`
+            # already carries the tap ratio. The circuit `base_power` is
+            # `data.base_power`.
+            circuit = TransformerCircuit(;
                 arc = connection_points,
-                r = branch.r,
-                x = branch.x,
-                primary_shunt = branch.primary_shunt,
-                winding_group_number = WindingGroupNumber.UNDEFINED,
-                rating = branch.rate,
-                base_power = data.base_power, # use system base power
-            )
-        elseif branch_type == TapTransformer
-            value = TapTransformer(;
-                name = name,
-                available = available,
-                active_power_flow = pf,
-                reactive_power_flow = qf,
-                arc = connection_points,
-                r = branch.r,
-                x = branch.x,
-                primary_shunt = branch.primary_shunt,
-                winding_group_number = WindingGroupNumber.UNDEFINED,
                 tap = branch.tap,
+                winding_group_number = WindingGroupNumber.UNDEFINED,
+                available = available,
+                r = branch.r,
+                x = branch.x,
                 rating = branch.rate,
-                base_power = data.base_power, # use system base power
+                active_power_flow = pf,
+                reactive_power_flow = qf,
+                base_power = data.base_power,
+                base_voltage_primary = get_base_voltage(bus_from),
+                base_voltage_secondary = get_base_voltage(bus_to),
+            )
+            value = TwoWindingTransformer(;
+                name = name,
+                circuit = circuit,
+                magnetizing_shunt = branch.primary_shunt,
             )
         else
             error("Unsupported branch type $branch_type")
