@@ -1,14 +1,31 @@
+# Fixtures that carry corrupt data which the parser should report at error level.
+const EXPECTED_BUILD_LOG_ERRORS = Dict(
+    "isolated_bus_test_system" => r"topologically isolated bus",
+)
+
+function build_parsing_test_system(case_type, name)
+    expected_error = get(EXPECTED_BUILD_LOG_ERRORS, name, nothing)
+    if isnothing(expected_error)
+        return build_system(case_type, name; force_build = true)
+    end
+    return @test_logs (:error, expected_error) match_mode = :any build_system(
+        case_type,
+        name;
+        force_build = true,
+    )
+end
+
 @testset "Test Serialization/De-Serialization Parsing System Tests" begin
     system_catalog = SystemCatalog(SYSTEM_CATALOG)
     for case_type in [PSSEParsingTestSystems, MatpowerTestSystems]
         for (name, descriptor) in system_catalog.data[case_type]
             # build a new system from scratch
-            sys = build_system(case_type, name; force_build = true)
+            sys = build_parsing_test_system(case_type, name)
 
             @test isa(sys, System)
             # build a new system from json
             @test PSB.is_serialized(name)
-            sys2 = build_system(case_type, name; force_build = true)
+            sys2 = build_parsing_test_system(case_type, name)
             @test isa(sys2, System)
 
             PSB.clear_serialized_system(name)
