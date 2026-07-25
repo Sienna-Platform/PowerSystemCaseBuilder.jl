@@ -19,4 +19,4 @@ TimeSeries = "9e3dc215-6440-5c97-bce1-76c03772f85e"
 InfrastructureSystems = {url = "https://github.com/NREL-Sienna/InfrastructureSystems.jl", rev = "IS4"}
 PowerFlowFileParser = {url = "https://github.com/NREL-Sienna/PowerFlowFileParser.jl", rev = "psy6"}
 PowerSystems = {url = "https://github.com/NREL-Sienna/PowerSystems.jl", rev = "psy6"}
-PowerTableDataParser = {url = "https://github.com/NREL-Sienna/PowerTableDataParser.jl", rev = "psy6"}
+PowerTableDataParser = {url = "https://github.com/NLR-Sienna/PowerTableDataParser.jl", rev = "psy6"}
