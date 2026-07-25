@@ -22,9 +22,20 @@ list_systems(...); show_systems(...); list_categories()
 - Raw data via lazy artifacts (`Artifacts.toml`): `CaseData` = PowerSystemsTestData tarball (currently a 5.0-dev tag), `rts` = RTS-GMLC. **The CaseData download can flake — retry once before digging**; there is no retry in the code. Re-pin the sha256 when PowerSystemsTestData re-tags.
 - `SystemDescriptor`/`SystemBuildStats` are mutable with accessors — no dot access. Descriptors are shared mutable state across builds (audit-flagged); don't mutate them in builders.
 
+## The transformer refactor and the cache (PSY PR #1714, `d19f3244f`)
+
+The single highest-risk interaction between this package and the psy6 line. PSY replaced five concrete transformer types with two — `Transformer2W`/`TapTransformer`/`PhaseShiftingTransformer` → `TwoWindingTransformer`, `Transformer3W`/`PhaseShiftingTransformer3W` → `ThreeWindingTransformer` — and moved all series data onto a nested `TransformerCircuit` (one per 2W, three per 3W, joined at `star_bus`).
+
+Why PSB feels this harder than other packages: **the cache stores serialized systems and has no version-aware invalidation** (see above). Every cached JSON written before the refactor encodes the deleted type names and the old flat field layout, and `TransformerCircuit` has hand-written `IS.serialize`/`IS.deserialize` that encode `arc` as a UUID and deliberately omit `base_value`. A stale cache therefore fails to deserialize, or — worse — yields circuits with no units anchor, whose explicit-units getters misbehave with no error. **Clear `data/serialized_system/` after any transformer-touching PSY change**; do not trust a passing suite that ran off a warm cache.
+
+- Availability is derived, not stored: `get_available(t) = any(get_available, get_circuits(t))`, and `set_available!(t, val)` cascades to every circuit. A builder that sets availability on a transformer touches all of its circuits.
+- Builders constructing transformers must go through `add_component!` before any code reads an impedance — `base_value` is populated on attach.
+- Transformer parsing coverage lives in `test/test_transformer_parsing.jl`; the CaseData artifact is pinned at a `PowerSystemsTestData 5.0-dev2` tag carrying the post-refactor raw data.
+
 ## psy6 specifics
 
 - Branch `psy6`; `[sources]` pins in **both** root and `test/Project.toml`: IS→`IS4`, PowerSystems→`psy6`, PowerFlowFileParser→`psy6`, PowerTableDataParser→`psy6`. ⚠️ Known pin inconsistencies to not propagate: root Project.toml points PowerTableDataParser at the org typo `NLR-Sienna` and mixes `NREL-Sienna` vs `Sienna-Platform` orgs between root and test manifests.
+- ⚠️ `test/Project.toml` may still pin PSY to `transformer-refactor` and PowerFlowFileParser to `mb/transformer-refactor`. Both are merged now — PSY `d19f3244f`, PFFP `adf5cb1` — so those revs are stale and should read `psy6`. The *root* `Project.toml` pin was always correct, which is why PSB works as a dependency even when its own test env does not resolve.
 - **`src/utils/psy6_compat.jl` is a sanctioned exception to the no-shims policy**: method overloads accepting old `Nothing`/Float64 signatures (`ReserveDemandCurve`/`MarketBidCost`) because the pinned PowerSystemsTestData artifact still uses pre-psy6 constructor calls. Scoped to external artifact data only; include-order sensitive (after `definitions.jl`, before `system_library.jl`). Remove it when the artifact is regenerated — never widen it.
 - Parsing goes through PowerFlowFileParser/PowerTableDataParser (PSY has no parsers in this line).
 - Reduction fixtures (for PNM/PF/POM work): `c_sys5`/`c_sys14` reduce **nothing**; `case11_network_reductions` has real series arcs but no forecasts; matpower RTS/case24 for larger cases.
@@ -33,13 +44,15 @@ list_systems(...); show_systems(...); list_categories()
 ## Commands
 
 ```sh
-julia --project=test -e 'using Pkg; Pkg.instantiate()'
+julia --project=test -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'   # ONCE PER CLONE — see warning below
 julia --project=test test/runtests.jl                       # full suite
 julia --project=test test/runtests.jl test_psisystems       # single file (@includetests, stem without .jl)
 julia --project=docs -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'   # docs first time
 julia --project=docs docs/make.jl
 julia --project=scripts/formatter -e 'include("scripts/formatter/formatter_code.jl")'
 ```
+
+⚠️ **`Pkg.develop(path=".")` is mandatory, not optional.** `test/Project.toml` lists PowerSystemCaseBuilder as a plain dep with no path in `[sources]`, so a bare `Pkg.instantiate()` silently resolves the **registered** PSB from `~/.julia/packages/PowerSystemCaseBuilder/…` and your working tree is never exercised. The failure mode is deeply misleading: the suite reports dozens of errors from code you cannot find in the repo (e.g. `UndefVarError: set_units_base_system! not defined in PowerSystems`, `PSY.PowerSystemTableData` undefined) because they come from the old registered version. If a stack trace points into `~/.julia/packages/PowerSystemCaseBuilder/`, stop and run the develop step.
 
 Compile-check: `julia --project=/home/jdlara/Sienna_work/psy6 -e 'using PowerSystemCaseBuilder'`. Note per-package `Pkg.test()` honors this repo's own `[sources]` git pins, not the shared psy6 env — repoint `test/Project.toml` `[sources]` to local paths to test against local checkouts (restore after).
 

@@ -1741,6 +1741,18 @@ function read_dcline!(
     end
 end
 
+# PSS/E encodes "no remote regulated bus" as REMOT = 0, but PSY's
+# `remote_bus_control_*` is `Union{Nothing, Int}` with a valid range of `>= 1`, and spells
+# local terminal-bus regulation as `nothing`. Passing 0 straight through trips the
+# descriptor's `error` validation action.
+function _psse_remote_bus(d::Dict, key::String)
+    remote_bus = get(get(d, "ext", Dict()), key, 0)
+    if iszero(remote_bus)
+        return nothing
+    end
+    return remote_bus
+end
+
 function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
     return TwoTerminalVSCLine(;
         name = name,
@@ -1770,7 +1782,7 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         rating_from = d["rating_from"],
         reactive_power_limits_from = (min = d["qminf"], max = d["qmaxf"]),
         power_factor_weighting_fraction_from = d["power_factor_weighting_fraction_from"],
-        remote_bus_control_from = get(get(d, "ext", Dict()), "REMOT_FROM", 0),
+        remote_bus_control_from = _psse_remote_bus(d, "REMOT_FROM"),
         rmpct_from = get(get(d, "ext", Dict()), "RMPCT_FROM", 100.0),
         reactive_power_to = get(d, "qt", 0.0),
         dc_control_to = if d["dc_voltage_control_to"]
@@ -1788,7 +1800,7 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         converter_loss_to = d["converter_loss_to"],
         max_dc_current_to = d["max_dc_current_to"],
         rating_to = d["rating_to"],
-        remote_bus_control_to = get(get(d, "ext", Dict()), "REMOT_TO", 0),
+        remote_bus_control_to = _psse_remote_bus(d, "REMOT_TO"),
         rmpct_to = get(get(d, "ext", Dict()), "RMPCT_TO", 100.0),
         reactive_power_limits_to = (min = d["qmint"], max = d["qmaxt"]),
         power_factor_weighting_fraction_to = d["power_factor_weighting_fraction_to"],
