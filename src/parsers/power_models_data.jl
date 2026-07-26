@@ -1855,6 +1855,8 @@ function make_switched_shunt(name::String, d::Dict, bus::ACBus)
         :number_of_steps => d["step_number"],
         :Y_increase => d["y_increment"],
         :admittance_limits => d["admittance_limits"],
+        :control_mode => SwitchedAdmittanceControlMode(d["control_mode"]),
+        :regulated_bus_number => d["regulated_bus_number"],
         :ext => d["ext"],
     )
 
