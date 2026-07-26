@@ -1872,7 +1872,7 @@ function make_switched_shunt(name::String, d::Dict, bus::ACBus)
     valid_control_modes = map(mode -> mode.value, instances(SwitchedAdmittanceControlMode))
     if !(control_mode_value in valid_control_modes)
         throw(
-            DataFormatError(
+            IS.DataFormatError(
                 "Switched shunt $name: unsupported MODSW control mode $control_mode_value",
             ),
         )
