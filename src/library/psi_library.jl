@@ -2056,9 +2056,9 @@ function build_118_bus_DA(; kwargs...)
     loads = power_load118(nodes118())
     for i in 1:3
         region = get_component(Area, sys, "R$i")
-        begin_time_series_update(sys) do
+        time_series_transaction(sys) do context
             for component in get_components_in_aggregation_topology(PowerLoad, sys, region)
-                add_time_series!(sys, component, load_TS[i])
+                add_time_series!(sys, component, load_TS[i]; context = context)
             end
         end
     end
@@ -2163,9 +2163,9 @@ function build_118_bus_RT(; kwargs...)
     loads = power_load118(nodes118())
     for i in 1:3
         region = get_component(Area, sys, "R$i")
-        begin_time_series_update(sys) do
+        time_series_transaction(sys) do context
             for component in get_components_in_aggregation_topology(PowerLoad, sys, region)
-                add_time_series!(sys, component, load_TS[i])
+                add_time_series!(sys, component, load_TS[i]; context = context)
             end
         end
     end

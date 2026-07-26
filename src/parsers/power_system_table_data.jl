@@ -195,7 +195,9 @@ function _add_time_series_from_pointers!(
     base_dir = dirname(metadata_file)
     csv_cache = Dict{String, DataFrames.DataFrame}()
     seen = Set{Tuple{Int, String}}()
-    associations = IS.TimeSeriesAssociation[]
+    # Gathered while reading CSVs, written in one block afterwards: an open block
+    # holds the store's write lock, so the slow parsing stays outside it.
+    associations = Tuple{Any, SingleTimeSeries}[]
     for entry in entries
         String(entry.type) == "SingleTimeSeries" || continue
         entry_res = Dates.Second(entry.resolution)
@@ -236,7 +238,7 @@ function _add_time_series_from_pointers!(
         end
         timestamps = range(initial_timestamp; step = entry_res, length = length(values))
         ta = TimeSeries.TimeArray(timestamps, values)
-        push!(associations, IS.TimeSeriesAssociation(component, SingleTimeSeries(name, ta)))
+        push!(associations, (component, SingleTimeSeries(name, ta)))
 
         # A pointer on an AggregationTopology (a LoadZone/Area) with a max-power
         # multiplier does not describe that topology's own device series: it is a
@@ -258,7 +260,13 @@ function _add_time_series_from_pointers!(
             timestamps,
         )
     end
-    isempty(associations) || bulk_add_time_series!(sys, associations)
+    if !isempty(associations)
+        time_series_transaction(sys) do context
+            for (component, ts) in associations
+                add_time_series!(sys, component, ts; context = context)
+            end
+        end
+    end
     return
 end
 
@@ -355,10 +363,7 @@ function _fan_out_aggregation_time_series!(
         scaled = profile .* peak
         push!(
             associations,
-            IS.TimeSeriesAssociation(
-                load,
-                SingleTimeSeries(name, TimeSeries.TimeArray(timestamps, scaled)),
-            ),
+            (load, SingleTimeSeries(name, TimeSeries.TimeArray(timestamps, scaled))),
         )
     end
     return
