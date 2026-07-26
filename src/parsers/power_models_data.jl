@@ -1377,7 +1377,11 @@ function _transformer_control_fields(d::Dict, suffix::Int)
     record = string(get(d, "name", get(d, "source_id", "unknown")))
     # RMA/RMI are PSS/E degrees for phase-shift CODs; -180/180 converts to the
     # documented radian default (-π, π) below rather than the tap-band (0.9, 1.1).
-    rmi_default, rma_default = phase_shifting ? (-180.0, 180.0) : (0.9, 1.1)
+    if phase_shifting
+        rmi_default, rma_default = -180.0, 180.0
+    else
+        rmi_default, rma_default = 0.9, 1.1
+    end
     rmi, rma = get(d, "RMI$suffix", rmi_default), get(d, "RMA$suffix", rma_default)
     if rmi > rma
         @warn "Transformer record $record winding $suffix has inverted control limits RMI$suffix = $rmi > RMA$suffix = $rma; normalizing to (min = $rma, max = $rmi)."
