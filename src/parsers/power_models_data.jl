@@ -1346,6 +1346,15 @@ function read_switch_breaker!(
     end
 end
 
+# COD values whose control objective is a phase-shift (angle) control rather
+# than a tap (voltage/reactive) control.
+const _PSSE_PHASE_SHIFT_OBJECTIVES = (
+    TransformerControlObjective.ACTIVE_POWER_FLOW,
+    TransformerControlObjective.ACTIVE_POWER_FLOW_DISABLED,
+    TransformerControlObjective.ASYMMETRIC_ACTIVE_POWER_FLOW,
+    TransformerControlObjective.ASYMMETRIC_ACTIVE_POWER_FLOW_DISABLED,
+)
+
 """
 Resolve the flat per-winding control fields from a PowerModels transformer dict
 `d` for winding `suffix` (1/2/3), mirroring the PSS/E per-winding control block
@@ -1357,13 +1366,6 @@ null state (no control block). Any other COD — including `0` (FIXED) and negat
 (disabled) codes — is preserved as data. Matpower records carry no COD keys, so
 `control_objective` stays `UNDEFINED` there (the `get` defaults handle it).
 """
-const _PSSE_PHASE_SHIFT_OBJECTIVES = (
-    TransformerControlObjective.ACTIVE_POWER_FLOW,
-    TransformerControlObjective.ACTIVE_POWER_FLOW_DISABLED,
-    TransformerControlObjective.ASYMMETRIC_ACTIVE_POWER_FLOW,
-    TransformerControlObjective.ASYMMETRIC_ACTIVE_POWER_FLOW_DISABLED,
-)
-
 function _transformer_control_fields(d::Dict, suffix::Int)
     cod = get(d, "COD$suffix", -99)
     objective = TransformerControlObjective(cod)
@@ -1866,6 +1868,16 @@ function read_vscline!(
 end
 
 function make_switched_shunt(name::String, d::Dict, bus::ACBus)
+    control_mode_value = d["control_mode"]
+    valid_control_modes = map(mode -> mode.value, instances(SwitchedAdmittanceControlMode))
+    if !(control_mode_value in valid_control_modes)
+        throw(
+            DataFormatError(
+                "Switched shunt $name: unsupported MODSW control mode $control_mode_value",
+            ),
+        )
+    end
+
     params = Dict(
         :name => name,
         :available => Bool(d["status"]),
@@ -1874,7 +1886,7 @@ function make_switched_shunt(name::String, d::Dict, bus::ACBus)
         :number_of_steps => d["step_number"],
         :Y_increase => d["y_increment"],
         :admittance_limits => d["admittance_limits"],
-        :control_mode => SwitchedAdmittanceControlMode(d["control_mode"]),
+        :control_mode => SwitchedAdmittanceControlMode(control_mode_value),
         :regulated_bus_number => d["regulated_bus_number"],
         :ext => d["ext"],
     )
