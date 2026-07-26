@@ -1357,8 +1357,17 @@ null state (no control block). Any other COD — including `0` (FIXED) and negat
 (disabled) codes — is preserved as data. Matpower records carry no COD keys, so
 `control_objective` stays `UNDEFINED` there (the `get` defaults handle it).
 """
+const _PSSE_PHASE_SHIFT_OBJECTIVES = (
+    TransformerControlObjective.ACTIVE_POWER_FLOW,
+    TransformerControlObjective.ACTIVE_POWER_FLOW_DISABLED,
+    TransformerControlObjective.ASYMMETRIC_ACTIVE_POWER_FLOW,
+    TransformerControlObjective.ASYMMETRIC_ACTIVE_POWER_FLOW_DISABLED,
+)
+
 function _transformer_control_fields(d::Dict, suffix::Int)
     cod = get(d, "COD$suffix", -99)
+    objective = TransformerControlObjective(cod)
+    phase_shifting = objective in _PSSE_PHASE_SHIFT_OBJECTIVES
     # RMI/RMA and VMI/VMA are the lower/upper edges of a band. Some (typically
     # synthetic) PSS/E data has them numerically inverted by rounding
     # (e.g. frankenstein_70.raw has VMA1 = 0.984 < VMI1 = 0.985); warn and
@@ -1366,10 +1375,16 @@ function _transformer_control_fields(d::Dict, suffix::Int)
     # the attach-time band-ordering check. The warning surfaces genuinely
     # corrupt bands on actively-controlled windings instead of hiding them.
     record = string(get(d, "name", get(d, "source_id", "unknown")))
-    rmi, rma = get(d, "RMI$suffix", 0.9), get(d, "RMA$suffix", 1.1)
+    # RMA/RMI are PSS/E degrees for phase-shift CODs; -180/180 converts to the
+    # documented radian default (-π, π) below rather than the tap-band (0.9, 1.1).
+    rmi_default, rma_default = phase_shifting ? (-180.0, 180.0) : (0.9, 1.1)
+    rmi, rma = get(d, "RMI$suffix", rmi_default), get(d, "RMA$suffix", rma_default)
     if rmi > rma
         @warn "Transformer record $record winding $suffix has inverted control limits RMI$suffix = $rmi > RMA$suffix = $rma; normalizing to (min = $rma, max = $rmi)."
         rmi, rma = rma, rmi
+    end
+    if phase_shifting
+        rmi, rma = deg2rad(rmi), deg2rad(rma)
     end
     vmi, vma = get(d, "VMI$suffix", 0.9), get(d, "VMA$suffix", 1.1)
     if vmi > vma
@@ -1377,7 +1392,7 @@ function _transformer_control_fields(d::Dict, suffix::Int)
         vmi, vma = vma, vmi
     end
     return (
-        control_objective = TransformerControlObjective(cod),
+        control_objective = objective,
         regulated_bus_number = get(d, "CONT$suffix", 0),
         control_limits = (min = rmi, max = rma),
         controlled_quantity_limits = (min = vmi, max = vma),
