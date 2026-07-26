@@ -63,6 +63,15 @@ function make_system(pm_data::PowerFlowFileParser.PowerModelsData; kwargs...)
 end
 
 """
+Construct a System from a PSS/E raw file via the PowerModels dict pipeline. Thin shim
+over [`make_system`](@ref); the metadata-reimport path threads its name-formatter kwargs
+through it.
+"""
+function system_via_power_models(file_path::AbstractString; kwargs...)
+    return make_system(PowerFlowFileParser.PowerModelsData(file_path); kwargs...)
+end
+
+"""
 Internal component name retrieval from pm2ps_dict
 """
 function _get_pm_dict_name(device_dict::Dict)::String

@@ -226,7 +226,7 @@ function parse_export_metadata_dict(md::Dict)
 end
 
 "Construct a System from a `.raw` file and a dictionary corresponding to the `<name>_export_metadata.json` file"
-function System(file_path::AbstractString, md::Dict; kwargs...)
+function PSY.System(file_path::AbstractString, md::Dict; kwargs...)
     sys_kwargs, bus_number_mapping = parse_export_metadata_dict(md)
     sys = system_via_power_models(file_path; merge(sys_kwargs, kwargs)...)
     # Remap bus numbers last because everything has been added to the system using PSS/E bus numbers
