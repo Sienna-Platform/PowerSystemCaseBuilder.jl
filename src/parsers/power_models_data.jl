@@ -1772,6 +1772,7 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         active_power_limits_from = (min = d["pminf"], max = d["pmaxf"]),
         active_power_limits_to = (min = d["pmint"], max = d["pmaxt"]),
         g = d["r"] == 0.0 ? 0.0 : 1.0 / d["r"],
+        rated_dc_voltage = d["rated_dc_voltage"],
         dc_current = get(d, "if", 0.0),
         reactive_power_from = get(d, "qf", 0.0),
         dc_control_from = if d["dc_voltage_control_from"]
