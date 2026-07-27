@@ -1,6 +1,6 @@
 # PowerSystemCaseBuilder.jl (PSB) — psy6 branch
 
-The Sienna **test-system fixture factory**: a registry of 200+ named `PSY.System` cases built from raw data (Matpower, PSSE raw/dyr, tabular CSV, PowerFlowData) with an on-disk serialized cache, so downstream test suites (PSY, PNM, PF, POM) get systems in seconds. Not an optimization package. Its serialization is PSY's own IS-based JSON+HDF5 — **not** the OpenAPI/GridDB pipeline. Platform conventions: `.claude/Sienna.md`; workspace architecture: `/home/jdlara/Sienna_work/psy6/CLAUDE.md`.
+The Sienna **test-system fixture factory**: a registry of 200+ named `PSY.System` cases built from raw data (Matpower, PSSE raw/dyr, tabular CSV, PowerFlowData) with an on-disk serialized cache, so downstream test suites (PSY, PNM, PF, POM) get systems in seconds. Not an optimization package. Its serialization is PSY's own IS-based JSON+HDF5 — **not** the OpenAPI/GridDB pipeline. Platform conventions: `.claude/Sienna.md`; workspace architecture: the psy6 workspace root `CLAUDE.md`.
 
 ## Why this package matters platform-wide
 
@@ -54,7 +54,7 @@ julia --project=scripts/formatter -e 'include("scripts/formatter/formatter_code.
 
 ⚠️ **`Pkg.develop(path=".")` is mandatory, not optional.** `test/Project.toml` lists PowerSystemCaseBuilder as a plain dep with no path in `[sources]`, so a bare `Pkg.instantiate()` silently resolves the **registered** PSB from `~/.julia/packages/PowerSystemCaseBuilder/…` and your working tree is never exercised. The failure mode is deeply misleading: the suite reports dozens of errors from code you cannot find in the repo (e.g. `UndefVarError: set_units_base_system! not defined in PowerSystems`, `PSY.PowerSystemTableData` undefined) because they come from the old registered version. If a stack trace points into `~/.julia/packages/PowerSystemCaseBuilder/`, stop and run the develop step.
 
-Compile-check: `julia --project=/home/jdlara/Sienna_work/psy6 -e 'using PowerSystemCaseBuilder'`. Note per-package `Pkg.test()` honors this repo's own `[sources]` git pins, not the shared psy6 env — repoint `test/Project.toml` `[sources]` to local paths to test against local checkouts (restore after).
+Compile-check: `julia --project=<psy6-workspace-root> -e 'using PowerSystemCaseBuilder'`. Note per-package `Pkg.test()` honors this repo's own `[sources]` git pins, not the shared psy6 env — repoint `test/Project.toml` `[sources]` to local paths to test against local checkouts (restore after).
 
 ## Downstream blast radius
 
