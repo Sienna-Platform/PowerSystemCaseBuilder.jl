@@ -27,7 +27,7 @@ function make_system(pm_data::PowerFlowFileParser.PowerModelsData; kwargs...)
     runchecks = get(kwargs, :runchecks, true)
     data = pm_data.data
     if length(data["bus"]) < 1
-        throw(DataFormatError("There are no buses in this file."))
+        throw(IS.DataFormatError("There are no buses in this file."))
     end
 
     @info "Constructing System from Power Models" data["name"] data["source_type"]
@@ -229,7 +229,7 @@ function _impedance_correction_table_lookup(data::Dict)
             end
         else
             throw(
-                DataFormatError(
+                IS.DataFormatError(
                     "Impedance correction mismatch at table $table_number: tap/angle and scaling count differs.",
                 ),
             )
@@ -440,7 +440,7 @@ function read_bus!(sys::System, data::Dict; kwargs...)
         end
         bus = make_bus(bus_name, bus_number, d, bus_types, area)
         has_component(ACBus, sys, bus_name) && throw(
-            DataFormatError(
+            IS.DataFormatError(
                 "Found duplicate bus names for $(get_name(bus)), consider reviewing your `bus_name_formatter` function",
             ),
         )
@@ -609,21 +609,21 @@ function read_loads!(sys::System, data, bus_number_to_bus::Dict{Int, ACBus}; kwa
         if data["source_type"] == "pti" && is_interruptible && d["interruptible"] != 1
             load = make_standard_load(d, bus, sys_mbase; kwargs...)
             has_component(StandardLoad, sys, get_name(load)) && throw(
-                DataFormatError(
+                IS.DataFormatError(
                     "Found duplicate load names of $(summary(load)), consider formatting names with `load_name_formatter` kwarg",
                 ),
             )
         elseif data["source_type"] == "pti" && is_interruptible && d["interruptible"] == 1
             load = make_interruptible_standardload(d, bus, sys_mbase; kwargs...)
             has_component(InterruptibleStandardLoad, sys, get_name(load)) && throw(
-                DataFormatError(
+                IS.DataFormatError(
                     "Found duplicate interruptible load names of $(summary(load)), consider formatting names with `load_name_formatter` kwarg",
                 ),
             )
         else
             load = make_power_load(d, bus, sys_mbase; kwargs...)
             has_component(PowerLoad, sys, get_name(load)) && throw(
-                DataFormatError(
+                IS.DataFormatError(
                     "Found duplicate load names of $(summary(load)), consider formatting names with `load_name_formatter` kwarg",
                 ),
             )
@@ -1120,7 +1120,7 @@ function read_gen!(sys::System, data::Dict, bus_number_to_bus::Dict{Int, ACBus};
         end
 
         has_component(typeof(generator), sys, get_name(generator)) && throw(
-            DataFormatError(
+            IS.DataFormatError(
                 "Found duplicate $(typeof(generator)) names of $(get_name(generator)), consider formatting names with `gen_name_formatter` kwarg",
             ),
         )
@@ -1210,7 +1210,7 @@ function make_branch(
 
     if d["transformer"] && branch_type == Line
         throw(
-            DataFormatError(
+            IS.DataFormatError(
                 "Branch data mismatched, cannot build the branch correctly for $d",
             ),
         )
@@ -1937,7 +1937,7 @@ function make_facts(name::String, d::Dict, bus::ACBus)
     end
 
     if d["control_mode"] > 3
-        throw(DataFormatError("Operation mode not supported."))
+        throw(IS.DataFormatError("Operation mode not supported."))
     end
 
     return FACTSControlDevice(;

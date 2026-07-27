@@ -1,7 +1,7 @@
 function build_tamu_ACTIVSg2000_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     file_path = joinpath(raw_data, "ACTIVSg2000", "ACTIVSg2000.RAW")
-    !isfile(file_path) && throw(DataFormatError("Cannot find $file_path"))
+    !isfile(file_path) && throw(IS.DataFormatError("Cannot find $file_path"))
 
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
 
@@ -31,7 +31,7 @@ function build_tamu_ACTIVSg2000_sys(; raw_data, kwargs...)
         tamu_files[occursin.("_load_time_series_MW.csv", tamu_files)][1],
     ) # currently only adding MW load time_series
 
-    !isfile(load_file) && throw(DataFormatError("Cannot find $load_file"))
+    !isfile(load_file) && throw(IS.DataFormatError("Cannot find $load_file"))
 
     header = String.(split(open(readlines, load_file)[header_row], ","))
     fixed_cols = ["Date", "Time", "Num Load", "Total MW Load", "Total Mvar Load"]

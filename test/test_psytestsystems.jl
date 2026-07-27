@@ -1,3 +1,9 @@
+@testset "Test IS.DataFormatError throw path" begin
+    @test_throws IS.DataFormatError PSB.build_tamu_ACTIVSg2000_sys(;
+        raw_data = mktempdir(),
+    )
+end
+
 @testset "Test Serialization/De-Serialization PSY Tests" begin
     system_catalog = SystemCatalog(SYSTEM_CATALOG)
     for (name, descriptor) in system_catalog.data[PSYTestSystems]
