@@ -1128,33 +1128,6 @@ function read_gen!(sys::System, data::Dict, bus_number_to_bus::Dict{Int, ACBus};
     end
 end
 
-const _SHIFT_TO_GROUP_MAP = Dict{Float64, WindingGroupNumber}(
-    0.0 => WindingGroupNumber.GROUP_0,
-    -30.0 => WindingGroupNumber.GROUP_1,
-    -150.0 => WindingGroupNumber.GROUP_5,
-    180.0 => WindingGroupNumber.GROUP_6,
-    150.0 => WindingGroupNumber.GROUP_7,
-    30.0 => WindingGroupNumber.GROUP_11,
-)
-
-"""
-Resolve the [`WindingGroupNumber`](@ref) from the phase-shift angle stored under
-`angle_key` (radians). Stores the result in `d[group_key]` (dict consumers read it
-there) and returns it so the caller can use it directly.
-"""
-function _add_vector_control_group(d::Dict, angle_key::String, group_key::String)
-    angle = d[angle_key]
-    group = WindingGroupNumber.UNDEFINED
-    for (angle_key_deg, candidate) in _SHIFT_TO_GROUP_MAP
-        if isapprox(rad2deg(angle), angle_key_deg)
-            group = candidate
-            break
-        end
-    end
-    d[group_key] = group
-    return group
-end
-
 # Tap changing and phase shifting are winding data (`tap`, `α`, `control`), not
 # distinct component types, so these type-inference helpers only distinguish
 # Line / switch / transformer.
@@ -1409,16 +1382,14 @@ end
 """
 Build a [`TransformerCircuit`](@ref) from a PowerModels transformer dict `d`,
 mapping the per-winding keys named by the keyword arguments. Shared by the 2W
-maker (one circuit) and the 3W maker (three circuits). The vector group number is
-derived from the phase-shift angle under `angle_key` (see
-[`_add_vector_control_group`](@ref)); ratings are resolved by the caller.
+maker (one circuit) and the 3W maker (three circuits); ratings are resolved by
+the caller.
 """
 function _make_transformer_circuit(
     d::Dict,
     arc::Arc;
     tap_key::String,
     angle_key::String,
-    group_key::String,
     control_suffix::Int,
     available::Bool,
     r,
@@ -1437,7 +1408,6 @@ function _make_transformer_circuit(
         arc = arc,
         tap = get(d, tap_key, 1.0),
         α = d[angle_key],
-        winding_group_number = _add_vector_control_group(d, angle_key, group_key),
         r = r,
         x = x,
         control_objective = control.control_objective,
@@ -1491,7 +1461,6 @@ function make_transformer_2w(
         Arc(bus_f, bus_t);
         tap_key = "tap",
         angle_key = "shift",
-        group_key = "group_number",
         control_suffix = 1,
         available = available_value,
         r = d["br_r"],
@@ -1541,7 +1510,6 @@ function make_3w_transformer(
         Arc(bus_primary, star_bus);
         tap_key = "primary_turns_ratio",
         angle_key = "primary_phase_shift_angle",
-        group_key = "primary_group_number",
         control_suffix = 1,
         available = Bool(d["available_primary"]),
         r = d["r_primary"],
@@ -1558,7 +1526,6 @@ function make_3w_transformer(
         Arc(bus_secondary, star_bus);
         tap_key = "secondary_turns_ratio",
         angle_key = "secondary_phase_shift_angle",
-        group_key = "secondary_group_number",
         control_suffix = 2,
         available = Bool(d["available_secondary"]),
         r = d["r_secondary"],
@@ -1575,7 +1542,6 @@ function make_3w_transformer(
         Arc(bus_tertiary, star_bus);
         tap_key = "tertiary_turns_ratio",
         angle_key = "tertiary_phase_shift_angle",
-        group_key = "tertiary_group_number",
         control_suffix = 3,
         available = Bool(d["available_tertiary"]),
         r = d["r_tertiary"],

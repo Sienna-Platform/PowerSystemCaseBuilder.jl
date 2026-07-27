@@ -194,7 +194,6 @@ end
     @test !isnothing(t_a7)
     w_a7 = get_circuit(t_a7)
     @test PSY.get_tap(w_a7) ≈ 1.015 atol = 1e-9
-    @test PSY.get_winding_group_number(w_a7) == WindingGroupNumber.UNDEFINED
     @test PSY.get_control_objective(w_a7) == TransformerControlObjective.UNDEFINED
     @test PSY.get_available(w_a7)
     # parent/circuit base_power invariant (both set from the table's system base)

@@ -272,14 +272,12 @@ function branch_csv_parser!(sys::System, data::PowerTableDataParser.PowerSystemT
             )
         elseif branch_type == TwoWindingTransformer
             # Table data has no COD/control-mode columns, so the circuit is
-            # uncontrolled (`control_objective` stays `UNDEFINED`) with no vector
-            # group (`winding_group_number` stays `UNDEFINED`). `branch.tap`
+            # uncontrolled (`control_objective` stays `UNDEFINED`). `branch.tap`
             # already carries the tap ratio. The circuit `base_power` is
             # `data.base_power`.
             circuit = TransformerCircuit(;
                 arc = connection_points,
                 tap = branch.tap,
-                winding_group_number = WindingGroupNumber.UNDEFINED,
                 available = available,
                 r = branch.r,
                 x = branch.x,
