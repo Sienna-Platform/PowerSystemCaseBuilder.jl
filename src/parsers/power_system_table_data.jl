@@ -261,9 +261,9 @@ function _add_time_series_from_pointers!(
         )
     end
     if !isempty(associations)
-        time_series_transaction(sys) do context
+        time_series_transaction(sys) do txn
             for (component, ts) in associations
-                add_time_series!(sys, component, ts; context = context)
+                add_time_series!(txn, component, ts)
             end
         end
     end
