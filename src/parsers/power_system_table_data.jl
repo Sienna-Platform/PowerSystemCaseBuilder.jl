@@ -24,7 +24,7 @@ function get_user_field(
 )
     key = _category_key(category)
     if !haskey(data.user_descriptors, key)
-        throw(DataFormatError("Invalid category=$category"))
+        throw(IS.DataFormatError("Invalid category=$category"))
     end
 
     try
@@ -37,7 +37,7 @@ function get_user_field(
         (err)
         if err == KeyError
             msg = "Failed to find category=$category field=$field in input descriptors $err"
-            throw(DataFormatError(msg))
+            throw(IS.DataFormatError(msg))
         else
             throw(err)
         end
@@ -51,7 +51,7 @@ function get_user_fields(
 )
     key = _category_key(category)
     if !haskey(data.user_descriptors, key)
-        throw(DataFormatError("Invalid category=$category"))
+        throw(IS.DataFormatError("Invalid category=$category"))
     end
 
     return [x["name"] for x in data.user_descriptors[key]]
@@ -272,14 +272,12 @@ function branch_csv_parser!(sys::System, data::PowerTableDataParser.PowerSystemT
             )
         elseif branch_type == TwoWindingTransformer
             # Table data has no COD/control-mode columns, so the circuit is
-            # uncontrolled (`control_objective` stays `UNDEFINED`) with no vector
-            # group (`winding_group_number` stays `UNDEFINED`). `branch.tap`
+            # uncontrolled (`control_objective` stays `UNDEFINED`). `branch.tap`
             # already carries the tap ratio. The circuit `base_power` is
             # `data.base_power`.
             circuit = TransformerCircuit(;
                 arc = connection_points,
                 tap = branch.tap,
-                winding_group_number = WindingGroupNumber.UNDEFINED,
                 available = available,
                 r = branch.r,
                 x = branch.x,
@@ -310,7 +308,7 @@ function dc_branch_csv_parser!(sys::System, data::PowerTableDataParser.PowerSyst
     function make_dc_limits(dc_branch, min, max)
         min_lim = dc_branch[min]
         if isnothing(dc_branch[min]) && isnothing(dc_branch[max])
-            throw(DataFormatError("valid limits required for $min , $max"))
+            throw(IS.DataFormatError("valid limits required for $min , $max"))
         elseif isnothing(dc_branch[min])
             min_lim = dc_branch[max] * -1.0
         end
@@ -416,7 +414,7 @@ function gen_csv_parser!(sys::System, data::PowerTableDataParser.PowerSystemTabl
         @debug "making generator:" _group = IS.LOG_GROUP_PARSING gen.name
         bus = get_bus(sys, gen.bus_id)
         if isnothing(bus)
-            throw(DataFormatError("could not find $(gen.bus_id)"))
+            throw(IS.DataFormatError("could not find $(gen.bus_id)"))
         end
 
         # Returns a vector of reservoirs when applicable to hydro turbines
@@ -446,13 +444,13 @@ function cache_storage(data::PowerTableDataParser.PowerSystemTableData)
             if !haskey(gen_head_dict, s.generator_name)
                 gen_head_dict[s.generator_name] = s
             else
-                throw(DataFormatError("Duplicate head storage found for gen $s"))
+                throw(IS.DataFormatError("Duplicate head storage found for gen $s"))
             end
         elseif occursin("tail", normalize(s.position; casefold = true))
             if !haskey(gen_tail_dict, s.generator_name)
                 gen_tail_dict[s.generator_name] = s
             else
-                throw(DataFormatError("Duplicate tail storage found for gen $s"))
+                throw(IS.DataFormatError("Duplicate tail storage found for gen $s"))
             end
         end
     end
@@ -472,7 +470,7 @@ function load_csv_parser!(sys::System, data::PowerTableDataParser.PowerSystemTab
         bus = get_bus(sys, rawload.bus_id)
         if isnothing(bus)
             throw(
-                DataFormatError(
+                IS.DataFormatError(
                     "could not find bus_number=$(rawload.bus_id) for load=$(rawload.name)",
                 ),
             )
@@ -560,12 +558,12 @@ function services_csv_parser!(sys::System, data::PowerTableDataParser.PowerSyste
                 push!(component, components[1])
             else
                 msg = "Found duplicate names type=$component_type name=$name"
-                throw(DataFormatError(msg))
+                throw(IS.DataFormatError(msg))
             end
         end
         if length(component) > 1
             msg = "Found duplicate components with name=$name"
-            throw(DataFormatError(msg))
+            throw(IS.DataFormatError(msg))
         elseif length(component) == 1
             push!(contributing_devices, component[1])
         end
@@ -625,7 +623,7 @@ function services_csv_parser!(sys::System, data::PowerTableDataParser.PowerSyste
 
         if length(contributing_devices) == 0
             throw(
-                DataFormatError(
+                IS.DataFormatError(
                     "did not find contributing devices for service $(reserve.name)",
                 ),
             )
@@ -653,7 +651,7 @@ function get_reserve_direction(direction::AbstractString)
     elseif lowercase(direction) == "down"
         return ReserveDown
     else
-        throw(DataFormatError("invalid reserve direction $direction"))
+        throw(IS.DataFormatError("invalid reserve direction $direction"))
     end
 end
 
@@ -692,7 +690,7 @@ function make_generator(
     elseif gen_type == EnergyReservoirStorage
         head_dict = gen_storage["head"]
         if !haskey(head_dict, gen.name)
-            throw(DataFormatError("Cannot find storage for $(gen.name) in storage.csv"))
+            throw(IS.DataFormatError("Cannot find storage for $(gen.name) in storage.csv"))
         end
         storage = head_dict[gen.name]
         generator = make_storage(data, gen, bus, storage)
@@ -902,7 +900,7 @@ function create_poly_cost(
 
     if !isnothing(a2) && (isnothing(a1) || isnothing(a0))
         throw(
-            DataFormatError(
+            IS.DataFormatError(
                 "All coefficients must be passed if quadratic term is passed.",
             ),
         )
@@ -1214,13 +1212,13 @@ function _make_hydro_reservoirs(
     tail_required::Bool,
 )
     if !haskey(data.category_to_df, _category_key(InputCategory.STORAGE))
-        throw(DataFormatError("Storage information must defined in storage.csv"))
+        throw(IS.DataFormatError("Storage information must defined in storage.csv"))
     end
 
     head_dict = gen_storage["head"]
     if !haskey(head_dict, gen.name)
         throw(
-            DataFormatError("Cannot find head storage for $(gen.name) in storage.csv"),
+            IS.DataFormatError("Cannot find head storage for $(gen.name) in storage.csv"),
         )
     end
     reservoir_data = head_dict[gen.name]
@@ -1244,7 +1242,7 @@ function _make_hydro_reservoirs(
     tail_dict = gen_storage["tail"]
     if !haskey(tail_dict, gen.name) && tail_required
         throw(
-            DataFormatError("Cannot find tail storage for $(gen.name) in storage.csv"),
+            IS.DataFormatError("Cannot find tail storage for $(gen.name) in storage.csv"),
         )
     elseif !haskey(tail_dict, gen.name) && !tail_required
         tail_reservoir = nothing
@@ -1486,7 +1484,7 @@ const CATEGORY_STR_TO_COMPONENT = Dict{String, DataType}(
 function _get_component_type_from_category(category::AbstractString)
     component_type = get(CATEGORY_STR_TO_COMPONENT, category, nothing)
     if isnothing(component_type)
-        throw(DataFormatError("unsupported category=$category"))
+        throw(IS.DataFormatError("unsupported category=$category"))
     end
 
     return component_type
@@ -1512,11 +1510,11 @@ function _get_field_infos(
 )
     key = _category_key(category)
     if !haskey(data.user_descriptors, key)
-        throw(DataFormatError("Invalid category=$category"))
+        throw(IS.DataFormatError("Invalid category=$category"))
     end
 
     if !haskey(data.descriptors, key)
-        throw(DataFormatError("Invalid category=$category"))
+        throw(IS.DataFormatError("Invalid category=$category"))
     end
 
     # Cache whether PowerSystems uses a column's values as system-per-unit.
@@ -1555,7 +1553,7 @@ function _get_field_infos(
 
             if item_unit_system == IS.UnitSystem.NATURAL_UNITS &&
                per_unit[name] != IS.UnitSystem.NATURAL_UNITS
-                throw(DataFormatError("$name cannot be defined as $(per_unit[name])"))
+                throw(IS.DataFormatError("$name cannot be defined as $(per_unit[name])"))
             end
 
             pu_conversion = (
@@ -1605,12 +1603,13 @@ function _read_data_row(
             value = row[field_info.custom_name]
         else
             value = field_info.default_value
-            value == "required" && throw(DataFormatError("$(field_info.name) is required"))
+            value == "required" &&
+                throw(IS.DataFormatError("$(field_info.name) is required"))
             @debug "Column $(field_info.custom_name) doesn't exist in df, enabling use of default value of $(field_info.default_value)" _group =
                 IS.LOG_GROUP_PARSING maxlog = 1
         end
         if ismissing(value)
-            throw(DataFormatError("$(field_info.custom_name) value missing"))
+            throw(IS.DataFormatError("$(field_info.custom_name) value missing"))
         end
         if na_to_nothing && value == "NA"
             value = nothing
@@ -1630,7 +1629,7 @@ function _read_data_row(
                     field_infos,
                 )
                 isnothing(reference_idx) && throw(
-                    DataFormatError(
+                    IS.DataFormatError(
                         "$(field_info.per_unit_conversion.Reference) not found in table with $(field_info.custom_name)",
                     ),
                 )
@@ -1640,7 +1639,7 @@ function _read_data_row(
                 reference_value =
                     get(row, reference_info.custom_name, reference_info.default_value)
                 reference_value == "required" && throw(
-                    DataFormatError(
+                    IS.DataFormatError(
                         "$(reference_info.name) is required for p.u. conversion",
                     ),
                 )
@@ -1648,7 +1647,7 @@ function _read_data_row(
                 value = reference_value == 0.0 ? 0.0 : value / reference_value
             elseif field_info.per_unit_conversion.From != field_info.per_unit_conversion.To
                 throw(
-                    DataFormatError(
+                    IS.DataFormatError(
                         "conversion not supported from $(field_info.per_unit_conversion.From) to $(field_info.per_unit_conversion.To) for $(field_info.custom_name)",
                     ),
                 )

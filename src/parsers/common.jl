@@ -236,7 +236,7 @@ function convert_units!(
         value /= 3600
     else
         throw(
-            DataFormatError(
+            IS.DataFormatError(
                 "Unit conversion from $(unit_conversion.From) to $(unit_conversion.To) not supported",
             ),
         )

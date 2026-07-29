@@ -27,7 +27,7 @@ function make_system(pm_data::PowerFlowFileParser.PowerModelsData; kwargs...)
     runchecks = get(kwargs, :runchecks, true)
     data = pm_data.data
     if length(data["bus"]) < 1
-        throw(DataFormatError("There are no buses in this file."))
+        throw(IS.DataFormatError("There are no buses in this file."))
     end
 
     @info "Constructing System from Power Models" data["name"] data["source_type"]
@@ -60,6 +60,15 @@ function make_system(pm_data::PowerFlowFileParser.PowerModelsData; kwargs...)
     add_geographic_info_to_buses!(sys, substation_data)
 
     return sys
+end
+
+"""
+Construct a System from a PSS/E raw file via the PowerModels dict pipeline. Thin shim
+over [`make_system`](@ref); the metadata-reimport path threads its name-formatter kwargs
+through it.
+"""
+function system_via_power_models(file_path::AbstractString; kwargs...)
+    return make_system(PowerFlowFileParser.PowerModelsData(file_path); kwargs...)
 end
 
 """
@@ -220,7 +229,7 @@ function _impedance_correction_table_lookup(data::Dict)
             end
         else
             throw(
-                DataFormatError(
+                IS.DataFormatError(
                     "Impedance correction mismatch at table $table_number: tap/angle and scaling count differs.",
                 ),
             )
@@ -431,7 +440,7 @@ function read_bus!(sys::System, data::Dict; kwargs...)
         end
         bus = make_bus(bus_name, bus_number, d, bus_types, area)
         has_component(ACBus, sys, bus_name) && throw(
-            DataFormatError(
+            IS.DataFormatError(
                 "Found duplicate bus names for $(get_name(bus)), consider reviewing your `bus_name_formatter` function",
             ),
         )
@@ -600,21 +609,21 @@ function read_loads!(sys::System, data, bus_number_to_bus::Dict{Int, ACBus}; kwa
         if data["source_type"] == "pti" && is_interruptible && d["interruptible"] != 1
             load = make_standard_load(d, bus, sys_mbase; kwargs...)
             has_component(StandardLoad, sys, get_name(load)) && throw(
-                DataFormatError(
+                IS.DataFormatError(
                     "Found duplicate load names of $(summary(load)), consider formatting names with `load_name_formatter` kwarg",
                 ),
             )
         elseif data["source_type"] == "pti" && is_interruptible && d["interruptible"] == 1
             load = make_interruptible_standardload(d, bus, sys_mbase; kwargs...)
             has_component(InterruptibleStandardLoad, sys, get_name(load)) && throw(
-                DataFormatError(
+                IS.DataFormatError(
                     "Found duplicate interruptible load names of $(summary(load)), consider formatting names with `load_name_formatter` kwarg",
                 ),
             )
         else
             load = make_power_load(d, bus, sys_mbase; kwargs...)
             has_component(PowerLoad, sys, get_name(load)) && throw(
-                DataFormatError(
+                IS.DataFormatError(
                     "Found duplicate load names of $(summary(load)), consider formatting names with `load_name_formatter` kwarg",
                 ),
             )
@@ -1111,39 +1120,12 @@ function read_gen!(sys::System, data::Dict, bus_number_to_bus::Dict{Int, ACBus};
         end
 
         has_component(typeof(generator), sys, get_name(generator)) && throw(
-            DataFormatError(
+            IS.DataFormatError(
                 "Found duplicate $(typeof(generator)) names of $(get_name(generator)), consider formatting names with `gen_name_formatter` kwarg",
             ),
         )
         add_component!(sys, generator; skip_validation = SKIP_PM_VALIDATION)
     end
-end
-
-const _SHIFT_TO_GROUP_MAP = Dict{Float64, WindingGroupNumber}(
-    0.0 => WindingGroupNumber.GROUP_0,
-    -30.0 => WindingGroupNumber.GROUP_1,
-    -150.0 => WindingGroupNumber.GROUP_5,
-    180.0 => WindingGroupNumber.GROUP_6,
-    150.0 => WindingGroupNumber.GROUP_7,
-    30.0 => WindingGroupNumber.GROUP_11,
-)
-
-"""
-Resolve the [`WindingGroupNumber`](@ref) from the phase-shift angle stored under
-`angle_key` (radians). Stores the result in `d[group_key]` (dict consumers read it
-there) and returns it so the caller can use it directly.
-"""
-function _add_vector_control_group(d::Dict, angle_key::String, group_key::String)
-    angle = d[angle_key]
-    group = WindingGroupNumber.UNDEFINED
-    for (angle_key_deg, candidate) in _SHIFT_TO_GROUP_MAP
-        if isapprox(rad2deg(angle), angle_key_deg)
-            group = candidate
-            break
-        end
-    end
-    d[group_key] = group
-    return group
 end
 
 # Tap changing and phase shifting are winding data (`tap`, `α`, `control`), not
@@ -1201,7 +1183,7 @@ function make_branch(
 
     if d["transformer"] && branch_type == Line
         throw(
-            DataFormatError(
+            IS.DataFormatError(
                 "Branch data mismatched, cannot build the branch correctly for $d",
             ),
         )
@@ -1337,6 +1319,15 @@ function read_switch_breaker!(
     end
 end
 
+# COD values whose control objective is a phase-shift (angle) control rather
+# than a tap (voltage/reactive) control.
+const _PSSE_PHASE_SHIFT_OBJECTIVES = (
+    TransformerControlObjective.ACTIVE_POWER_FLOW,
+    TransformerControlObjective.ACTIVE_POWER_FLOW_DISABLED,
+    TransformerControlObjective.ASYMMETRIC_ACTIVE_POWER_FLOW,
+    TransformerControlObjective.ASYMMETRIC_ACTIVE_POWER_FLOW_DISABLED,
+)
+
 """
 Resolve the flat per-winding control fields from a PowerModels transformer dict
 `d` for winding `suffix` (1/2/3), mirroring the PSS/E per-winding control block
@@ -1350,6 +1341,8 @@ null state (no control block). Any other COD — including `0` (FIXED) and negat
 """
 function _transformer_control_fields(d::Dict, suffix::Int)
     cod = get(d, "COD$suffix", -99)
+    objective = TransformerControlObjective(cod)
+    phase_shifting = objective in _PSSE_PHASE_SHIFT_OBJECTIVES
     # RMI/RMA and VMI/VMA are the lower/upper edges of a band. Some (typically
     # synthetic) PSS/E data has them numerically inverted by rounding
     # (e.g. frankenstein_70.raw has VMA1 = 0.984 < VMI1 = 0.985); warn and
@@ -1357,10 +1350,20 @@ function _transformer_control_fields(d::Dict, suffix::Int)
     # the attach-time band-ordering check. The warning surfaces genuinely
     # corrupt bands on actively-controlled windings instead of hiding them.
     record = string(get(d, "name", get(d, "source_id", "unknown")))
-    rmi, rma = get(d, "RMI$suffix", 0.9), get(d, "RMA$suffix", 1.1)
+    # RMA/RMI are PSS/E degrees for phase-shift CODs; -180/180 converts to the
+    # documented radian default (-π, π) below rather than the tap-band (0.9, 1.1).
+    if phase_shifting
+        rmi_default, rma_default = -180.0, 180.0
+    else
+        rmi_default, rma_default = 0.9, 1.1
+    end
+    rmi, rma = get(d, "RMI$suffix", rmi_default), get(d, "RMA$suffix", rma_default)
     if rmi > rma
         @warn "Transformer record $record winding $suffix has inverted control limits RMI$suffix = $rmi > RMA$suffix = $rma; normalizing to (min = $rma, max = $rmi)."
         rmi, rma = rma, rmi
+    end
+    if phase_shifting
+        rmi, rma = deg2rad(rmi), deg2rad(rma)
     end
     vmi, vma = get(d, "VMI$suffix", 0.9), get(d, "VMA$suffix", 1.1)
     if vmi > vma
@@ -1368,7 +1371,7 @@ function _transformer_control_fields(d::Dict, suffix::Int)
         vmi, vma = vma, vmi
     end
     return (
-        control_objective = TransformerControlObjective(cod),
+        control_objective = objective,
         regulated_bus_number = get(d, "CONT$suffix", 0),
         control_limits = (min = rmi, max = rma),
         controlled_quantity_limits = (min = vmi, max = vma),
@@ -1379,16 +1382,14 @@ end
 """
 Build a [`TransformerCircuit`](@ref) from a PowerModels transformer dict `d`,
 mapping the per-winding keys named by the keyword arguments. Shared by the 2W
-maker (one circuit) and the 3W maker (three circuits). The vector group number is
-derived from the phase-shift angle under `angle_key` (see
-[`_add_vector_control_group`](@ref)); ratings are resolved by the caller.
+maker (one circuit) and the 3W maker (three circuits); ratings are resolved by
+the caller.
 """
 function _make_transformer_circuit(
     d::Dict,
     arc::Arc;
     tap_key::String,
     angle_key::String,
-    group_key::String,
     control_suffix::Int,
     available::Bool,
     r,
@@ -1407,7 +1408,6 @@ function _make_transformer_circuit(
         arc = arc,
         tap = get(d, tap_key, 1.0),
         α = d[angle_key],
-        winding_group_number = _add_vector_control_group(d, angle_key, group_key),
         r = r,
         x = x,
         control_objective = control.control_objective,
@@ -1461,7 +1461,6 @@ function make_transformer_2w(
         Arc(bus_f, bus_t);
         tap_key = "tap",
         angle_key = "shift",
-        group_key = "group_number",
         control_suffix = 1,
         available = available_value,
         r = d["br_r"],
@@ -1511,7 +1510,6 @@ function make_3w_transformer(
         Arc(bus_primary, star_bus);
         tap_key = "primary_turns_ratio",
         angle_key = "primary_phase_shift_angle",
-        group_key = "primary_group_number",
         control_suffix = 1,
         available = Bool(d["available_primary"]),
         r = d["r_primary"],
@@ -1528,7 +1526,6 @@ function make_3w_transformer(
         Arc(bus_secondary, star_bus);
         tap_key = "secondary_turns_ratio",
         angle_key = "secondary_phase_shift_angle",
-        group_key = "secondary_group_number",
         control_suffix = 2,
         available = Bool(d["available_secondary"]),
         r = d["r_secondary"],
@@ -1545,7 +1542,6 @@ function make_3w_transformer(
         Arc(bus_tertiary, star_bus);
         tap_key = "tertiary_turns_ratio",
         angle_key = "tertiary_phase_shift_angle",
-        group_key = "tertiary_group_number",
         control_suffix = 3,
         available = Bool(d["available_tertiary"]),
         r = d["r_tertiary"],
@@ -1763,6 +1759,7 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         active_power_limits_from = (min = d["pminf"], max = d["pmaxf"]),
         active_power_limits_to = (min = d["pmint"], max = d["pmaxt"]),
         g = d["r"] == 0.0 ? 0.0 : 1.0 / d["r"],
+        rated_dc_voltage = d["rated_dc_voltage"],
         dc_current = get(d, "if", 0.0),
         reactive_power_from = get(d, "qf", 0.0),
         dc_control_from = if d["dc_voltage_control_from"]
@@ -1837,6 +1834,16 @@ function read_vscline!(
 end
 
 function make_switched_shunt(name::String, d::Dict, bus::ACBus)
+    control_mode_value = d["control_mode"]
+    valid_control_modes = map(mode -> mode.value, instances(SwitchedAdmittanceControlMode))
+    if !(control_mode_value in valid_control_modes)
+        throw(
+            IS.DataFormatError(
+                "Switched shunt $name: unsupported MODSW control mode $control_mode_value",
+            ),
+        )
+    end
+
     params = Dict(
         :name => name,
         :available => Bool(d["status"]),
@@ -1845,6 +1852,8 @@ function make_switched_shunt(name::String, d::Dict, bus::ACBus)
         :number_of_steps => d["step_number"],
         :Y_increase => d["y_increment"],
         :admittance_limits => d["admittance_limits"],
+        :control_mode => SwitchedAdmittanceControlMode(control_mode_value),
+        :regulated_bus_number => d["regulated_bus_number"],
         :ext => d["ext"],
     )
 
@@ -1894,11 +1903,7 @@ function make_facts(name::String, d::Dict, bus::ACBus)
     end
 
     if d["control_mode"] > 3
-        throw(DataFormatError("Operation mode not supported."))
-    end
-
-    if d["reactive_power_required"] < 0
-        throw(DataFormatError("% MVAr required must me positive."))
+        throw(IS.DataFormatError("Operation mode not supported."))
     end
 
     return FACTSControlDevice(;
@@ -1908,7 +1913,7 @@ function make_facts(name::String, d::Dict, bus::ACBus)
         control_mode = d["control_mode"],
         voltage_setpoint = d["voltage_setpoint"],
         max_shunt_current = d["max_shunt_current"],
-        reactive_power_required = d["reactive_power_required"],
+        regulated_bus_number = d["regulated_bus_number"],
         ext = get(d, "ext", Dict{String, Any}()),
     )
 end

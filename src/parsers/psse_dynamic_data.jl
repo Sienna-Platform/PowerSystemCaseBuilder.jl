@@ -188,7 +188,7 @@ function _parse_dyr_components(dyr_file::AbstractString)
         data = _parse_dyr_file(dyr_file)
         return _parse_dyr_components(data)
     else
-        throw(DataFormatError("$dyr_file is not a .dyr file type"))
+        throw(IS.DataFormatError("$dyr_file is not a .dyr file type"))
     end
 end
 

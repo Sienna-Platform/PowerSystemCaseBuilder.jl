@@ -152,7 +152,7 @@ include("parsers/enums.jl")
 include("parsers/power_system_table_data.jl")
 include("parsers/power_models_data.jl")
 include("parsers/psse_dynamic_data.jl")
-#include("parsers/psse_metadata_reimport.jl")
+include("parsers/psse_metadata_reimport.jl")
 
 # includes
 
