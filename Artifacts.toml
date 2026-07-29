@@ -1,10 +1,10 @@
 [CaseData]
-git-tree-sha1 = "18a7fd75d8717bd037250cbba35fce22bcdf38ca"
+git-tree-sha1 = "cdbdea882cd7cb977ad71ef23a45b5f1fb0c1f75"
 lazy = true
 
     [[CaseData.download]]
-    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/refs/tags/5.0-dev2.tar.gz"
-    sha256 = "669d44d2fe25938de0d5b4854b7a413ba32540ecc34d26c45be3fe5bf53164d2"
+    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/refs/tags/5.0-dev3.tar.gz"
+    sha256 = "6a5977918fe26f48f0e545cc15d202ad0f43e0e2713ec2649aa2c3e1052e44ad"
 
 [rts]
 git-tree-sha1 = "c257b2c37b981f261fdc328b0fb9b96436a96537"
