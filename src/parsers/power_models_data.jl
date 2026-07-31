@@ -41,7 +41,7 @@ function make_system(pm_data::PowerFlowFileParser.PowerModelsData; kwargs...)
     read_loads!(sys, data, bus_number_to_bus; kwargs...)
     read_loadzones!(sys, data, bus_number_to_bus; kwargs...)
     read_gen!(sys, data, bus_number_to_bus; kwargs...)
-    for component_type in ["switch", "breaker"]
+    for component_type in ["switch", "breaker", "generic_connector"]
         read_switch_breaker!(sys, data, bus_number_to_bus, component_type; kwargs...)
     end
     read_branch!(sys, data, bus_number_to_bus; kwargs...)
@@ -56,7 +56,7 @@ function make_system(pm_data::PowerFlowFileParser.PowerModelsData; kwargs...)
         check(sys)
     end
 
-    substation_data = get(data, "substation_data", [])
+    substation_data = get(data, "substation", Dict{String, Any}())
     add_geographic_info_to_buses!(sys, substation_data)
 
     return sys
@@ -112,9 +112,16 @@ function _get_pm_branch_name(device_dict, bus_f::ACBus, bus_t::ACBus)
     elseif device_dict["source_id"][1] == "branch" && length(device_dict["source_id"]) > 2
         index = strip(device_dict["source_id"][4])
     elseif (
-        device_dict["source_id"][1] == "switch" || device_dict["source_id"][1] == "breaker"
+        device_dict["source_id"][1] == "switch" ||
+        device_dict["source_id"][1] == "breaker" ||
+        device_dict["source_id"][1] == "generic_connector"
     ) && length(device_dict["source_id"]) > 2
-        index = string(device_dict["source_id"][4][2])
+        # Legacy switches/breakers modeled as branches carry a marker-prefixed CKT
+        # (e.g. "@1", "*2"); strip the leading '@'/'*' marker to get the circuit id.
+        # Switching devices from a SWITCHING DEVICE record (including node-breaker
+        # substation devices) carry a plain circuit id with no marker.
+        ckt = strip(string(device_dict["source_id"][4]))
+        index = (!isempty(ckt) && first(ckt) in ('@', '*')) ? ckt[2:end] : ckt
     elseif device_dict["source_id"][1] == "transformer" &&
            length(device_dict["source_id"]) > 3
         index = strip(device_dict["source_id"][5])
@@ -145,6 +152,7 @@ function add_geographic_info_to_buses!(sys, substation_data)
     end
 
     bus_coords_lookup = Dict{Int, GeographicInfo}()
+    substation_coords_lookup = Dict{Any, GeographicInfo}()
 
     for (_, substation) in substation_data
         if haskey(substation, "nodes") && haskey(substation, "latitude") &&
@@ -158,9 +166,12 @@ function add_geographic_info_to_buses!(sys, substation_data)
                 ),
             )
             for node in substation["nodes"]
-                if haskey(node, "I")
-                    bus_coords_lookup[node["I"]] = geo_info
+                if haskey(node, "bus")
+                    bus_coords_lookup[node["bus"]] = geo_info
                 end
+            end
+            if haskey(substation, "index")
+                substation_coords_lookup[substation["index"]] = geo_info
             end
         end
     end
@@ -172,8 +183,18 @@ function add_geographic_info_to_buses!(sys, substation_data)
         for bus in get_components(ACBus, sys)
             bus_number = get_number(bus)
 
-            if haskey(bus_coords_lookup, bus_number)
-                geo_info = bus_coords_lookup[bus_number]
+            geo_info = get(bus_coords_lookup, bus_number, nothing)
+            if isnothing(geo_info)
+                # Injected node-breaker buses are keyed on a synthetic bus number, not
+                # the original PSS(R)E bus, so fall back to the substation they were
+                # split from (recorded in ext by node-breaker materialization).
+                nb_substation = get(get_ext(bus), "nb_substation", nothing)
+                if !isnothing(nb_substation)
+                    geo_info = get(substation_coords_lookup, nb_substation, nothing)
+                end
+            end
+
+            if !isnothing(geo_info)
                 add_supplemental_attribute!(sys, bus, geo_info)
                 buses_with_coords += 1
             else
@@ -447,6 +468,14 @@ function read_bus!(sys::System, data::Dict; kwargs...)
 
         bus_number_to_bus[bus.number] = bus
         add_component!(sys, bus; skip_validation = SKIP_PM_VALIDATION)
+
+        if get(d, "area_slack", false) == true
+            set_bustype!(bus, ACBusTypes.SLACK)
+        end
+        bus_ext = get(d, "ext", Dict{String, Any}())
+        if !isempty(bus_ext)
+            merge!(get_ext(bus), bus_ext)
+        end
     end
 
     if data["source_type"] == "pti" && haskey(data, "interarea_transfer")
@@ -602,6 +631,13 @@ function read_loads!(sys::System, data, bus_number_to_bus::Dict{Int, ACBus}; kwa
     end
 
     sys_mbase = data["baseMVA"]
+
+    dgen_lookup = Dict{Tuple{Int, String}, Dict}()
+    for dgen in values(get(data, "distributed_generation", Dict{String, Any}()))
+        dgen_lookup[(dgen["bus"], strip(string(dgen["source_id"][3])))] = dgen
+    end
+    unmatched_dgen_keys = Set(keys(dgen_lookup))
+
     for d_key in keys(data["load"])
         d = data["load"][d_key]
         bus = bus_number_to_bus[d["load_bus"]]
@@ -629,6 +665,38 @@ function read_loads!(sys::System, data, bus_number_to_bus::Dict{Int, ACBus}; kwa
             )
         end
         add_component!(sys, load; skip_validation = SKIP_PM_VALIDATION)
+
+        load_source_id = get(d, "source_id", String[])
+        if length(load_source_id) >= 3 && load_source_id[1] == "load"
+            dgen_key = (d["load_bus"], strip(string(load_source_id[3])))
+            dgen = get(dgen_lookup, dgen_key, nothing)
+            if !isnothing(dgen)
+                delete!(unmatched_dgen_keys, dgen_key)
+                dgen_load = RenewableNonDispatch(;
+                    name = string(get_name(load), "_dgen"),
+                    available = Bool(dgen["status"]),
+                    bus = bus,
+                    active_power = dgen["pg"],
+                    reactive_power = dgen["qg"],
+                    rating = hypot(dgen["pg"], dgen["qg"]),
+                    prime_mover_type = PrimeMovers.OT,
+                    # The dgen injector mirrors the upstream distributed-generation
+                    # contract, which reports net P/Q with a unity-power-factor placeholder.
+                    power_factor = 1.0,
+                    base_power = sys_mbase,
+                )
+                has_component(RenewableNonDispatch, sys, get_name(dgen_load)) && throw(
+                    IS.DataFormatError(
+                        "Found duplicate RenewableNonDispatch names of $(get_name(dgen_load)), consider formatting names with `load_name_formatter` kwarg",
+                    ),
+                )
+                add_component!(sys, dgen_load; skip_validation = SKIP_PM_VALIDATION)
+            end
+        end
+    end
+
+    for (bus_number, id) in unmatched_dgen_keys
+        @warn "Distributed generation entry on bus $bus_number with id \"$id\" did not match any load; skipping"
     end
 end
 
