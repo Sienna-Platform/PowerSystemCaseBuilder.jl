@@ -1,6 +1,6 @@
 # PowerSystemCaseBuilder.jl (PSB) — psy6 branch
 
-The Sienna **test-system fixture factory**: a registry of 200+ named `PSY.System` cases built from raw data (Matpower, PSSE raw/dyr, tabular CSV, PowerFlowData) with an on-disk serialized cache, so downstream test suites (PSY, PNM, PF, POM) get systems in seconds. Not an optimization package. Its serialization is PSY's own IS-based JSON+HDF5 — **not** the OpenAPI/GridDB pipeline. Platform conventions: `.claude/Sienna.md`; workspace architecture: the psy6 workspace root `CLAUDE.md`.
+The Sienna **test-system fixture factory**: a registry of 200+ named `PSY.System` cases built from raw data (Matpower, PSSE raw/dyr, tabular CSV, PowerFlowData) with an on-disk serialized cache, so downstream test suites (PSY, PNM, PF, POM) get systems in seconds. Not an optimization package. Its serialization is PSY's own IS-based JSON+HDF5 — **not** the OpenAPI/GridDB pipeline. Platform conventions: the `sienna-psy6` skill; workspace architecture: the psy6 workspace root `CLAUDE.md`.
 
 ## Why this package matters platform-wide
 
