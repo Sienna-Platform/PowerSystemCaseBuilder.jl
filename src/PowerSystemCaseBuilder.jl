@@ -157,7 +157,6 @@ include("parsers/psse_metadata_reimport.jl")
 # includes
 
 include("definitions.jl")
-include("utils/psy6_compat.jl") # must be included before system_library.jl
 include("system_library.jl")
 
 include("system_build_stats.jl")
