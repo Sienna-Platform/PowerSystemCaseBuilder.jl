@@ -495,23 +495,23 @@ function make_modified_RTS_GMLC_sys(
     )
 
     sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
-    res_up = PSY.get_component(PSY.VariableReserve{PSY.ReserveUp}, sys, "Flex_Up")
-    res_dn = PSY.get_component(PSY.VariableReserve{PSY.ReserveDown}, sys, "Flex_Down")
+    res_up = PSY.get_component(PSY.OnlineReserve{PSY.ReserveUp}, sys, "Flex_Up")
+    res_dn = PSY.get_component(PSY.OnlineReserve{PSY.ReserveDown}, sys, "Flex_Down")
     PSY.remove_component!(sys, res_dn)
     PSY.remove_component!(sys, res_up)
-    reg_reserve_up = PSY.get_component(PSY.VariableReserve, sys, "Reg_Up")
+    reg_reserve_up = PSY.get_component(PSY.OnlineReserve, sys, "Reg_Up")
     PSY.set_requirement!(
         reg_reserve_up,
         1.75 * PSY.get_requirement(reg_reserve_up, IS.SU) * IS.SU,
     )
-    reg_reserve_dn = PSY.get_component(PSY.VariableReserve, sys, "Reg_Down")
+    reg_reserve_dn = PSY.get_component(PSY.OnlineReserve, sys, "Reg_Down")
     PSY.set_requirement!(
         reg_reserve_dn,
         1.75 * PSY.get_requirement(reg_reserve_dn, IS.SU) * IS.SU,
     )
-    spin_reserve_R1 = PSY.get_component(PSY.VariableReserve, sys, "Spin_Up_R1")
-    spin_reserve_R2 = PSY.get_component(PSY.VariableReserve, sys, "Spin_Up_R2")
-    spin_reserve_R3 = PSY.get_component(PSY.VariableReserve, sys, "Spin_Up_R3")
+    spin_reserve_R1 = PSY.get_component(PSY.OnlineReserve, sys, "Spin_Up_R1")
+    spin_reserve_R2 = PSY.get_component(PSY.OnlineReserve, sys, "Spin_Up_R2")
+    spin_reserve_R3 = PSY.get_component(PSY.OnlineReserve, sys, "Spin_Up_R3")
     for g in PSY.get_components(
         x -> PSY.get_prime_mover_type(x) in [PSY.PrimeMovers.CT, PSY.PrimeMovers.CC],
         PSY.ThermalStandard,
@@ -1444,7 +1444,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         PSY.set_name!(b, name_ * "_twin")
         # change bus (already changed)
         # check if it has services
-        @assert !PSY.has_service(b, PSY.VariableReserve)
+        @assert !PSY.has_service(b, PSY.OnlineReserve)
         PSY.add_component!(main_sys, b)
         !PSY.has_time_series(b) && PSY.copy_time_series!(b, main_comp)
 
@@ -1772,6 +1772,8 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             c = 0.0,
             active_power_limits_from = (min = 0.0, max = limit),
             active_power_limits_to = (min = 0.0, max = limit),
+            # base_current (A) = S_base / V_base
+            base_current = 100.0e6 / (PSY.get_base_voltage(bus_from) * 1e3),
         )
         push!(dclines, dcline)
     end
@@ -1822,6 +1824,8 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             c = 0.0,
             active_power_limits_from = (min = 0.0, max = limit),
             active_power_limits_to = (min = 0.0, max = limit),
+            # base_current (A) = S_base / V_base (all 9T buses are 300 kV).
+            base_current = 100.0e6 / (PSY.get_base_voltage(bus_from) * 1e3),
         )
         push!(dclines, dcline)
     end
