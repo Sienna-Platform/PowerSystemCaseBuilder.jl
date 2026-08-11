@@ -472,7 +472,9 @@ function build_c_sys5_re(;
             reserve_re[3],
             PSY.get_components(PSY.RenewableDispatch, c_sys5_re),
         )
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_re))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_re),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -494,7 +496,9 @@ function build_c_sys5_re(;
                 end
             end
         end
-        for (ix, serv) in enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_re))
+        for (ix, serv) in enumerate(
+            PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_re),
+        )
             PSY.set_variable_cost!(
                 c_sys5_re,
                 serv,
@@ -595,7 +599,9 @@ function build_c_sys5_re_fuel_cost(;
             reserve_re[3],
             PSY.get_components(PSY.RenewableDispatch, c_sys5_re),
         )
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_re))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_re),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -617,7 +623,9 @@ function build_c_sys5_re_fuel_cost(;
                 end
             end
         end
-        for (ix, serv) in enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_re))
+        for (ix, serv) in enumerate(
+            PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_re),
+        )
             PSY.set_variable_cost!(
                 c_sys5_re,
                 serv,
@@ -820,7 +828,9 @@ function build_c_sys5_hy(;
             [collect(PSY.get_components(PSY.HydroDispatch, c_sys5_hy))[end]],
         )
 
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hy))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hy),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -989,7 +999,9 @@ function build_c_sys5_hy_turbine_energy(;
             turb,
         )
 
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -1115,7 +1127,9 @@ function build_c_sys5_hy_turbine_head(;
             turb,
         )
 
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -1289,7 +1303,9 @@ function build_c_sys5_hy_cascading_turbine_energy(;
             turb_down,
         )
 
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -1419,7 +1435,9 @@ function build_c_sys5_hy_cascading_turbine_head(;
             turb_down,
         )
 
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -1583,7 +1601,9 @@ function build_c_sys5_hyd(;
             reserve_hy[3],
             PSY.get_components(PSY.HydroTurbine, c_sys5_hyd),
         )
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -1603,7 +1623,9 @@ function build_c_sys5_hyd(;
                 )
             end
         end
-        for (ix, serv) in enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd))
+        for (ix, serv) in enumerate(
+            PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
+        )
             PSY.set_variable_cost!(
                 c_sys5_hyd,
                 serv,
@@ -1752,7 +1774,9 @@ function build_c_sys5_hyd_ems(;
             reserve_hy[3],
             PSY.get_components(PSY.HydroTurbine, c_sys5_hyd),
         )
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -1772,7 +1796,9 @@ function build_c_sys5_hyd_ems(;
                 )
             end
         end
-        for (ix, serv) in enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd))
+        for (ix, serv) in enumerate(
+            PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
+        )
             PSY.set_variable_cost!(
                 c_sys5_hyd,
                 serv,
@@ -1872,7 +1898,9 @@ function build_c_sys5_bat(;
             reserve_bat[3],
             PSY.get_components(PSY.EnergyReservoirStorage, c_sys5_bat),
         )
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_bat))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_bat),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -1894,7 +1922,9 @@ function build_c_sys5_bat(;
                 end
             end
         end
-        for (ix, serv) in enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_bat))
+        for (ix, serv) in enumerate(
+            PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_bat),
+        )
             PSY.set_variable_cost!(
                 c_sys5_bat,
                 serv,
@@ -1994,7 +2024,9 @@ function build_c_sys5_hydro_pump_energy(;
             reserve_bat[3],
             PSY.get_components(PSY.EnergyReservoirStorage, c_sys5_bat),
         )
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_bat))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_bat),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -2016,7 +2048,9 @@ function build_c_sys5_hydro_pump_energy(;
                 end
             end
         end
-        for (ix, serv) in enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_bat))
+        for (ix, serv) in enumerate(
+            PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_bat),
+        )
             PSY.set_variable_cost!(
                 c_sys5_bat,
                 serv,
@@ -2161,7 +2195,9 @@ function build_c_sys5_il(;
             reserve_il[3],
             PSY.get_components(PSY.InterruptiblePowerLoad, c_sys5_il),
         )
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_il))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_il),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(Reserve_ts[t])[1]
@@ -2181,7 +2217,9 @@ function build_c_sys5_il(;
                 )
             end
         end
-        for (ix, serv) in enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_il))
+        for (ix, serv) in enumerate(
+            PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_il),
+        )
             PSY.set_variable_cost!(
                 c_sys5_il,
                 serv,
@@ -2845,7 +2883,9 @@ function build_c_sys5_uc(;
             end
         end
 
-        for (ix, serv) in enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_uc))
+        for (ix, serv) in enumerate(
+            PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_uc),
+        )
             PSY.set_variable_cost!(
                 c_sys5_uc,
                 serv,
@@ -2976,7 +3016,9 @@ function build_c_sys5_uc_non_spin(;
             end
         end
 
-        for (ix, serv) in enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_uc))
+        for (ix, serv) in enumerate(
+            PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_uc),
+        )
             PSY.set_variable_cost!(
                 c_sys5_uc,
                 serv,
@@ -3127,7 +3169,9 @@ function build_c_sys5_uc_re(;
             end
         end
 
-        for (ix, serv) in enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_uc))
+        for (ix, serv) in enumerate(
+            PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_uc),
+        )
             PSY.set_variable_cost!(
                 c_sys5_uc,
                 serv,
@@ -4471,7 +4515,8 @@ function build_c_sys5_phes_ed(;
             [collect(PSY.get_components(PSY.HydroPumpTurbine, c_sys5_phes_ed))[end]],
         )
 
-        for serv in PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_phes_ed)
+        for serv in
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_phes_ed)
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2 # loop over days
                 ta_DA = Reserve_ts[t]
@@ -4568,7 +4613,9 @@ function build_c_sys5_pglib(;
             reserve_uc[3],
             PSY.get_components(PSY.ThermalMultiStart, c_sys5_uc),
         )
-        for (ix, serv) in enumerate(PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_uc))
+        for (ix, serv) in enumerate(
+            PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_uc),
+        )
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = timestamp(Reserve_ts[t])[1]
@@ -4890,7 +4937,8 @@ function build_c_sys5_bat_ems(;
             reserve_bat[3],
             get_components(PSY.EnergyReservoirStorage, c_sys5_bat),
         )
-        for (ix, serv) in enumerate(get_components(!has_demand_curve, OnlineReserve, c_sys5_bat))
+        for (ix, serv) in
+            enumerate(get_components(!has_demand_curve, OnlineReserve, c_sys5_bat))
             forecast_data = SortedDict{Dates.DateTime, TimeArray}()
             for t in 1:2
                 ini_time = timestamp(Reserve_ts[t])[1]
@@ -4903,7 +4951,8 @@ function build_c_sys5_bat_ems(;
                 PSY.SingleTimeSeries("requirement", Reserve_single_ts),
             )
         end
-        for (ix, serv) in enumerate(get_components(has_demand_curve, OnlineReserve, c_sys5_bat))
+        for (ix, serv) in
+            enumerate(get_components(has_demand_curve, OnlineReserve, c_sys5_bat))
             set_variable_cost!(
                 c_sys5_bat,
                 serv,
@@ -6744,7 +6793,8 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
                 reserve_time_series,
             )
         end
-        for (ix, serv) in enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, sys))
+        for (ix, serv) in
+            enumerate(PSY.get_components(PSY.has_demand_curve, PSY.OnlineReserve, sys))
             PSY.set_variable_cost!(
                 sys,
                 serv,
