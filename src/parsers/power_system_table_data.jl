@@ -630,10 +630,12 @@ function services_csv_parser!(sys::System, data::PowerTableDataParser.PowerSyste
         end
 
         direction = get_reserve_direction(reserve.direction)
+        # `OnlineReserve` covers static and time-series-scaled reserves alike; the
+        # distinction is whether a requirement time series is attached.
         if isnothing(requirement)
-            service = ConstantReserve{direction}(reserve.name, true, reserve.timeframe, 0.0)
+            service = OnlineReserve{direction}(reserve.name, true, reserve.timeframe, 0.0)
         else
-            service = VariableReserve{direction}(
+            service = OnlineReserve{direction}(
                 reserve.name,
                 true,
                 reserve.timeframe,
