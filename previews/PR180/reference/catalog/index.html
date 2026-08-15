@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Full Catalog of Systems · PowerSystemCaseBuilder.jl</title><meta name="title" content="Full Catalog of Systems · PowerSystemCaseBuilder.jl"/><meta property="og:title" content="Full Catalog of Systems · PowerSystemCaseBuilder.jl"/><meta property="twitter:title" content="Full Catalog of Systems · PowerSystemCaseBuilder.jl"/><meta name="description" content="Documentation for PowerSystemCaseBuilder.jl."/><meta property="og:description" content="Documentation for PowerSystemCaseBuilder.jl."/><meta property="twitter:description" content="Documentation for PowerSystemCaseBuilder.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="PowerSystemCaseBuilder.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">PowerSystemCaseBuilder.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Welcome</a></li><li><span class="tocitem">How to...</span><ul><li><a class="tocitem" href="../../how_to_guides/explore_load/">Select and Load a Power System</a></li><li><a class="tocitem" href="../../how_to_guides/add_a_system/">Add a <code>System</code> to the Catalog</a></li></ul></li><li><span class="tocitem">Reference</span><ul><li><a class="tocitem" href="../public/">Public API</a></li><li class="is-active"><a class="tocitem" href>Full Catalog of <code>System</code>s</a></li><li><input class="collapse-toggle" id="menuitem-3-3" type="checkbox"/><label class="tocitem" for="menuitem-3-3"><span class="docs-label">Developers</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../developer_guidelines/">Developer Guidelines</a></li><li><a class="tocitem" href="../internal/">Internals</a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Reference</a></li><li class="is-active"><a href>Full Catalog of <code>System</code>s</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Full Catalog of <code>System</code>s</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/NREL-Sienna/PowerSystemCaseBuilder.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/NREL-Sienna/PowerSystemCaseBuilder.jl/blob/main/docs/src/reference/catalog.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Full-Catalog-of-Systems"><a class="docs-heading-anchor" href="#Full-Catalog-of-Systems">Full Catalog of <code>System</code>s</a><a id="Full-Catalog-of-Systems-1"></a><a class="docs-heading-anchor-permalink" href="#Full-Catalog-of-Systems" title="Permalink"></a></h1><pre><code class="nohighlight hljs ansi" style="display:block;">
+Category: MatpowerTestSystems
+
+┌──────────────────────────────┬──────────────────────────────────┐
+│<span class="sgr1"> Name                         │ Descriptor                       │
+├──────────────────────────────┼──────────────────────────────────┤
+│ matpower_ACTIVSg10k_sys      │ ACTIVSg10k Test system           │
+│ matpower_ACTIVSg2000_sys     │ MATPOWER ACTIVSg2000 Test system │
+│ matpower_RTS_GMLC_sys        │ Matpower RTS-GMLC Test system    │
+│ matpower_case14_sys          │ Matpower Test system             │
+│ matpower_case24_sys          │ Matpower Test system             │
+│ matpower_case2_sys           │ Matpower Test system             │
+│ matpower_case30_sys          │ Matpower Test system             │
+│ matpower_case3_tnep_sys      │ Matpower Test system             │
+│ matpower_case5_asym_sys      │ Matpower Test system             │
+│ matpower_case5_dc_sys        │ Matpower Test system             │
+│ matpower_case5_gap_sys       │ Matpower Test system             │
+│ matpower_case5_pwlc_sys      │ Matpower Test system             │
+│ matpower_case5_re_sys        │ Matpower Test system             │
+│ matpower_case5_re_uc_pwl_sys │ Matpower Test system             │
+│ matpower_case5_re_uc_sys     │ Matpower Test system             │
+│ matpower_case5_strg_sys      │ Matpower Test system             │
+│ ⋮                            │ ⋮                                │
+└──────────────────────────────┴──────────────────────────────────┘
+<span class="sgr36">                                                     7 rows omitted
+
+Category: PSIDSystems
+
+┌───────────────────────────────────────┬───────────────────────────────────────
+│ Name                                  │ Descriptor                           ⋯
+├───────────────────────────────────────┼───────────────────────────────────────
+│ 14 Bus Base Case                      │ 14 Bus Dynamic Test System Case      ⋯
+│ 2 Bus Load Tutorial                   │ 2 Bus Base System for load tutorials ⋯
+│ 2 Bus Load Tutorial Droop             │ 2 Bus Base System for load tutorials ⋯
+│ 2 Bus Load Tutorial GENROU            │ 2 Bus Base System for load tutorials ⋯
+│ 3 Bus Inverter Base                   │ 3 Bus Base System for tutorials      ⋯
+│ OMIB System                           │ OMIB case with 2 state machine for e ⋯
+│ Three Bus Dynamic data Example System │ Three Bus case for examples          ⋯
+│ WECC 240 Bus                          │ WECC 240 Bus case dynamic data with  ⋯
+│ WECC 9 Bus                            │ WECC 9 Bus System with dynamic gens  ⋯
+│ psid_11bus_andes                      │ PSID 11-bus Kundur System compared a ⋯
+│ psid_4bus_multigen                    │ PSID Multiple Generators in Single-B ⋯
+└───────────────────────────────────────┴───────────────────────────────────────
+                                                                1 column omitted
+
+Category: PSIDTestSystems
+
+┌───────────────────────────────┬───────────────────────────────────────────────
+│ Name                          │ Descriptor                                   ⋯
+├───────────────────────────────┼───────────────────────────────────────────────
+│ psid_psse_test_avr            │ PSID AVR Test Cases for PSSE Validation      ⋯
+│ psid_psse_test_constantI_load │ PSID Constant Current Load Test Case         ⋯
+│ psid_psse_test_constantP_load │ PSID Constant Power Load Test Case           ⋯
+│ psid_psse_test_exp_load       │ PSID Exponential Load Test Case              ⋯
+│ psid_psse_test_gen            │ PSID GEN Test Cases for PSSE Validation      ⋯
+│ psid_psse_test_pss            │ PSID PSS Test Cases for PSSE Validation      ⋯
+│ psid_psse_test_tg             │ PSID TG Test Cases for PSSE Validation       ⋯
+│ psid_test_3rd_indmotor        │ PSID System with 3rd-order Induction Motor T ⋯
+│ psid_test_5th_indmotor        │ PSID System with 5th-order Induction Motor T ⋯
+│ psid_test_droop_inverter      │ PSID Two Bus Droop GFM Inverter Test Case    ⋯
+│ psid_test_gfoll_inverter      │ PSID Two Bus Grid Following Inverter Test Ca ⋯
+│ psid_test_ieee_9bus           │ PSID IEEE 9-bus system with Anderson-Fouad M ⋯
+│ psid_test_indmotor            │ PSID System without Induction Motor Test Cas ⋯
+│ psid_test_omib                │ PSID OMIB Test Case                          ⋯
+│ psid_test_pvs                 │ PSID OMIB with Periodic Variable Source Test ⋯
+│ psid_test_threebus_5shaft     │ PSID Three Bus 5-shaft Test Case             ⋯
+│ ⋮                             │ ⋮                                            ⋱
+└───────────────────────────────┴───────────────────────────────────────────────
+                                                    1 column and 13 rows omitted
+
+Category: PSISystems
+
+┌──────────────────────────────────┬────────────────────────────────────────────
+│ Name                             │ Descriptor                                ⋯
+├──────────────────────────────────┼────────────────────────────────────────────
+│ 2Area 5 Bus System               │ PSI test system with two areas connected  ⋯
+│ 5_bus_hydro_ed_sys               │ 5-Bus hydro economic dispatch data        ⋯
+│ 5_bus_hydro_ed_sys_with_targets  │ 5-Bus hydro economic dispatch data with e ⋯
+│ 5_bus_hydro_uc_sys               │ 5-Bus hydro unit commitment data          ⋯
+│ 5_bus_hydro_uc_sys_with_targets  │ 5-Bus hydro unit commitment data with ene ⋯
+│ 5_bus_hydro_wk_sys               │ 5-Bus hydro system for weekly dispatch    ⋯
+│ 5_bus_hydro_wk_sys_with_targets  │ 5-Bus hydro system for weekly dispatch wi ⋯
+│ 5_bus_matpower_AGC               │ matpower 5-Bus system with AGC time serie ⋯
+│ 5_bus_matpower_DA                │ matpower 5-Bus system with DA time series ⋯
+│ 5_bus_matpower_RT                │ matpower 5-Bus system with RT time series ⋯
+│ AC_TWO_RTO_RTS_1Hr_sys           │ Two Area RTO System Connected via AC with ⋯
+│ AC_TWO_RTO_RTS_5min_sys          │ Two Area RTO System Connected via AC with ⋯
+│ HVDC_TWO_RTO_RTS_1Hr_sys         │ Two Area RTO System Connected via HVDC wi ⋯
+│ HVDC_TWO_RTO_RTS_5min_sys        │ Two Area RTO System Connected via HVDC wi ⋯
+│ MTHVDC_two_RTS_DA_sys_noForecast │ Two RTS systems connected by two multi-te ⋯
+│ RTS_GMLC_DA_sys                  │ RTS-GMLC Full system from git repo for da ⋯
+│ ⋮                                │ ⋮                                         ⋱
+└──────────────────────────────────┴────────────────────────────────────────────
+                                                    1 column and 12 rows omitted
+
+Category: PSITestSystems
+
+┌────────────────────────────────┬──────────────────────────────────────────────
+│ Name                           │ Descriptor                                  ⋯
+├────────────────────────────────┼──────────────────────────────────────────────
+│ batt_test_case_b_sys           │ test system for Storage Energy Target formu ⋯
+│ batt_test_case_c_sys           │ test system for Storage Energy Target formu ⋯
+│ batt_test_case_d_sys           │ test system for Storage Energy Target formu ⋯
+│ batt_test_case_e_sys           │ test system for Storage Energy Target formu ⋯
+│ batt_test_case_f_sys           │ test system for Storage Energy Target formu ⋯
+│ c_duration_test                │ 1 Bus for duration testing                  ⋯
+│ c_fixed_market_bid_cost        │ 1 bus system with a Fixed MarketBidCost Mod ⋯
+│ c_linear_cost_test             │ 1 Bus linear cost for testing               ⋯
+│ c_linear_fuel_test             │ 1 Bus linear fuel curve testing             ⋯
+│ c_linear_fuel_test_ts          │ 1 Bus linear fuel curve testing             ⋯
+│ c_market_bid_cost              │ 1 bus system with MarketBidCost Model       ⋯
+│ c_non_convex_io_pwl_cost_test  │ 1 Bus PWL sos testing                       ⋯
+│ c_pwl_incremental_cost_test    │ 1 Bus PWL incremental cost curve testing    ⋯
+│ c_pwl_incremental_fuel_test    │ 1 Bus PWL incremental (marginal) fuel curve ⋯
+│ c_pwl_incremental_fuel_test_ts │ 1 Bus PWL incremental (marginal) fuel curve ⋯
+│ c_pwl_io_cost_test             │ 1 Bus PWL I/O cost curve testing            ⋯
+│ ⋮                              │ ⋮                                           ⋱
+└────────────────────────────────┴──────────────────────────────────────────────
+                                                    1 column and 55 rows omitted
+
+Category: PSSEParsingTestSystems
+
+┌────────────────────────────────────────────┬──────────────────────────────────
+│ Name                                       │ Descriptor                      ⋯
+├────────────────────────────────────────────┼──────────────────────────────────
+│ Base_Eastern_Interconnect_515GW            │ Synthetic Eastern Interconnecti ⋯
+│ PSSE 30 Test System                        │ PSSE 30 Test system             ⋯
+│ isolated_bus_test_system                   │ PSSE isolated bus test system   ⋯
+│ psse_14_network_reduction_test_system      │ PSSE network reduction test sys ⋯
+│ psse_14_tap_correction_test_system         │ PSSE tap correction test system ⋯
+│ psse_14_zero_impedance_branch_test_system  │ PSSE zero impedance branch test ⋯
+│ psse_4_zero_impedance_3wt_test_system      │ PSSE zero impedance 3-winding t ⋯
+│ psse_ACTIVSg2000_sys                       │ PSSE ACTIVSg2000 Test system    ⋯
+│ psse_RTS_GMLC_sys                          │ PSSE .raw RTS-GMLC system       ⋯
+│ psse_ybus_14_test_system                   │ PSSE ybus test system           ⋯
+│ pti_case10_voltage_winding_correction_sys  │ PSSE case10 winding voltage cor ⋯
+│ pti_case11_with_synchronous_condensers_sys │ PSSE Case 11 with Synch. Conden ⋯
+│ pti_case14_sys                             │ PSSE 14-bus Test system         ⋯
+│ pti_case14_with_interruptible_loads_sys    │ PSSE with interruptible loads T ⋯
+│ pti_case14_with_pst3w_sys                  │ PSSE Case 14 with PST3W         ⋯
+│ pti_case16_complete_sys                    │ PSSE Case 16 with All Network C ⋯
+│ ⋮                                          │ ⋮                               ⋱
+└────────────────────────────────────────────┴──────────────────────────────────
+                                                    1 column and 21 rows omitted
+
+Category: PSYTestSystems
+
+┌─────────────────────────────────┬─────────────────────────────────────────────
+│ Name                            │ Descriptor                                 ⋯
+├─────────────────────────────────┼─────────────────────────────────────────────
+│ dynamic_inverter_sys            │ PSY test dynamic inverter system           ⋯
+│ psse_240_parsing_sys            │ Test parsing of PSSE 240 Bus Case system   ⋯
+│ psse_3bus_SEXS_sys              │ Test parsing of PSSE 3-bus Test system wit ⋯
+│ psse_3bus_gen_cls_sys           │ Test parsing of PSSE 3-bus Test system wit ⋯
+│ psse_3bus_no_cls_sys            │ Test parsing of PSSE 3-bus Test system wit ⋯
+│ psse_Benchmark_4ger_33_2015_sys │ Test parsing of PSSE Benchmark system      ⋯
+│ psse_OMIB_sys                   │ Test parsing of PSSE OMIB Test system      ⋯
+│ psse_renewable_parsing_1        │ Test parsing PSSE 3-bus Test system with R ⋯
+│ tamu_ACTIVSg2000_sys            │ TAMU ACTIVSg2000 Test system               ⋯
+└─────────────────────────────────┴─────────────────────────────────────────────
+                                                                1 column omitted
+
+Category: SPISystems
+
+┌─────────────────────────────────────────────┬─────────────────────────────────
+│ Name                                        │ Descriptor                     ⋯
+├─────────────────────────────────────────────┼─────────────────────────────────
+│ RTS_GMLC_5min with Static Outage Data       │ 5 minute RTS_GMLC System with  ⋯
+│ RTS_GMLC_5min with TimeSeries Outage Data   │ 5 minute RTS_GMLC System with  ⋯
+│ RTS_GMLC_Hourly with Static Outage Data     │ Hourly RTS_GMLC System with St ⋯
+│ RTS_GMLC_Hourly with TimeSeries Outage Data │ Hourly RTS_GMLC System with Ge ⋯
+└─────────────────────────────────────────────┴─────────────────────────────────
+                                                                1 column omitted</span></span></code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../public/">« Public API</a><a class="docs-footer-nextpage" href="../developer_guidelines/">Developer Guidelines »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Tuesday 16 December 2025 18:15">Tuesday 16 December 2025</span>. Using Julia version 1.11.8.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
