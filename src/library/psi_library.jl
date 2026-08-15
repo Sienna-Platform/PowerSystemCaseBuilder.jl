@@ -1773,6 +1773,8 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             c = 0.0,
             active_power_limits_from = (min = 0.0, max = limit),
             active_power_limits_to = (min = 0.0, max = limit),
+            # base_current (A) = S_base / V_base
+            base_current = 100.0e6 / (PSY.get_base_voltage(bus_from) * 1e3),
         )
         push!(dclines, dcline)
     end
@@ -1823,6 +1825,8 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             c = 0.0,
             active_power_limits_from = (min = 0.0, max = limit),
             active_power_limits_to = (min = 0.0, max = limit),
+            # base_current (A) = S_base / V_base (all 9T buses are 300 kV).
+            base_current = 100.0e6 / (PSY.get_base_voltage(bus_from) * 1e3),
         )
         push!(dclines, dcline)
     end
