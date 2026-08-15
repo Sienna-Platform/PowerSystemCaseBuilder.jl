@@ -50,7 +50,7 @@ import CSV
 import HDF5
 import DataFrames: DataFrame
 import LazyArtifacts
-import JSON3
+import JSON
 import SHA
 import YAML
 import InteractiveUtils
@@ -148,8 +148,8 @@ struct SPISystems <: SystemCategory end
 
 # Include Parsing files
 include("parsers/common.jl")
-include("parsers/enums.jl")
-include("parsers/power_system_table_data.jl")
+include("parsers/known_stale_fixture_data.jl")
+include("parsers/openapi_pipeline.jl")
 include("parsers/power_models_data.jl")
 include("parsers/psse_dynamic_data.jl")
 include("parsers/psse_metadata_reimport.jl")
@@ -157,7 +157,6 @@ include("parsers/psse_metadata_reimport.jl")
 # includes
 
 include("definitions.jl")
-include("utils/psy6_compat.jl") # must be included before system_library.jl
 include("system_library.jl")
 
 include("system_build_stats.jl")

@@ -1,5 +1,5 @@
 const PACKAGE_DIR = joinpath(dirname(dirname(pathof(PowerSystemCaseBuilder))))
-const DATA_DIR = joinpath(LazyArtifacts.artifact"CaseData", "PowerSystemsTestData-5.0-dev4")
+const DATA_DIR = joinpath(LazyArtifacts.artifact"CaseData", "PowerSystemsTestData-5.0-dev5")
 
 const RTS_DIR = joinpath(LazyArtifacts.artifact"rts", "RTS-GMLC-0.2.3")
 
@@ -7,8 +7,22 @@ const SYSTEM_DESCRIPTORS_FILE = joinpath(PACKAGE_DIR, "src", "system_descriptor.
 
 const SERIALIZED_DIR = joinpath(PACKAGE_DIR, "data", "serialized_system")
 
-const SERIALIZE_FILE_EXTENSIONS =
-    [".json", "_metadata.json", "_validation_descriptors.json", "_time_series_storage.h5"]
+"""
+Column-to-field map for the RTS-GMLC tables, shipped here rather than read from the RTS
+artifact.
+
+The artifact's own `user_descriptors.yaml` declares neither the emission columns, the MTTF/MTTR
+and outage-rate columns, the bus shunt columns, the LTE/STE emergency ratings, nor lat/lng — so
+`PowerTableDataParser`'s emissions, outage, and geographic parsers found `nothing`, skipped, and
+that data reached the `System` nowhere. It survived only as unmapped extras on the document,
+which PowerSystems does not read back.
+
+This copy (from `PowerTableDataParser.jl/test/descriptors/rts_user_descriptors.yaml`, the
+descriptor its own acceptance tests use) declares them, so the parsers build the attributes the
+tables describe.
+"""
+const RTS_USER_DESCRIPTOR_FILE =
+    joinpath(PACKAGE_DIR, "descriptors", "rts_user_descriptors.yaml")
 
 const ACCEPTED_PSID_TEST_SYSTEMS_KWARGS = [:avr_type, :tg_type, :pss_type, :gen_type]
 const AVAILABLE_PSID_PSSE_AVRS_TEST =

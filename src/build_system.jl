@@ -9,8 +9,11 @@ systems
 # Accepted Key Words
 - `print_stat::Bool = false`: Print statistics about the system build process
 - `force_build::Bool`: `true` runs entire build process, `false` (Default) uses deserializiation if possible
-- `assign_new_uuids::Bool`: Assign new UUIDs to the system and all components if
-   deserialization is used. Default is `true`.
+- `assign_new_uuids::Bool`: Retained for signature compatibility and effectively always
+   `true`. A cached `System` is read from an OpenAPI document, which carries component ids
+   rather than UUIDs, so every load rebuilds components with fresh UUIDs and there is nothing
+   to reassign. Passing `false` warns, since stable UUIDs across loads can no longer be
+   delivered.
 - `skip_serialization::Bool`: Default is `false`
 - `system_catalog::SystemCatalog`: Defaults to the `PowerSystemCaseBuilder.jl` catalog of `System`s
 """
@@ -49,6 +52,37 @@ function build_system(
     )
 end
 
+"""
+Whether `sys` can round-trip through an OpenAPI document without loss.
+
+Forecasts round-trip as of PSY converter-plan §4 (Deterministic, DeterministicSingleTimeSeries,
+SingleTimeSeries — Probabilistic/Scenarios still do not, see PSY's
+`_missing_structural_field`, but no PSCB builder produces either), so that clause is gone.
+What remains: any component whose type PSY's document converters do not cover at all —
+dynamics today — per PSY's own `is_document_exportable` trait (`src/openapi/ledger.jl`,
+generated from `DOCUMENT_PLAN`). Caching such a system anyway would silently truncate it on
+the next load (a dynamics-carrying system reads back with none — the exact trap this
+function exists to prevent).
+"""
+function _is_losslessly_serializable(sys::PSY.System, name::AbstractString)
+    unexportable = Dict{String, Int}()
+    for component in PSY.get_components(PSY.Component, sys)
+        PSY.is_document_exportable(component) && continue
+        type_name = string(nameof(typeof(component)))
+        unexportable[type_name] = get(unexportable, type_name, 0) + 1
+    end
+    if !isempty(unexportable)
+        listed = join(
+            ("$k ($(unexportable[k]))" for k in sort(collect(keys(unexportable)))), ", ",
+        )
+        @info "Not caching $name: it carries component type(s) with no OpenAPI document " *
+              "converter ($listed), which would be silently dropped by a cached round trip. " *
+              "It will be rebuilt from raw data each time."
+        return false
+    end
+    return true
+end
+
 function _build_system(
     name::String,
     sys_descriptor::SystemDescriptor,
@@ -78,20 +112,33 @@ function _build_system(
             sys_args...,
         )
         #construct_time = time() - start
-        serialized_filepath = get_serialized_filepath(name, case_args)
         start = time()
-        if !skip_serialization && isempty(sys_args)
-            PSY.to_json(sys, serialized_filepath; force = true)
+        if !skip_serialization && isempty(sys_args) &&
+           _is_losslessly_serializable(sys, name)
+            # `unit_system = :device_base`, not the `:original` default: that one reproduces the
+            # document a System was read from and needs the round-trip ledger, which only
+            # document-built systems carry. Device base is what PSY stores internally, so the
+            # cache is a direct read of stored values with no unit conversion either way.
+            PSY.to_file(
+                sys,
+                get_serialized_dirpath(name, case_args);
+                unit_system = :device_base,
+                force = true,
+            )
             #serialize_time = time() - start
             serialize_case_parameters(case_args)
         end
         # set_stats!(sys_descriptor, SystemBuildStats(construct_time, serialize_time))
     else
-        @debug "Deserialize system from file" sys_descriptor.name
+        @debug "Deserialize system from bundle" sys_descriptor.name
         start = time()
-        # time_series_in_memory = get(kwargs, :time_series_in_memory, false)
-        file_path = get_serialized_filepath(name, case_args)
-        sys = PSY.System(file_path; assign_new_uuids = assign_new_uuids, sys_args...)
+        if !assign_new_uuids
+            @warn "assign_new_uuids = false cannot be honored: a cached System is read from " *
+                  "an OpenAPI document, which carries component ids rather than UUIDs, so " *
+                  "every load rebuilds components with fresh UUIDs"
+        end
+        sys =
+            PSY.from_file(PSY.System, get_serialized_dirpath(name, case_args); sys_args...)
         PSY.get_runchecks(sys)
         # update_stats!(sys_descriptor, time() - start)
     end

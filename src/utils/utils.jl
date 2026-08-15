@@ -11,13 +11,11 @@ function check_serialized_storage()
 end
 
 function clear_serialized_systems(name::String)
-    file_names = [name * ext for ext in SERIALIZE_FILE_EXTENSIONS]
     for dir in _get_system_directories(SERIALIZED_DIR)
-        for file in file_names
-            if isfile(joinpath(dir, file))
-                @debug "Deleting file" file
-                rm(joinpath(dir, file); force = true)
-            end
+        bundle = joinpath(dir, name)
+        if isdir(bundle)
+            @debug "Deleting serialized system bundle" bundle
+            rm(bundle; recursive = true, force = true)
         end
     end
     return
@@ -33,10 +31,10 @@ function clear_serialized_system(
     name::String,
     case_args::Dict{Symbol, <:Any} = Dict{Symbol, Any}(),
 )
-    file_path = get_serialized_filepath(name, case_args)
-    if isfile(file_path)
-        @debug "Deleting file at " file_path
-        rm(file_path; force = true)
+    dir_path = get_serialized_dirpath(name, case_args)
+    if isdir(dir_path)
+        @debug "Deleting serialized system bundle at " dir_path
+        rm(dir_path; recursive = true, force = true)
     end
 
     return
@@ -60,17 +58,31 @@ function get_serialization_dir(case_args::Dict{Symbol, <:Any} = Dict{Symbol, Any
     return joinpath(PACKAGE_DIR, "data", "serialized_system", "$hash_value")
 end
 
-function get_serialized_filepath(
+"""
+Directory holding one cached `System`, written by `PSY.to_file` and read by `PSY.from_file`.
+
+A serialized `System` is a bundle directory (`system.json` + `time_series.h5`), not a single
+file, so a cache entry is a directory named after the system rather than `<name>.json` plus
+sibling files sharing its stem.
+"""
+function get_serialized_dirpath(
     name::String,
     case_args::Dict{Symbol, <:Any} = Dict{Symbol, Any}(),
 )
     dir = get_serialization_dir(case_args)
-    return joinpath(dir, "$(name).json")
+    return joinpath(dir, name)
 end
 
+"""
+Whether `name` has a complete cache entry.
+
+Checks for the document rather than just the directory: a directory left behind by an
+interrupted write would otherwise look like a valid cache entry and fail confusingly on read.
+"""
 function is_serialized(name::String, case_args::Dict{Symbol, <:Any} = Dict{Symbol, Any}())
-    file_path = get_serialized_filepath(name, case_args)
-    return isfile(file_path)
+    return isfile(
+        joinpath(get_serialized_dirpath(name, case_args), PSY.SYSTEM_DOCUMENT_FILE),
+    )
 end
 
 function get_raw_data(; kwargs...)
@@ -96,7 +108,7 @@ function serialize_case_parameters(case_args::Dict{Symbol, <:Any})
 
     if !isfile(file_path)
         open(file_path, "w") do io
-            JSON3.write(io, case_args)
+            JSON.print(io, case_args)
         end
     end
 end

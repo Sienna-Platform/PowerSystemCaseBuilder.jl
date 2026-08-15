@@ -94,10 +94,9 @@ function get_generator_mapping(filename::String)
     return mappings
 end
 
-# mappings is now a union of type String and DataType because when
-# get_generator_type is called in power_system_table_data.jl, mappings is of
-# type String (see above function and comment), and when the function is called
-# in power_models_data.jl, mappings is of type DataType
+# Union{...,String} predates the deleted power_system_table_data.jl; PowerTableDataParser.jl
+# now owns that String-mapping path via its own get_generator_type. Only the
+# power_models_data.jl (DataType) call site remains here.
 
 """Return the PowerSystems generator type for this fuel and unit_type."""
 function get_generator_type(
@@ -175,80 +174,6 @@ function calculate_ramp_limit(
     end
     @warn "Not enough information to determine ramp limit for generator $(gen_name). Returning nothing"
     return nothing
-end
-
-function string_compare(str1, str2; casefold = true)
-    return normalize(str1; casefold = casefold) === normalize(str2; casefold = casefold)
-end
-
-function string_occursin(str1, str2; casefold = true)
-    return occursin(
-        normalize(str1; casefold = casefold),
-        normalize(srt2; casefold = casefold),
-    )
-end
-
-function convert_units!(
-    value::Float64,
-    unit_conversion::NamedTuple{(:From, :To), Tuple{String, String}},
-)
-    if string_compare(unit_conversion.From, "degree") &&
-       string_compare(unit_conversion.To, "radian")
-        value = deg2rad(value)
-    elseif string_compare(unit_conversion.From, "radian") &&
-           string_compare(unit_conversion.To, "degree")
-        value = rad2deg(value)
-    elseif string_compare(unit_conversion.From, "TW") &&
-           string_compare(unit_conversion.To, "MW")
-        value *= 1e6
-    elseif string_compare(unit_conversion.From, "TWh") &&
-           string_compare(unit_conversion.To, "MWh")
-        value *= 1e6
-    elseif string_compare(unit_conversion.From, "GW") &&
-           string_compare(unit_conversion.To, "MW")
-        value *= 1000
-    elseif string_compare(unit_conversion.From, "GWh") &&
-           string_compare(unit_conversion.To, "MWh")
-        value *= 1000
-    elseif string_compare(unit_conversion.From, "kW") &&
-           string_compare(unit_conversion.To, "MW")
-        value /= 1000
-    elseif string_compare(unit_conversion.From, "kWh") &&
-           string_compare(unit_conversion.To, "MWh")
-        value /= 1000
-    elseif string_compare(unit_conversion.From, "hour") &&
-           string_compare(unit_conversion.To, "second")
-        value *= 3600
-    elseif string_compare(unit_conversion.From, "minute") &&
-           string_compare(unit_conversion.To, "second")
-        value *= 60
-    elseif string_compare(unit_conversion.From, "hour") &&
-           string_compare(unit_conversion.To, "minute")
-        value *= 60
-    elseif string_compare(unit_conversion.From, "minute") &&
-           string_compare(unit_conversion.To, "hour")
-        value /= 60
-    elseif string_compare(unit_conversion.From, "second") &&
-           string_compare(unit_conversion.To, "minute")
-        value /= 60
-    elseif string_compare(unit_conversion.From, "second") &&
-           string_compare(unit_conversion.To, "hour")
-        value /= 3600
-    else
-        throw(
-            IS.DataFormatError(
-                "Unit conversion from $(unit_conversion.From) to $(unit_conversion.To) not supported",
-            ),
-        )
-    end
-    return value
-end
-
-function convert_units!(
-    value::Int,
-    unit_conversion::NamedTuple{(:From, :To), Tuple{String, String}},
-)
-    return convert_units!(convert(Float64, value), unit_conversion)
 end
 
 function parse_enum_mapping(::Type{ThermalFuels}, fuel::AbstractString)

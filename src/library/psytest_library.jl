@@ -15,7 +15,7 @@ function build_tamu_ACTIVSg2000_sys(; raw_data, kwargs...)
         get(sys_kwargs, :load_name_formatter, x -> strip(join(x["source_id"], "_")))
 
     # make system
-    sys = make_system(
+    sys = system_from_openapi(
         pm_data;
         bus_name_formatter = bus_name_formatter,
         load_name_formatter = load_name_formatter,

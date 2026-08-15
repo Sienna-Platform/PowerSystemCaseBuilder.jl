@@ -1,0 +1,290 @@
+# RTS-GMLC column-to-field map used by PowerSystemCaseBuilder's RTS fixtures.
+#
+# Derived from the descriptor shipped inside the RTS-GMLC-0.2.3 artifact, plus 20 field
+# mappings that descriptor omits. Without them PowerTableDataParser's emissions, outage, and
+# geographic parsers read `nothing`, skip silently, and the data reaches the System nowhere --
+# it survived only as unmapped extras on the OpenAPI document, which PowerSystems drops.
+#
+# Deliberately NOT copied from PowerTableDataParser's own test descriptor: that one maps shunts
+# to `mw_shunt_g`/`mvar_shut_b` and coordinates to `lat`/`lng`, none of which are field names in
+# `power_system_inputs.json`. Those mappings are dead there, which is why the RTS bus shunts
+# never become FixedAdmittance components in its fixture. The artifact's `shunt_g`/`shunt_b` and
+# `position` mappings are correct and are kept.
+#
+# Every added field name was verified against PowerTableDataParser's `power_system_inputs.json`.
+branch:
+- custom_name: UID
+  name: name
+- custom_name: From Bus
+  name: connection_points_from
+- custom_name: To Bus
+  name: connection_points_to
+- custom_name: R
+  name: r
+  unit_system: device_base
+- custom_name: X
+  name: x
+  unit_system: device_base
+- custom_name: B
+  name: primary_shunt
+  unit_system: device_base
+- custom_name: Cont Rating
+  name: rate
+  unit_system: natural_units
+- custom_name: Tr Ratio
+  name: tap
+- custom_name: Perm OutRate
+  name: permanent_outage_rate
+- custom_name: Duration
+  name: permanent_outage_duration
+- custom_name: Tran OutRate
+  name: transient_outage_rate
+- custom_name: LTE Rating
+  name: rating_b
+  unit_system: natural_units
+- custom_name: STE Rating
+  name: rating_c
+  unit_system: natural_units
+bus:
+- custom_name: Bus ID
+  name: bus_id
+- custom_name: Bus Name
+  name: name
+- custom_name: Area
+  name: area
+- custom_name: Zone
+  name: zone
+- custom_name: BaseKV
+  name: base_voltage
+- custom_name: Bus Type
+  name: bus_type
+- custom_name: V Mag
+  name: voltage
+  unit_system: device_base
+- custom_name: V Angle
+  name: angle
+  unit: degree
+- custom_name: MW Shunt G
+  name: shunt_g
+  unit_system: natural_units
+- custom_name: MVAR Shunt B
+  name: shunt_b
+  unit_system: natural_units
+- custom_name: MW Load
+  name: max_active_power
+  unit_system: natural_units
+- custom_name: MVAR Load
+  name: max_reactive_power
+  unit_system: natural_units
+- custom_name: MW Load
+  name: active_power
+  unit_system: natural_units
+- custom_name: MVAR Load
+  name: reactive_power
+  unit_system: natural_units
+- custom_name: lat
+  name: latitude
+- custom_name: lng
+  name: longitude
+dc_branch:
+- custom_name: UID
+  name: name
+- custom_name: From Bus
+  name: connection_points_from
+- custom_name: To Bus
+  name: connection_points_to
+- custom_name: MW Load
+  name: mw_load
+- custom_name: From Max Firing Angle
+  name: rectifier_firing_angle_max
+- custom_name: From Min Firing Angle
+  name: rectifier_firing_angle_min
+- custom_name: From X Commutating
+  name: rectifier_xrc
+  unit_system: device_base
+- custom_name: From Tap Max
+  name: rectifier_tap_limits_max
+- custom_name: From Tap Min
+  name: rectifier_tap_limits_min
+- custom_name: To Max Firing Angle
+  name: inverter_firing_angle_max
+- custom_name: To Min Firing Angle
+  name: inverter_firing_angle_min
+- custom_name: To X Commutating
+  name: inverter_xrc
+  unit_system: device_base
+- custom_name: To Tap Max
+  name: inverter_tap_limits_max
+- custom_name: To Tap Min
+  name: inverter_tap_limits_min
+- custom_name: Margin
+  name: loss
+- custom_name: Control Mode
+  name: control_mode
+- custom_name: MW Load
+  name: max_active_power_limit_from
+- custom_name: MW Load
+  name: max_reactive_power_limit_from
+- custom_name: MW Load
+  name: max_active_power_limit_to
+- custom_name: MW Load
+  name: max_reactive_power_limit_to
+generator:
+- custom_name: GEN UID
+  name: name
+- custom_name: Bus ID
+  name: bus_id
+- custom_name: Fuel
+  name: fuel
+- custom_name: Fuel Price $/MMBTU
+  name: fuel_price
+- custom_name: MW Inj
+  name: active_power
+  unit_system: natural_units
+- custom_name: MVAR Inj
+  name: reactive_power
+  unit_system: natural_units
+- custom_name: PMax MW
+  name: active_power_limits_max
+  unit_system: natural_units
+- custom_name: PMin MW
+  name: active_power_limits_min
+  unit_system: natural_units
+- custom_name: QMax MVAR
+  name: reactive_power_limits_max
+  unit_system: natural_units
+- custom_name: QMin MVAR
+  name: reactive_power_limits_min
+  unit_system: natural_units
+- custom_name: Min Down Time Hr
+  name: min_down_time
+- custom_name: Min Up Time Hr
+  name: min_up_time
+- custom_name: Ramp Rate MW/Min
+  name: ramp_limits
+  unit_system: natural_units
+- custom_name: Start Heat Cold MBTU
+  name: startup_heat_cold_cost
+- custom_name: HR_avg_0
+  name: heat_rate_avg_0
+- custom_name: HR_incr_1
+  name: heat_rate_incr_1
+- custom_name: HR_incr_2
+  name: heat_rate_incr_2
+- custom_name: HR_incr_3
+  name: heat_rate_incr_3
+- custom_name: HR_incr_4
+  name: heat_rate_incr_4
+- custom_name: Output_pct_0
+  name: output_point_0
+  unit_system: device_base
+- custom_name: Output_pct_1
+  name: output_point_1
+  unit_system: device_base
+- custom_name: Output_pct_2
+  name: output_point_2
+  unit_system: device_base
+- custom_name: Output_pct_3
+  name: output_point_3
+  unit_system: device_base
+- custom_name: Output_pct_4
+  name: output_point_4
+  unit_system: device_base
+- custom_name: Base MVA
+  name: base_mva
+- custom_name: Non Fuel Shutdown Cost $
+  name: shutdown_cost
+- custom_name: Unit Type
+  name: unit_type
+- custom_name: Category
+  name: category
+- custom_name: Start Time Cold Hr
+  name: cold_start_time
+- custom_name: Start Time Warm Hr
+  name: warm_start_time
+- custom_name: Start Time Hot Hr
+  name: hot_start_time
+- custom_name: Startup Ramp Rate MW/min
+  name: startup_ramp
+  unit_system: natural_units
+- custom_name: Shutdown Ramp Rate MW/min
+  name: shutdown_ramp
+  unit_system: natural_units
+- custom_name: Status at Start
+  name: status_at_start
+- custom_name: Time at Status
+  name: time_at_status
+- custom_name: Start Cost Cold
+  name: cold_start_cost
+- custom_name: Start Cost Warm
+  name: warm_start_cost
+- custom_name: Start Cost Hot
+  name: hot_start_cost
+- custom_name: Must Run
+  name: must_run
+- custom_name: Emissions SO2 Lbs/MMBTU
+  name: emissions_so2
+- custom_name: Emissions NOX Lbs/MMBTU
+  name: emissions_nox
+- custom_name: Emissions CO2 Lbs/MMBTU
+  name: emissions_co2
+- custom_name: Emissions CH4 Lbs/MMBTU
+  name: emissions_ch4
+- custom_name: Emissions N2O Lbs/MMBTU
+  name: emissions_n2o
+- custom_name: Emissions CO Lbs/MMBTU
+  name: emissions_co
+- custom_name: Emissions VOCs Lbs/MMBTU
+  name: emissions_vocs
+- custom_name: Emissions Part Lbs/MMBTU
+  name: emissions_particulates
+- custom_name: MTTF Hr
+  name: mttf
+- custom_name: MTTR Hr
+  name: mttr
+- custom_name: FOR
+  name: fotr
+- custom_name: Non Fuel Start Cost $
+  name: non_fuel_startup_cost
+- custom_name: VOM
+  name: variable_cost
+load: []
+reserves:
+- custom_name: Reserve Product
+  name: name
+- custom_name: Requirement (MW)
+  name: requirement
+  unit_system: natural_units
+- custom_name: Timeframe (sec)
+  name: timeframe
+- custom_name: Eligible Device Categories
+  name: eligible_device_categories
+- custom_name: Eligible Device SubCategories
+  name: eligible_device_subcategories
+- custom_name: Eligible Regions
+  name: eligible_regions
+- custom_name: Direction
+  name: direction
+simulation_objects: []
+storage:
+- custom_name: GEN UID
+  name: generator_name
+- custom_name: Storage
+  name: name
+- custom_name: Max Volume GWh
+  name: storage_capacity
+  unit: GWh
+- custom_name: Inflow Limit GWh
+  name: input_active_power_limit_max
+  unit: GW
+- custom_name: Rating MVA
+  name: output_active_power_limit_max
+- custom_name: Initial Volume GWh
+  name: energy_level
+  unit: GWh
+- custom_name: Rating MVA
+  name: rating
+- custom_name: Rating MVA
+  name: base_power
+- custom_name: position
+  name: position
