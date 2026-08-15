@@ -13,6 +13,47 @@
 import PowerSystems: ReserveDemandCurve, ReserveDirection
 import PowerSystems:
     MarketBidCost, CostCurve, PiecewiseIncrementalCurve, LinearCurve, Service
+import PowerSystems: OnlineReserve, OfflineReserve
+
+# ---------------------------------------------------------------------------
+# Reserve types renamed in the PSY6 reserve redesign.
+#
+# The artifact data (data_5bus_pu.jl) still constructs ConstantReserve,
+# VariableReserve, and VariableReserveNonSpinning, all replaced by
+# OnlineReserve / OfflineReserve. The names alias directly; ConstantReserve's
+# 8-argument positional call also needs an adapter below because OnlineReserve
+# inserts `variable` (the ORDC) at position 5.
+# ---------------------------------------------------------------------------
+const ConstantReserve = OnlineReserve
+const VariableReserve = OnlineReserve
+const VariableReserveNonSpinning = OfflineReserve
+
+# Old call (data_5bus_pu.jl):
+#   ConstantReserve{ReserveUp}(name, available, time_frame, requirement,
+#                              sustained_time, max_output_fraction,
+#                              max_participation_factor, deployed_fraction)
+function PowerSystems.OnlineReserve{T}(
+    name::String,
+    available::Bool,
+    time_frame::Real,
+    requirement::Real,
+    sustained_time::Real,
+    max_output_fraction::Real,
+    max_participation_factor::Real,
+    deployed_fraction::Real,
+) where {T <: ReserveDirection}
+    return OnlineReserve{T}(
+        name,
+        available,
+        Float64(time_frame),
+        Float64(requirement),
+        _ZERO_OFFER_CURVE,
+        Float64(sustained_time),
+        Float64(max_output_fraction),
+        Float64(max_participation_factor),
+        Float64(deployed_fraction),
+    )
+end
 
 # ---------------------------------------------------------------------------
 # ReserveDemandCurve – variable field: Nothing → ZERO_OFFER_CURVE

@@ -170,10 +170,11 @@ end
 end
 
 @testset "tabular parser (RTS-GMLC) 2W transformer construction" begin
-    # `test_RTS_GMLC_sys` is built via `power_system_table_data.jl`'s
-    # `branch_csv_parser!` (PowerTableDataParser.PowerSystemTableData), the only
-    # tabular-parser test system in the descriptor list that contains
-    # transformers. Skip forecast construction (irrelevant here, and slow).
+    # `test_RTS_GMLC_sys` is built by `build_test_RTS_GMLC_sys`
+    # (src/library/psitest_library.jl), which routes through `system_from_openapi`
+    # and PowerTableDataParser's `src/openapi/branch.jl`, the only tabular-parser
+    # test system in the descriptor list that contains transformers. Skip forecast
+    # construction (irrelevant here, and slow).
     sys = build_system(
         PSITestSystems,
         "test_RTS_GMLC_sys";
@@ -194,7 +195,9 @@ end
     @test !isnothing(t_a7)
     w_a7 = get_circuit(t_a7)
     @test PSY.get_tap(w_a7) ≈ 1.015 atol = 1e-9
-    @test PSY.get_control_objective(w_a7) == TransformerControlObjective.UNDEFINED
+    # Tap present, no control block -> COD 0 (FIXED), same convention the PSSE path
+    # uses above (lines 44-45) for the same tap/no-control-block pattern.
+    @test PSY.get_control_objective(w_a7) == TransformerControlObjective.FIXED
     @test PSY.get_available(w_a7)
     # parent/circuit base_power invariant (both set from the table's system base)
     @test PSY._get_base_power(t_a7) == PSY.get_base_power(w_a7)

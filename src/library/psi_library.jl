@@ -241,54 +241,67 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
 end
 
 function build_5_bus_hydro_uc_sys(; add_forecasts, raw_data, sys_kwargs...)
-    rawsys = PowerTableDataParser.PowerSystemTableData(
-        raw_data,
-        100.0,
-        joinpath(raw_data, "user_descriptors.yaml");
-        generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
-    )
+    # `timeseries_metadata_file` is only known once `add_forecasts` is resolved, and
+    # `system_from_openapi` (unlike the retired `make_system`) has no per-call override
+    # for it — it always reads whatever is set on `rawsys` itself, so `rawsys` is built
+    # per branch rather than shared.
     if add_forecasts
-        c_sys5_hy_uc = make_system(
-            rawsys;
+        rawsys = PowerTableDataParser.PowerSystemTableData(
+            raw_data,
+            100.0,
+            joinpath(raw_data, "user_descriptors.yaml");
+            generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
             timeseries_metadata_file = joinpath(
                 raw_data,
                 "5bus_ts",
                 "7day",
                 "timeseries_pointers_da_7day.json",
             ),
-            time_series_in_memory = true,
-            sys_kwargs...,
         )
+        c_sys5_hy_uc =
+            system_from_openapi(rawsys; time_series_in_memory = true, sys_kwargs...)
         PSY.transform_single_time_series!(c_sys5_hy_uc, Hour(24), Hour(24))
     else
-        c_sys5_hy_uc = make_system(rawsys; sys_kwargs...)
+        rawsys = PowerTableDataParser.PowerSystemTableData(
+            raw_data,
+            100.0,
+            joinpath(raw_data, "user_descriptors.yaml");
+            generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
+        )
+        c_sys5_hy_uc =
+            system_from_openapi(rawsys; time_series_in_memory = true, sys_kwargs...)
     end
 
     return c_sys5_hy_uc
 end
 
 function build_5_bus_hydro_uc_sys_targets(; add_forecasts, raw_data, sys_kwargs...)
-    rawsys = PowerTableDataParser.PowerSystemTableData(
-        raw_data,
-        100.0,
-        joinpath(raw_data, "user_descriptors.yaml");
-        generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
-    )
+    # See build_5_bus_hydro_uc_sys for why rawsys is built per branch.
     if add_forecasts
-        c_sys5_hy_uc = make_system(
-            rawsys;
+        rawsys = PowerTableDataParser.PowerSystemTableData(
+            raw_data,
+            100.0,
+            joinpath(raw_data, "user_descriptors.yaml");
+            generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
             timeseries_metadata_file = joinpath(
                 raw_data,
                 "5bus_ts",
                 "7day",
                 "timeseries_pointers_da_7day.json",
             ),
-            time_series_in_memory = true,
-            sys_kwargs...,
         )
+        c_sys5_hy_uc =
+            system_from_openapi(rawsys; time_series_in_memory = true, sys_kwargs...)
         PSY.transform_single_time_series!(c_sys5_hy_uc, Hour(24), Hour(24))
     else
-        c_sys5_hy_uc = make_system(rawsys; sys_kwargs...)
+        rawsys = PowerTableDataParser.PowerSystemTableData(
+            raw_data,
+            100.0,
+            joinpath(raw_data, "user_descriptors.yaml");
+            generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
+        )
+        c_sys5_hy_uc =
+            system_from_openapi(rawsys; time_series_in_memory = true, sys_kwargs...)
     end
     cost = HydroGenerationCost(CostCurve(LinearCurve(0.15)), 0.0)
     for hy in get_components(HydroTurbine, c_sys5_hy_uc)
@@ -304,18 +317,15 @@ function build_5_bus_hydro_ed_sys(; raw_data, kwargs...)
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
         generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
-    )
-    c_sys5_hy_ed = make_system(
-        rawsys;
         timeseries_metadata_file = joinpath(
             raw_data,
             "5bus_ts",
             "7day",
             "timeseries_pointers_rt_7day.json",
         ),
-        time_series_in_memory = true,
-        sys_kwargs...,
     )
+    c_sys5_hy_ed =
+        system_from_openapi(rawsys; time_series_in_memory = true, sys_kwargs...)
     PSY.transform_single_time_series!(c_sys5_hy_ed, Hour(2), Hour(1))
 
     return c_sys5_hy_ed
@@ -328,18 +338,15 @@ function build_5_bus_hydro_ed_sys_targets(; raw_data, kwargs...)
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
         generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
-    )
-    c_sys5_hy_ed = make_system(
-        rawsys;
         timeseries_metadata_file = joinpath(
             raw_data,
             "5bus_ts",
             "7day",
             "timeseries_pointers_rt_7day.json",
         ),
-        time_series_in_memory = true,
-        sys_kwargs...,
     )
+    c_sys5_hy_ed =
+        system_from_openapi(rawsys; time_series_in_memory = true, sys_kwargs...)
     cost = HydroGenerationCost(CostCurve(LinearCurve(0.15)), 0.0)
     for hy in get_components(HydroTurbine, c_sys5_hy_ed)
         set_operation_cost!(hy, cost)
@@ -356,18 +363,15 @@ function build_5_bus_hydro_wk_sys(; raw_data, kwargs...)
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
         generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
-    )
-    c_sys5_hy_wk = make_system(
-        rawsys;
         timeseries_metadata_file = joinpath(
             raw_data,
             "5bus_ts",
             "7day",
             "timeseries_pointers_wk_7day.json",
         ),
-        time_series_in_memory = true,
-        sys_kwargs...,
     )
+    c_sys5_hy_wk =
+        system_from_openapi(rawsys; time_series_in_memory = true, sys_kwargs...)
     PSY.transform_single_time_series!(c_sys5_hy_wk, Hour(48), Hour(48))
 
     return c_sys5_hy_wk
@@ -380,18 +384,15 @@ function build_5_bus_hydro_wk_sys_targets(; raw_data, kwargs...)
         100.0,
         joinpath(raw_data, "user_descriptors.yaml");
         generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
-    )
-    c_sys5_hy_wk = make_system(
-        rawsys;
         timeseries_metadata_file = joinpath(
             raw_data,
             "5bus_ts",
             "7day",
             "timeseries_pointers_wk_7day.json",
         ),
-        time_series_in_memory = true,
-        sys_kwargs...,
     )
+    c_sys5_hy_wk =
+        system_from_openapi(rawsys; time_series_in_memory = true, sys_kwargs...)
     cost = HydroGenerationCost(CostCurve(LinearCurve(0.15)), 0.0)
     for hy in get_components(HydroTurbine, c_sys5_hy_wk)
         set_operation_cost!(hy, cost)
@@ -409,12 +410,12 @@ function build_RTS_GMLC_DA_sys(; raw_data, kwargs...)
     rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
-        joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
+        RTS_USER_DESCRIPTOR_FILE;
         timeseries_metadata_file = joinpath(RTS_SIIP_DIR, "timeseries_pointers.json"),
         generator_mapping_file = joinpath(MAP_DIR, "generator_mapping.yaml"),
     )
     resolution = get(sys_kwargs, :time_series_resolution, Dates.Hour(1))
-    sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
+    sys = system_from_openapi(rawsys; time_series_resolution = resolution, sys_kwargs...)
     interval = get(sys_kwargs, :interval, Dates.Hour(24))
     horizon = Hour(get(sys_kwargs, :horizon, 48))
     PSY.transform_single_time_series!(sys, horizon, interval)
@@ -429,12 +430,12 @@ function build_RTS_GMLC_RT_sys(; raw_data, kwargs...)
     rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
-        joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
+        RTS_USER_DESCRIPTOR_FILE;
         timeseries_metadata_file = joinpath(RTS_SIIP_DIR, "timeseries_pointers.json"),
         generator_mapping_file = joinpath(MAP_DIR, "generator_mapping.yaml"),
     )
     resolution = get(sys_kwargs, :time_series_resolution, Dates.Minute(5))
-    sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
+    sys = system_from_openapi(rawsys; time_series_resolution = resolution, sys_kwargs...)
     interval = get(sys_kwargs, :interval, Dates.Minute(5))
     horizon = Hour(get(sys_kwargs, :horizon, 2))
     PSY.transform_single_time_series!(sys, horizon, interval)
@@ -449,12 +450,12 @@ function build_RTS_GMLC_DA_sys_noForecast(; raw_data, kwargs...)
     rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
-        joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
+        RTS_USER_DESCRIPTOR_FILE;
         timeseries_metadata_file = joinpath(RTS_SIIP_DIR, "timeseries_pointers.json"),
         generator_mapping_file = joinpath(MAP_DIR, "generator_mapping.yaml"),
     )
     resolution = get(sys_kwargs, :time_series_resolution, Dates.Hour(1))
-    sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
+    sys = system_from_openapi(rawsys; time_series_resolution = resolution, sys_kwargs...)
     return sys
 end
 
@@ -466,12 +467,12 @@ function build_RTS_GMLC_RT_sys_noForecast(; raw_data, kwargs...)
     rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
-        joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
+        RTS_USER_DESCRIPTOR_FILE;
         timeseries_metadata_file = joinpath(RTS_SIIP_DIR, "timeseries_pointers.json"),
         generator_mapping_file = joinpath(MAP_DIR, "generator_mapping.yaml"),
     )
     resolution = get(sys_kwargs, :time_series_resolution, Dates.Minute(5))
-    sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
+    sys = system_from_openapi(rawsys; time_series_resolution = resolution, sys_kwargs...)
     return sys
 end
 
@@ -489,29 +490,29 @@ function make_modified_RTS_GMLC_sys(
     rawsys = PowerTableDataParser.PowerSystemTableData(
         RTS_SRC_DIR,
         100.0,
-        joinpath(RTS_SIIP_DIR, "user_descriptors.yaml");
+        RTS_USER_DESCRIPTOR_FILE;
         timeseries_metadata_file = joinpath(RTS_SIIP_DIR, "timeseries_pointers.json"),
         generator_mapping_file = joinpath(MAP_DIR, "generator_mapping.yaml"),
     )
 
-    sys = make_system(rawsys; time_series_resolution = resolution, sys_kwargs...)
-    res_up = PSY.get_component(PSY.VariableReserve{PSY.ReserveUp}, sys, "Flex_Up")
-    res_dn = PSY.get_component(PSY.VariableReserve{PSY.ReserveDown}, sys, "Flex_Down")
+    sys = system_from_openapi(rawsys; time_series_resolution = resolution, sys_kwargs...)
+    res_up = PSY.get_component(PSY.OnlineReserve{PSY.ReserveUp}, sys, "Flex_Up")
+    res_dn = PSY.get_component(PSY.OnlineReserve{PSY.ReserveDown}, sys, "Flex_Down")
     PSY.remove_component!(sys, res_dn)
     PSY.remove_component!(sys, res_up)
-    reg_reserve_up = PSY.get_component(PSY.VariableReserve, sys, "Reg_Up")
+    reg_reserve_up = PSY.get_component(PSY.OnlineReserve, sys, "Reg_Up")
     PSY.set_requirement!(
         reg_reserve_up,
         1.75 * PSY.get_requirement(reg_reserve_up, IS.SU) * IS.SU,
     )
-    reg_reserve_dn = PSY.get_component(PSY.VariableReserve, sys, "Reg_Down")
+    reg_reserve_dn = PSY.get_component(PSY.OnlineReserve, sys, "Reg_Down")
     PSY.set_requirement!(
         reg_reserve_dn,
         1.75 * PSY.get_requirement(reg_reserve_dn, IS.SU) * IS.SU,
     )
-    spin_reserve_R1 = PSY.get_component(PSY.VariableReserve, sys, "Spin_Up_R1")
-    spin_reserve_R2 = PSY.get_component(PSY.VariableReserve, sys, "Spin_Up_R2")
-    spin_reserve_R3 = PSY.get_component(PSY.VariableReserve, sys, "Spin_Up_R3")
+    spin_reserve_R1 = PSY.get_component(PSY.OnlineReserve, sys, "Spin_Up_R1")
+    spin_reserve_R2 = PSY.get_component(PSY.OnlineReserve, sys, "Spin_Up_R2")
+    spin_reserve_R3 = PSY.get_component(PSY.OnlineReserve, sys, "Spin_Up_R3")
     for g in PSY.get_components(
         x -> PSY.get_prime_mover_type(x) in [PSY.PrimeMovers.CT, PSY.PrimeMovers.CC],
         PSY.ThermalStandard,
@@ -1444,7 +1445,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         PSY.set_name!(b, name_ * "_twin")
         # change bus (already changed)
         # check if it has services
-        @assert !PSY.has_service(b, PSY.VariableReserve)
+        @assert !PSY.has_service(b, PSY.OnlineReserve)
         PSY.add_component!(main_sys, b)
         !PSY.has_time_series(b) && PSY.copy_time_series!(b, main_comp)
 
