@@ -51,7 +51,6 @@ import HDF5
 import DataFrames: DataFrame
 import LazyArtifacts
 import JSON
-import JSON3
 import SHA
 import YAML
 import InteractiveUtils

@@ -143,7 +143,7 @@ generator:
   unit_system: natural_units
 - custom_name: MVAR Inj
   name: reactive_power
-  unit_system natural_units: null
+  unit_system: natural_units
 - custom_name: PMax MW
   name: active_power_limits_max
   unit_system: natural_units

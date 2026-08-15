@@ -80,7 +80,9 @@ Checks for the document rather than just the directory: a directory left behind 
 interrupted write would otherwise look like a valid cache entry and fail confusingly on read.
 """
 function is_serialized(name::String, case_args::Dict{Symbol, <:Any} = Dict{Symbol, Any}())
-    return isfile(joinpath(get_serialized_dirpath(name, case_args), PSY.SYSTEM_DOCUMENT_FILE))
+    return isfile(
+        joinpath(get_serialized_dirpath(name, case_args), PSY.SYSTEM_DOCUMENT_FILE),
+    )
 end
 
 function get_raw_data(; kwargs...)
@@ -106,7 +108,7 @@ function serialize_case_parameters(case_args::Dict{Symbol, <:Any})
 
     if !isfile(file_path)
         open(file_path, "w") do io
-            JSON3.write(io, case_args)
+            JSON.print(io, case_args)
         end
     end
 end

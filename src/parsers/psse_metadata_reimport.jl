@@ -241,7 +241,7 @@ function system_from_psse_reimport(file_path::AbstractString; kwargs...)
     )
     if isfile(md_path)
         @info "Found a PowerFlows.jl PSS/E export metadata file at $md_path, will use it to perform remapping for round trip"
-        md = JSON3.read(md_path, Dict)
+        md = JSON.parsefile(md_path)
         return System(file_path, md; kwargs...)
     else
         @info "Did not find a PowerFlows.jl PSS/E export metadata file at $md_path, will not do any remapping"

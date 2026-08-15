@@ -1,88 +1,90 @@
-# Replaces the retired power_system_table_data.jl (make_system + its *_csv_parser!
-# functions): table data now flows through the OpenAPI document pipeline —
-# PowerTableDataParser.build_openapi_system -> JSON document + HDF5 sidecar ->
-# PowerSystems.from_openapi(System, doc) — verified end to end against the full RTS
-# corpus (.claude/plans/2026-08-04-pscb-openapi-pipeline-switchover.md, Phases 1-2).
+# Glue only. The parsers emit an OpenAPI document, PowerSystems reads one; this package is
+# just the one that depends on both sides, since neither parser can depend on PowerSystems
+# nor PowerSystems on a parser.
+
+# The two parsers' `to_json` are distinct functions, so the write dispatches. Everything
+# after it is shared.
+_write_document(oapi::PowerTableDataParser.OpenAPISystem, path::AbstractString) =
+    PowerTableDataParser.to_json(oapi, path; force = true)
+
+_write_document(oapi::PowerFlowFileParser.OpenAPISystem, path::AbstractString) =
+    PowerFlowFileParser.to_json(oapi, path; force = true)
 
 """
-Build a `System` from `rawsys` through the OpenAPI document pipeline, replacing the
-retired `make_system(rawsys::PowerSystemTableData)`.
+Load a parser's OpenAPI document into a `System`, via a temporary bundle on disk.
 
-`time_series_resolution` filters the document's `time_series_associations` to just the
-matching resolution before import — the old path's `add_time_series!(...;
-resolution = ...)` kwarg applied the same `metadata.resolution == resolution` equality
-filter (`IS.add_time_series_from_file_metadata!`); `nothing` (the default) keeps every
-resolution, matching the old default too.
+Two reasons the bundle is not skippable today. A document carrying time series has nowhere
+to hand them over in memory: `from_openapi` reads series through an
+`IS.Hdf5TimeSeriesStorage` built from a path (`sqlite_load.jl`), so widening those readers
+to `IS.TimeSeriesStorage` — `InMemoryTimeSeriesStorage` already implements the same
+interface — is what would remove it. And PSY's importer expects the round-tripped shape of
+some values regardless of time series; see the note on the PSS/E method.
 
-Every other `kwargs` entry passes straight through to
-`PSY.from_openapi(System, doc; system_kwargs...)`, which forwards it to `System`'s own
-constructor (`time_series_in_memory`, `time_series_directory`, `time_series_read_only`,
-`runchecks`, ... — `PSY.SYSTEM_KWARGS`); an unsupported key still errors, from `System`'s
-own constructor, not here.
+`to_json` writes the sidecar beside the document and `from_file` resolves it back off the
+document, so neither path is spelled out here. The bundle is scoped to the call:
+`from_file` materializes every series into the `System`'s own storage, so a bare
+`mktempdir` would just hold a dead copy until the process exits.
+"""
+function system_from_document(oapi; kwargs...)
+    return mktempdir() do dir
+        _write_document(oapi, joinpath(dir, PowerSystems.SYSTEM_DOCUMENT_FILE))
+        PowerSystems.from_file(PowerSystems.System, dir; kwargs...)
+    end
+end
+
+"""
+Build a `System` from table data. `time_series_resolution` keeps only the associations at
+that resolution, matching the retired `make_system`'s kwarg of the same name.
 """
 function system_from_openapi(
     rawsys::PowerTableDataParser.PowerSystemTableData;
     time_series_resolution::Union{Dates.Period, Nothing} = nothing,
     kwargs...,
 )
-    rawsys = fix_known_stale_time_series_data(rawsys)
-    oapi = PowerTableDataParser.build_openapi_system(rawsys)
-    dir = mktempdir()
-    doc_path = joinpath(dir, "system.json")
-    PowerTableDataParser.to_json(oapi, doc_path; force = true, pretty = false)
-    ts_path = joinpath(dir, "system_time_series_storage.h5")
-    PowerTableDataParser.write_time_series(oapi, ts_path)
-
-    # Reached through PowerSystems rather than by depending on PowerCoreOpenAPIModels
-    # directly: PSCB is being trimmed to PSY + the parsers, so this avoids a new dep for one
-    # call. Revisit when PSCB's dependency set is settled.
-    doc = PowerSystems.PC.read_document(doc_path)
-    _filter_time_series_resolution!(doc, time_series_resolution)
-
-    sys = PowerSystems.from_openapi(
-        PowerSystems.System,
-        doc;
-        time_series_storage_path = ts_path,
-        kwargs...,
+    oapi = PowerTableDataParser.build_openapi_system(
+        fix_known_stale_time_series_data(rawsys),
     )
-    check(sys)
-    return sys
+    _keep_time_series_resolution!(oapi, time_series_resolution)
+    return system_from_document(oapi; kwargs...)
 end
 
 """
-Build a `System` from PSS/E or Matpower data through the OpenAPI document pipeline,
-replacing `make_system(pm_data::PowerFlowFileParser.PowerModelsData)`.
+Build a `System` from PSS/E or Matpower data.
 
-Unlike the table-data path there is no serialization step: `build_openapi_system` returns
-the `SystemDocument` already, and these formats carry no time series, so there is no
-sidecar to write and nothing for `from_openapi` to read back.
-
-`kwargs` are split the way the retired `make_system` split them — the `*_name_formatter`
-entries go to the reader, everything else to `System`'s own constructor.
+Goes through the document on disk even though these formats carry no time series and
+`from_openapi` would accept the in-memory document directly. Handing it over in memory
+errors on an LCC line: `_hvdc_loss_curve` (PSY `import_handwritten.jl`) reads a `value`
+field off the loss curve's function data, which only exists after a JSON round trip
+normalizes it — PSY's importer is written against the round-tripped shape. Take the
+shortcut once that is fixed, not before.
 """
-function system_from_openapi(
-    pm_data::PowerFlowFileParser.PowerModelsData;
-    kwargs...,
-)
-    reader_kwargs = filter(p -> endswith(string(first(p)), "_name_formatter"), kwargs)
-    system_kwargs = filter(p -> !endswith(string(first(p)), "_name_formatter"), kwargs)
-    oapi = PowerFlowFileParser.build_openapi_system(pm_data; reader_kwargs...)
-    sys = PowerSystems.from_openapi(
-        PowerSystems.System,
-        PowerFlowFileParser.get_document(oapi);
-        system_kwargs...,
-    )
-    check(sys)
-    return sys
+function system_from_openapi(pm_data::PowerFlowFileParser.PowerModelsData; kwargs...)
+    oapi = PowerFlowFileParser.build_openapi_system(pm_data; kwargs...)
+    return system_from_document(oapi; filter_kwargs(; kwargs...)...)
 end
 
-_filter_time_series_resolution!(doc, ::Nothing) = doc
+"""
+Drop every time series whose resolution is not `resolution`, before the sidecar is written.
 
-"""Keep only `time_series_associations` rows whose ISO 8601 `PT<seconds>S` resolution
-(the only form PowerTableDataParser's writer emits) matches `resolution`, mirroring
-`IS.add_time_series_from_file_metadata!`'s `metadata.resolution == resolution` filter."""
-function _filter_time_series_resolution!(doc, resolution::Dates.Period)
+Errors when nothing matches: the association's `resolution` is a wire string, so a
+mismatch between the requested `Period` and the encoding the writer emits would otherwise
+yield a `System` with silently no time series.
+"""
+function _keep_time_series_resolution!(oapi, resolution::Dates.Period)
     target = "PT$(Dates.value(Dates.Second(resolution)))S"
-    filter!(row -> row.resolution == target, doc.time_series_associations)
-    return doc
+    associations = PowerTableDataParser.get_time_series_associations(oapi)
+    if !any(row -> row.resolution == target, associations)
+        throw(
+            IS.DataFormatError(
+                "no time series at resolution $resolution (looked for $target); " *
+                "the document carries $(unique(row.resolution for row in associations))",
+            ),
+        )
+    end
+    filter!(row -> row.resolution == target, associations)
+    return
+end
+
+function _keep_time_series_resolution!(oapi, ::Nothing)
+    return
 end

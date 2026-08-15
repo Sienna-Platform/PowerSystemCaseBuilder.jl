@@ -52,7 +52,6 @@ function build_system(
     )
 end
 
-
 """
 Whether `sys` can round-trip through an OpenAPI document without loss.
 
@@ -114,7 +113,8 @@ function _build_system(
         )
         #construct_time = time() - start
         start = time()
-        if !skip_serialization && isempty(sys_args) && _is_losslessly_serializable(sys, name)
+        if !skip_serialization && isempty(sys_args) &&
+           _is_losslessly_serializable(sys, name)
             # `unit_system = :device_base`, not the `:original` default: that one reproduces the
             # document a System was read from and needs the round-trip ledger, which only
             # document-built systems carry. Device base is what PSY stores internally, so the
@@ -137,7 +137,8 @@ function _build_system(
                   "an OpenAPI document, which carries component ids rather than UUIDs, so " *
                   "every load rebuilds components with fresh UUIDs"
         end
-        sys = PSY.from_file(PSY.System, get_serialized_dirpath(name, case_args); sys_args...)
+        sys =
+            PSY.from_file(PSY.System, get_serialized_dirpath(name, case_args); sys_args...)
         PSY.get_runchecks(sys)
         # update_stats!(sys_descriptor, time() - start)
     end
