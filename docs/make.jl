@@ -1,12 +1,18 @@
 using Documenter, PowerSystemCaseBuilder
 import DataStructures: OrderedDict
-# using Literate
+using Literate
 using DocumenterInterLinks
+
+# UPDATE FOR CURRENT MODULE NAME HERE
+const _DOCS_BASE_URL = "https://nrel-sienna.github.io/PowerSystemCaseBuilder.jl/stable"
 
 links = InterLinks(
     "PowerSystems" => "https://sienna-platform.github.io/PowerSystems.jl/stable/",
     "Pkg" => "https://pkgdocs.julialang.org/v1/",
 )
+
+include(joinpath(@__DIR__, "make_tutorials.jl"))
+make_tutorials()
 
 if isfile("docs/src/howto/.DS_Store.md")
     rm("docs/src/howto/.DS_Store.md")
