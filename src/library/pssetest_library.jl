@@ -1,6 +1,6 @@
 function build_psse_RTS_GMLC_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = make_system(PowerFlowFileParser.PowerModelsData(raw_data), sys_kwargs...)
+    sys = system_from_openapi(PowerFlowFileParser.PowerModelsData(raw_data); sys_kwargs...)
 
     return sys
 end
@@ -16,13 +16,13 @@ end
 
 function build_pti(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = make_system(PowerFlowFileParser.PowerModelsData(raw_data), sys_kwargs...)
+    sys = system_from_openapi(PowerFlowFileParser.PowerModelsData(raw_data); sys_kwargs...)
     return sys
 end
 
 function build_psse_modified_14bus_sys(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    sys = make_system(
+    sys = system_from_openapi(
         PowerFlowFileParser.PowerModelsData(raw_data);
         runchecks = false,
         sys_kwargs...,

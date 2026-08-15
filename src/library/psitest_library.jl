@@ -4801,7 +4801,7 @@ function build_test_RTS_GMLC_sys(; raw_data, add_forecasts, kwargs...)
             timeseries_metadata_file = joinpath(raw_data, "timeseries_pointers.json"),
             generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
         )
-        sys = make_system(rawsys; time_series_resolution = Dates.Hour(1), sys_kwargs...)
+        sys = system_from_openapi(rawsys; time_series_resolution = Dates.Hour(1), sys_kwargs...)
         PSY.transform_single_time_series!(sys, Hour(24), Dates.Hour(24))
         return sys
     else
@@ -4811,7 +4811,7 @@ function build_test_RTS_GMLC_sys(; raw_data, add_forecasts, kwargs...)
             joinpath(raw_data, "user_descriptors.yaml");
             generator_mapping_file = joinpath(raw_data, "generator_mapping.yaml"),
         )
-        sys = make_system(rawsys; time_series_resolution = Dates.Hour(1), sys_kwargs...)
+        sys = system_from_openapi(rawsys; time_series_resolution = Dates.Hour(1), sys_kwargs...)
         return sys
     end
 end
