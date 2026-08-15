@@ -7,13 +7,6 @@ const GENERATOR_MAPPING_FILE_PM =
         "generator_mapping_pm.yaml",
     )
 
-const GENERATOR_MAPPING_FILE_CDM =
-    joinpath(
-        dirname(pathof(PowerSystemCaseBuilder)),
-        "parsers",
-        "generator_mapping_cdm.yaml",
-    )
-
 const PSSE_DYR_MAPPING_FILE =
     joinpath(
         dirname(pathof(PowerSystemCaseBuilder)),
@@ -62,11 +55,8 @@ merge!(
     ),
 )
 
-# get_generator_mapping is only used in two places: to create a
-# PowerSystemTableData object, where mappings is type String which has been
-# extracted to the parser repo; to create a System from a
-# PowerFlowFileParser.PowerModelsData object, where mappings is type DataType.
-# Thus get_generator_mapping still needs to stay in this repo
+# Stays until `make_system(::PowerModelsData)` goes: that path resolves each mapping to a
+# `DataType`, unlike PowerTableDataParser's, which resolves to a type name.
 """Return a dict where keys are a tuple of input parameters (fuel, unit_type) and values are
 generator types."""
 function get_generator_mapping(filename::String)

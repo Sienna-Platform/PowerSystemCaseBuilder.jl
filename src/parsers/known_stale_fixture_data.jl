@@ -97,13 +97,26 @@ function fix_known_stale_time_series_data(
     open(fixed_path, "w") do io
         JSON.print(io, fixed)
     end
-    return PowerTableDataParser.PowerSystemTableData(
-        rawsys.base_power,
-        rawsys.category_to_df,
-        fixed_path,
-        rawsys.directory,
-        rawsys.user_descriptors,
-        rawsys.descriptors,
-        rawsys.generator_mapping,
-    )
+    return _with_timeseries_metadata_file(rawsys, fixed_path)
+end
+
+"""
+Copy `rawsys` with `timeseries_metadata_file` replaced.
+
+Field values are taken by name rather than positionally: `PowerSystemTableData` belongs to
+PowerTableDataParser, and two of its seven fields are adjacent `Dict`s, so a reorder there
+would leave a positional rebuild compiling and silently wrong.
+"""
+function _with_timeseries_metadata_file(
+    rawsys::PowerTableDataParser.PowerSystemTableData,
+    path::AbstractString,
+)
+    T = PowerTableDataParser.PowerSystemTableData
+    values = map(fieldnames(T)) do field
+        if field === :timeseries_metadata_file
+            return path
+        end
+        return getfield(rawsys, field)
+    end
+    return T(values...)
 end
