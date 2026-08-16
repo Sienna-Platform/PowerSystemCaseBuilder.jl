@@ -222,7 +222,11 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
             add_time_series!(
                 c_sys5,
                 l,
-                PSY.SingleTimeSeries("max_active_power", rt_timearray),
+                PSY.SingleTimeSeries(
+                    "max_active_power",
+                    rt_timearray;
+                    per_unit_of("active_power")...,
+                ),
             )
         end
         for (ix, g) in enumerate(PSY.get_components(RenewableDispatch, c_sys5))
@@ -1278,21 +1282,36 @@ function build_two_zone_5_bus(; kwargs...)
             PSY.add_time_series!(
                 sys,
                 l,
-                Deterministic("max_active_power", data, resolution),
+                Deterministic(
+                    "max_active_power",
+                    data,
+                    resolution;
+                    per_unit_of("active_power")...,
+                ),
             )
         elseif occursin("nodeC", PSY.get_name(l))
             data = Dict(DateTime("2020-01-01T00:00:00") => loadbusC_ts_DA)
             PSY.add_time_series!(
                 sys,
                 l,
-                Deterministic("max_active_power", data, resolution),
+                Deterministic(
+                    "max_active_power",
+                    data,
+                    resolution;
+                    per_unit_of("active_power")...,
+                ),
             )
         else
             data = Dict(DateTime("2020-01-01T00:00:00") => loadbusD_ts_DA)
             PSY.add_time_series!(
                 sys,
                 l,
-                Deterministic("max_active_power", data, resolution),
+                Deterministic(
+                    "max_active_power",
+                    data,
+                    resolution;
+                    per_unit_of("active_power")...,
+                ),
             )
         end
     end
@@ -1300,6 +1319,22 @@ function build_two_zone_5_bus(; kwargs...)
 end
 
 const COST_PERTURBATION_NOISE_SEED = 1357
+
+"""
+Clear a detached component's id so the system it is added to next mints a fresh one.
+
+`_duplicate_system` moves components out of a `deepcopy` into the original, where their ids
+would collide with the very components they were copied from. Reassigning inside the twin
+first (`IS.assign_new_id!`) is not enough: the two systems' id counters start out equal, so
+the twin hands out exactly the ids `main_sys` is itself handing out to the arcs and lines
+built along the way. Clearing the id instead lets `add_component!` draw it from the
+receiving system — the only counter that can guarantee uniqueness there.
+
+Safe only on a component already removed from its old system, and only because
+`_duplicate_system` clears the twin's time series up front: an id is what the time series
+store and the attribute associations key on.
+"""
+_detach_id!(component) = IS.set_id!(component, IS.UNASSIGNED_ID)
 
 function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line::Bool)
     names = [
@@ -1344,8 +1379,8 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
             name_ = PSY.get_name(b)
             main_comp = PSY.get_component(component_type, main_sys, name_)
 
-            IS.assign_new_uuid!(twin_sys.data, b)
             PSY.remove_component!(twin_sys, b)
+            _detach_id!(b)
             # change name
             PSY.set_name!(b, name_ * "_twin")
             # define time series container
@@ -1363,8 +1398,8 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         name_ = PSY.get_name(b)
         main_comp = PSY.get_component(PSY.ACBus, main_sys, name_)
 
-        IS.assign_new_uuid!(twin_sys.data, b)
         PSY.remove_component!(twin_sys, b)
+        _detach_id!(b)
         # change name
         PSY.set_name!(b, name_ * "_twin")
         # change area
@@ -1388,8 +1423,8 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         name_ = PSY.get_name(b)
         main_comp = PSY.get_component(typeof(b), main_sys, name_)
 
-        IS.assign_new_uuid!(twin_sys.data, b)
         PSY.remove_component!(twin_sys, b)
+        _detach_id!(b)
         # change name
         PSY.set_name!(b, name_ * "_twin")
         # create new component from scratch since copying is not working
@@ -1421,8 +1456,8 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         name_ = PSY.get_name(srvc)
         main_comp = PSY.get_component(PSY.Service, main_sys, name_)
 
-        IS.assign_new_uuid!(twin_sys.data, srvc)
         PSY.remove_component!(twin_sys, srvc)
+        _detach_id!(srvc)
         # change name
         PSY.set_name!(srvc, name_ * "_twin")
         # define time series container
@@ -1439,8 +1474,8 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         name_ = PSY.get_name(b)
         main_comp = PSY.get_component(typeof(b), main_sys, name_)
         PSY.clear_services!(b)
-        IS.assign_new_uuid!(twin_sys.data, b)
         PSY.remove_component!(twin_sys, b)
+        _detach_id!(b)
         # change name
         PSY.set_name!(b, name_ * "_twin")
         # change bus (already changed)
@@ -1633,17 +1668,22 @@ function fix_rts_RT_reserve_requirements(DA_sys::PSY.System, RT_sys::PSY.System)
 
     # loop over the different services
     for name in services_DA_names
+        # `SingleTimeSeries.data` is the raw value `Vector`, not a `TimeArray` — the
+        # timestamps are implied by `initial_timestamp` and `resolution`. `IS.get_array`
+        # returns those values; `IS.get_time_array` builds the `TimeArray` the timestamps
+        # are read off of.
+
         # Read Reg_Up DA
         service_da = get_component(Service, DA_sys, name)
-        time_series_da = get_time_series(SingleTimeSeries, service_da, "requirement").data
-        data_da = values(time_series_da)
+        data_da = IS.get_array(get_time_series(SingleTimeSeries, service_da, "requirement"))
 
         # Read Reg_Up RT
         service_rt = get_component(Service, RT_sys, name)
         if !has_time_series(service_rt)
             continue
         end
-        time_series_rt = get_time_series(SingleTimeSeries, service_rt, "requirement").data
+        time_series_rt =
+            IS.get_time_array(get_time_series(SingleTimeSeries, service_rt, "requirement"))
         dates_rt = timestamp(time_series_rt)
         data_rt = values(time_series_rt)
 
@@ -1990,7 +2030,7 @@ function build_118_bus_DA(; kwargs...)
         local solar_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = solar_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
+            per_unit_of("active_power")...,
         )
         push!(solar_DA_TS, solar_TS)
     end
@@ -2003,7 +2043,7 @@ function build_118_bus_DA(; kwargs...)
         local wind_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = wind_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
+            per_unit_of("active_power")...,
         )
         push!(wind_DA_TS, wind_TS)
     end
@@ -2015,7 +2055,7 @@ function build_118_bus_DA(; kwargs...)
         local load_time_series = SingleTimeSeries(;
             name = "max_active_power",
             data = load_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
+            per_unit_of("active_power")...,
         )
         push!(load_TS, load_time_series)
     end
@@ -2099,7 +2139,7 @@ function build_118_bus_RT(; kwargs...)
         local solar_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = solar_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
+            per_unit_of("active_power")...,
         )
         push!(solar_RT_TS, solar_TS)
     end
@@ -2112,7 +2152,7 @@ function build_118_bus_RT(; kwargs...)
         local wind_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = wind_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
+            per_unit_of("active_power")...,
         )
         push!(wind_RT_TS, wind_TS)
     end
@@ -2124,7 +2164,7 @@ function build_118_bus_RT(; kwargs...)
         local load_time_series = SingleTimeSeries(;
             name = "max_active_power",
             data = load_array,
-            scaling_factor_multiplier = get_max_active_power, #assumption?
+            per_unit_of("active_power")...,
         )
         push!(load_TS, load_time_series)
     end

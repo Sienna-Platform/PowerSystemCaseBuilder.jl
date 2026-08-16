@@ -55,3 +55,39 @@ const WINDING_NAMES = Dict(
     WindingCategory.SECONDARY_WINDING => "secondary",
     WindingCategory.TERTIARY_WINDING => "tertiary",
 )
+
+"""
+Keyword arguments declaring a time series stored per unit on its owner's own base.
+
+Replaces `scaling_factor_multiplier`, which InfrastructureSystems removed. A normalized
+profile used to be stored bare next to the name of an accessor, and every read multiplied it
+by that accessor's value on the owner. The profile is still stored the same way — one shared
+array many components can point at — but the storage now *declares* what it is:
+`unit_system` says the values are per unit on the component's own base, and `quantity_kind`
+names the physical quantity they scale to. That carries the same meaning without a function
+name for the reader to resolve, and leaves the scaling to the consumer.
+
+`units` stays `nothing`: a per-unit basis is not a units label.
+"""
+per_unit_of(quantity_kind::AbstractString) =
+    (unit_system = IS.DU, units = nothing, quantity_kind = quantity_kind)
+
+"""
+The quantity a profile normalized against a reservoir's storage capacity scales to.
+
+Depends on the reservoir: `level_data_type` decides whether its levels are accounted in
+energy, in volume, or as a head. `PowerTableDataParser` owns the mapping so the fixtures and
+the table parser cannot drift apart on what a reservoir-normalized series means.
+"""
+reservoir_level_quantity(reservoir::PSY.HydroReservoir) =
+    PowerTableDataParser.quantity_kind_for_multiplier(
+        "get_storage_capacity",
+        () -> string(PSY.get_level_data_type(reservoir)),
+    )
+
+"""
+An `EnergyReservoirStorage` has no `level_data_type` to choose from: its `storage_capacity`
+is canonically MWh, with `conversion_factor` scaling a non-MWh medium into it. So its levels
+are energy however the medium is measured.
+"""
+reservoir_level_quantity(::PSY.EnergyReservoirStorage) = "energy"
