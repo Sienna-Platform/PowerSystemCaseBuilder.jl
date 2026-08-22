@@ -23,7 +23,7 @@
 
 const PSSE_EXPORT_METADATA_EXTENSION = "_export_metadata.json"
 
-reverse_dict(d::Dict) = Dict(map(reverse, collect(d)))
+reverse_dict(d::AbstractDict) = Dict(map(reverse, collect(d)))
 
 function split_first_rest(s::AbstractString; delim = "_")
     splitted = split(s, delim)
@@ -94,7 +94,7 @@ Parse an export_metadata dictionary, returning the kwargs that should be passed 
 System constructor and the bus number remapping that should be used to effect the
 retransformation.
 """
-function parse_export_metadata_dict(md::Dict)
+function parse_export_metadata_dict(md::AbstractDict)
     bus_name_map = reverse_dict(md["bus_name_mapping"])  # PSS/E bus name -> Sienna bus name
     all_branch_name_map = deserialize_reverse_component_ids(
         merge(
@@ -121,7 +121,7 @@ function parse_export_metadata_dict(md::Dict)
     )
 
     function branch_name_formatter(
-        device_dict::Dict,
+        device_dict::AbstractDict,
         bus_f::ACBus,
         bus_t::ACBus,
     )::String
@@ -142,7 +142,7 @@ function parse_export_metadata_dict(md::Dict)
     end
 
     function xfrm_3w_name_formatter(
-        device_dict::Dict,
+        device_dict::AbstractDict,
         p_bus::ACBus,
         s_bus::ACBus,
         t_bus::ACBus,
@@ -226,7 +226,7 @@ function parse_export_metadata_dict(md::Dict)
 end
 
 "Construct a System from a `.raw` file and a dictionary corresponding to the `<name>_export_metadata.json` file"
-function PSY.System(file_path::AbstractString, md::Dict; kwargs...)
+function PSY.System(file_path::AbstractString, md::AbstractDict; kwargs...)
     sys_kwargs, bus_number_mapping = parse_export_metadata_dict(md)
     sys = system_via_power_models(file_path; merge(sys_kwargs, kwargs)...)
     # Remap bus numbers last because everything has been added to the system using PSS/E bus numbers

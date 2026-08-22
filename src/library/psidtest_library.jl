@@ -81,9 +81,7 @@ function build_psid_psse_test_avr(; raw_data, kwargs...)
     pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
     avr_sys = make_system(pm_data; sys_kwargs...)
     add_dyn_injectors!(avr_sys, dyr_file)
-    for l in get_components(PSY.PowerLoad, avr_sys)
-        PSY.set_model!(l, PSY.LoadModels.ConstantImpedance)
-    end
+    _set_zip_load_model!(avr_sys, :impedance)
     return avr_sys
 end
 
@@ -870,28 +868,106 @@ function build_psid_psse_test_constantP_load(; raw_data, kwargs...)
     return sys
 end
 
+"""The three ways a `StandardLoad` can hold power: constant power, constant current, and
+constant impedance."""
+const _ZIP_BUCKETS = (:constant, :current, :impedance)
+
+"""The (prefix, suffix) around a bucket name spelling `StandardLoad`'s four power fields per
+bucket — `constant_active_power`, `max_constant_active_power`, and the reactive pair."""
+const _ZIP_QUANTITIES = (
+    ("", "active_power"),
+    ("", "reactive_power"),
+    ("max_", "active_power"),
+    ("max_", "reactive_power"),
+)
+
+"""
+Give every load in `sys` a single ZIP model: `:constant`, `:current` or `:impedance`.
+
+Stands in for `PSY.set_model!(load, PSY.LoadModels.X)`. PSY removed the `LoadModels` enum in
+its load refactor: the model is now structural — which of `StandardLoad`'s `constant_*`,
+`current_*` and `impedance_*` pairs carries the power — rather than a tag on the load.
+
+Note this operates on `StandardLoad`, which is what the PSS/E parser emits; the `PowerLoad`
+pass is for systems built some other way, and goes through `PSY.convert_component!` so the
+load keeps its id, time series and service memberships.
+"""
+function _set_zip_load_model!(sys::PSY.System, bucket::Symbol)
+    bucket in _ZIP_BUCKETS ||
+        error("unknown ZIP load bucket $bucket; expected one of $_ZIP_BUCKETS")
+    for old_load in collect(get_components(PSY.PowerLoad, sys))
+        PSY.convert_component!(sys, old_load, PSY.StandardLoad)
+    end
+    for load in get_components(PSY.StandardLoad, sys)
+        _consolidate_zip_model!(load, bucket)
+    end
+    return
+end
+
+"""
+Sum a `StandardLoad`'s three ZIP buckets into `bucket`, zeroing the other two.
+
+Sums rather than moves one bucket: a parsed load can already split its power across the
+three, and selecting a model means the whole load behaves that way. Read and written in
+device base, the basis the struct stores, so nothing is rescaled.
+"""
+function _consolidate_zip_model!(load::PSY.StandardLoad, bucket::Symbol)
+    for (prefix, suffix) in _ZIP_QUANTITIES
+        total = _total_zip_power(load, prefix, suffix)
+        for b in _ZIP_BUCKETS
+            value = b === bucket ? total : 0.0
+            setter = getproperty(PSY, Symbol("set_", prefix, b, "_", suffix, "!"))
+            setter(load, value * IS.DU)
+        end
+    end
+    return
+end
+
+"""
+Total of a `StandardLoad`'s three ZIP buckets for one power quantity, in device base.
+
+`prefix` is `""` for the operating point or `"max_"` for the limit, `suffix` is
+`"active_power"` or `"reactive_power"` — the halves `_ZIP_QUANTITIES` pairs up. PSY supplies
+this aggregate only for `max_active_power` (`get_max_active_power(::StandardLoad, units)`),
+so the other three are summed the same way here.
+"""
+function _total_zip_power(
+    load::PSY.StandardLoad,
+    prefix::AbstractString,
+    suffix::AbstractString,
+)
+    return sum(
+        getproperty(PSY, Symbol("get_", prefix, b, "_", suffix))(load, IS.DU)
+        for b in _ZIP_BUCKETS
+    )
+end
+
 function build_psid_psse_test_constantI_load(; kwargs...)
     sys = build_psid_psse_test_constantP_load(; kwargs...)
-    for l in get_components(PSY.PowerLoad, sys)
-        PSY.set_model!(l, PSY.LoadModels.ConstantCurrent)
-    end
+    _set_zip_load_model!(sys, :current)
     return sys
 end
 
 function build_psid_psse_test_exp_load(; kwargs...)
     sys = build_psid_psse_test_constantP_load(; kwargs...)
-    for l in collect(get_components(PSY.PowerLoad, sys))
+    # `StandardLoad`, not `PowerLoad`: the PSS/E parser emits the former, so iterating the
+    # latter matched nothing and this builder returned a system with no exponential load at
+    # all. Powers are summed across the ZIP buckets and passed in device base, which is what
+    # the constructor stores.
+    for l in collect(get_components(PSY.StandardLoad, sys))
         exp_load = PSY.ExponentialLoad(;
             name = PSY.get_name(l),
             available = PSY.get_available(l),
             bus = PSY.get_bus(l),
-            active_power = PSY.get_active_power(l, IS.SU),
-            reactive_power = PSY.get_reactive_power(l, IS.SU),
-            active_power_coefficient = 0.0, # Constant Power
-            reactive_power_coefficient = 0.0, # Constant Power
+            active_power = _total_zip_power(l, "", "active_power"),
+            reactive_power = _total_zip_power(l, "", "reactive_power"),
+            # PSY renamed these from `active_power_coefficient`/`reactive_power_coefficient`.
+            # Same meaning: the voltage exponent, 0 = constant power.
+            α = 0.0,
+            β = 0.0,
             base_power = PSY.get_base_power(l, IS.NU),
-            max_active_power = PSY.get_max_active_power(l, IS.SU),
-            max_reactive_power = PSY.get_max_reactive_power(l, IS.SU),
+            max_active_power = _total_zip_power(l, "max_", "active_power"),
+            max_reactive_power = _total_zip_power(l, "max_", "reactive_power"),
         )
         PSY.remove_component!(sys, l)
         PSY.add_component!(sys, exp_load)
