@@ -2096,13 +2096,14 @@ const SYSTEM_CATALOG = [
         raw_data = joinpath(DATA_DIR, "psid_tests", "data_tests", "OMIB.raw"),
         build_function = build_psid_test_pvs,
     ), # TO ADD TEST 29
-    SystemDescriptor(;
-        name = "psid_test_ieee_9bus",
-        description = "PSID IEEE 9-bus system with Anderson-Fouad Machine Test Case", # Old Test 32
-        category = PSIDTestSystems,
-        raw_data = joinpath(DATA_DIR, "psid_tests", "data_tests", "9BusSystem.json"),
-        build_function = build_psid_test_ieee_9bus,
-    ),
+    # Parked: the serialized system predates IS4 integer ids and has no raw source. Restore with the dynamics campaign.
+    # SystemDescriptor(;
+    #     name = "psid_test_ieee_9bus",
+    #     description = "PSID IEEE 9-bus system with Anderson-Fouad Machine Test Case", # Old Test 32
+    #     category = PSIDTestSystems,
+    #     raw_data = joinpath(DATA_DIR, "psid_tests", "data_tests", "9BusSystem.json"),
+    #     build_function = build_psid_test_ieee_9bus,
+    # ),
     SystemDescriptor(;
         name = "psid_psse_test_constantP_load",
         description = "PSID Constant Power Load Test Case", # Old Test 33
@@ -2166,24 +2167,27 @@ const SYSTEM_CATALOG = [
         raw_data = joinpath(DATA_DIR, "psy_data", "data_5bus_pu.jl"),
         build_function = build_two_zone_5_bus,
     ),
-    SystemDescriptor(;
-        name = "OMIB System",
-        description = "OMIB case with 2 state machine for examples",
-        category = PSIDSystems,
-        build_function = build_psid_omib,
-    ),
-    SystemDescriptor(;
-        name = "Three Bus Dynamic data Example System",
-        description = "Three Bus case for examples",
-        category = PSIDSystems,
-        build_function = build_psid_3bus,
-    ),
-    SystemDescriptor(;
-        name = "WECC 240 Bus",
-        description = "WECC 240 Bus case dynamic data with some modifications",
-        category = PSIDSystems,
-        build_function = build_wecc_240_dynamic,
-    ),
+    # Parked: the serialized system predates IS4 integer ids and has no raw source. Restore with the dynamics campaign.
+    # SystemDescriptor(;
+    #     name = "OMIB System",
+    #     description = "OMIB case with 2 state machine for examples",
+    #     category = PSIDSystems,
+    #     build_function = build_psid_omib,
+    # ),
+    # Parked: the serialized system predates IS4 integer ids and has no raw source. Restore with the dynamics campaign.
+    # SystemDescriptor(;
+    #     name = "Three Bus Dynamic data Example System",
+    #     description = "Three Bus case for examples",
+    #     category = PSIDSystems,
+    #     build_function = build_psid_3bus,
+    # ),
+    # Parked: the serialized system predates IS4 integer ids and has no raw source. Restore with the dynamics campaign.
+    # SystemDescriptor(;
+    #     name = "WECC 240 Bus",
+    #     description = "WECC 240 Bus case dynamic data with some modifications",
+    #     category = PSIDSystems,
+    #     build_function = build_wecc_240_dynamic,
+    # ),
     SystemDescriptor(;
         name = "14 Bus Base Case",
         description = "14 Bus Dynamic Test System Case",
