@@ -1,5 +1,8 @@
 const PACKAGE_DIR = joinpath(dirname(dirname(pathof(PowerSystemCaseBuilder))))
-const DATA_DIR = joinpath(LazyArtifacts.artifact"CaseData", "PowerSystemsTestData-5.0-dev5")
+# GitHub's tag tarball unpacks to a single "<repo>-<tag>" directory; read it back rather
+# than hardcode the tag, so a re-tag needs no code change here.
+const _CASE_DATA_ARTIFACT_DIR = LazyArtifacts.artifact"CaseData"
+const DATA_DIR = joinpath(_CASE_DATA_ARTIFACT_DIR, only(readdir(_CASE_DATA_ARTIFACT_DIR)))
 
 const RTS_DIR = joinpath(LazyArtifacts.artifact"rts", "RTS-GMLC-0.2.3")
 

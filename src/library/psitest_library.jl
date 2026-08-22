@@ -171,6 +171,8 @@ function build_c_sys14_hvdc_vsc(;
         active_power_limits_from = (min = -2.0, max = 2.0),
         active_power_limits_to = (min = -2.0, max = 2.0),
         g = 50.0,
+        # DC voltage base for the g/dc_setpoint per-unit values; export requires one whenever g != 0
+        rated_dc_voltage = 100.0,
         # from converter: DC-voltage control (DC slack), reactive-power setpoint
         dc_control_from = PSY.VSCDCControlModes.DC_VOLTAGE,
         ac_control_from = PSY.VSCACControlModes.AC_REACTIVE_POWER,
