@@ -808,6 +808,7 @@ function make_hydro_dispatch(
         time_limits = nothing,
         operation_cost = curtailcost,
         base_power = mbase,
+        ext = get(d, "ext", Dict{String, Any}()),
     )
 end
 
@@ -848,6 +849,7 @@ function make_hydro_reservoir(
         time_limits = nothing,
         operation_cost = curtailcost,
         base_power = mbase,
+        ext = get(d, "ext", Dict{String, Any}()),
     )
 end
 
@@ -891,6 +893,7 @@ function make_renewable_dispatch(
         power_factor = 1.0,
         operation_cost = cost,
         base_power = mbase,
+        ext = get(d, "ext", Dict{String, Any}()),
     )
 
     return generator
@@ -921,6 +924,7 @@ function make_renewable_fix(
         prime_mover_type = parse_enum_mapping(PrimeMovers, d["type"]),
         power_factor = 1.0,
         base_power = mbase,
+        ext = get(d, "ext", Dict{String, Any}()),
     )
 
     return generator
@@ -949,6 +953,7 @@ function make_generic_battery(
         reactive_power = d["qs"],
         reactive_power_limits = (min = d["qmin"], max = d["qmax"]),
         base_power = d["thermal_rating"],
+        ext = get(d, "ext", Dict{String, Any}()),
     )
     return storage
 end
