@@ -7711,7 +7711,10 @@ function build_pwl_average_cost_test_sys(; kwargs...)
     node = PSY.get_component(ACBus, base_sys, "nodeA")
     test_gen = thermal_generator_pwl_incremental_cost(node)
     oc = get_operation_cost(test_gen)
-    set_variable!(oc, CostCurve(AverageRateCurve(get_value_curve(get_variable(oc)))))
+    set_variable_operation_cost!(
+        oc,
+        CostCurve(AverageRateCurve(get_value_curve(get_variable_operation_cost(oc)))),
+    )
     PSY.add_component!(base_sys, test_gen)
     return base_sys
 end
@@ -7722,8 +7725,11 @@ function build_pwl_average_fuel_test_sys(; kwargs...)
     node = PSY.get_component(ACBus, base_sys, "nodeA")
     test_gen = thermal_generator_pwl_incremental_fuel(node)
     oc = get_operation_cost(test_gen)
-    vc = get_variable(oc)
-    set_variable!(oc, FuelCurve(AverageRateCurve(get_value_curve(vc)), get_fuel_cost(vc)))
+    vc = get_variable_operation_cost(oc)
+    set_variable_operation_cost!(
+        oc,
+        FuelCurve(AverageRateCurve(get_value_curve(vc)), get_fuel_cost(vc)),
+    )
     PSY.add_component!(base_sys, test_gen)
     return base_sys
 end
