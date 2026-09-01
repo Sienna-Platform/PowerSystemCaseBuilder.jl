@@ -1725,6 +1725,13 @@ function read_3w_transformer!(
     end
 end
 
+# PSY's loss fields are `LossCurve`s, which name the basis their curve is on. Input
+# documents carry a bare curve, so one is supplied here: these parsers read MW-denominated
+# loss coefficients, which is `NaturalUnit`. A value that already arrives as a `LossCurve`
+# keeps the basis it came with.
+_as_loss_curve(loss::AnyLossCurve) = loss
+_as_loss_curve(curve::ValueCurve) = LossCurve(curve, NaturalUnit())
+
 function make_dcline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus, source_type::String)
     if source_type == "pti"
         return TwoTerminalLCCLine(;
@@ -1765,7 +1772,7 @@ function make_dcline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus, source_t
             active_power_limits_to = d["active_power_limits_to"],
             reactive_power_limits_from = d["reactive_power_limits_from"],
             reactive_power_limits_to = d["reactive_power_limits_to"],
-            loss = LinearCurve(d["loss1"], d["loss0"]),
+            loss = LossCurve(LinearCurve(d["loss1"], d["loss0"]), NaturalUnit()),
             ext = get(d, "ext", Dict{String, Any}()),
         )
     elseif source_type == "matpower"
@@ -1778,7 +1785,7 @@ function make_dcline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus, source_t
             active_power_limits_to = (min = d["pmint"], max = d["pmaxt"]),
             reactive_power_limits_from = (min = d["qminf"], max = d["qmaxf"]),
             reactive_power_limits_to = (min = d["qmint"], max = d["qmaxt"]),
-            loss = LinearCurve(d["loss1"], d["loss0"]),
+            loss = LossCurve(LinearCurve(d["loss1"], d["loss0"]), NaturalUnit()),
         )
     else
         error("Not supported source type for DC lines: $source_type")
@@ -1847,7 +1854,7 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         end,
         dc_setpoint_from = d["dc_setpoint_from"],
         ac_setpoint_from = d["ac_setpoint_from"],
-        converter_loss_from = d["converter_loss_from"],
+        converter_loss_from = _as_loss_curve(d["converter_loss_from"]),
         max_dc_current_from = d["max_dc_current_from"],
         rating_from = d["rating_from"],
         reactive_power_limits_from = (min = d["qminf"], max = d["qmaxf"]),
@@ -1867,7 +1874,7 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         end,
         dc_setpoint_to = d["dc_setpoint_to"],
         ac_setpoint_to = d["ac_setpoint_to"],
-        converter_loss_to = d["converter_loss_to"],
+        converter_loss_to = _as_loss_curve(d["converter_loss_to"]),
         max_dc_current_to = d["max_dc_current_to"],
         rating_to = d["rating_to"],
         remote_bus_control_to = _psse_remote_bus(d, "REMOT_TO"),
