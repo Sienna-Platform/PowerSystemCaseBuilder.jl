@@ -145,7 +145,7 @@ function convert_to_hydropump!(d::EnergyReservoirStorage, sys::System)
         time_limits = nothing,
         base_power = d.base_power,
         operation_cost = HydroGenerationCost(;
-            variable = d.operation_cost.discharge_variable_cost,
+            variable_operation_cost = d.operation_cost.discharge_variable_cost,
             fixed = d.operation_cost.fixed,
         ),
         active_power_pump = 0.0,

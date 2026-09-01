@@ -533,7 +533,7 @@ end
 
 function make_interruptible_powerload(d::Dict, bus::ACBus, sys_mbase::Float64; kwargs...)
     operation_cost = LoadCost(;
-        variable = zero(CostCurve),
+        variable_operation_cost = zero(CostCurve),
         fixed = 0.0,
     )
 
@@ -554,7 +554,7 @@ end
 
 function make_interruptible_standardload(d::Dict, bus::ACBus, sys_mbase::Float64; kwargs...)
     operation_cost = LoadCost(;
-        variable = zero(CostCurve),
+        variable_operation_cost = zero(CostCurve),
         fixed = 0.0,
     )
 
@@ -1033,7 +1033,7 @@ function make_thermal_gen(
     end
 
     operation_cost = ThermalGenerationCost(;
-        variable = cost,
+        variable_operation_cost = cost,
         fixed = fixed,
         start_up = startup,
         shut_down = shutdn,

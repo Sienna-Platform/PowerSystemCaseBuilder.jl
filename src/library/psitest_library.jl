@@ -698,7 +698,7 @@ function build_c_sys5_re_fuel_cost(;
     operation_cost_brighton = th_brighton.operation_cost
     io_curve =
         PiecewisePointCurve([(0.0, 0.0), (200.0, 2000.0), (400.0, 4800.0), (600.0, 8400.0)])
-    operation_cost_brighton.variable = FuelCurve(io_curve, 1.0) # Use PWL for Brighton
+    operation_cost_brighton.variable_operation_cost = FuelCurve(io_curve, 1.0) # Use PWL for Brighton
     set_fuel_cost!(c_sys5_re, th_brighton, Deterministic("fuel_cost", forecast_data))
 
     ### Update Solitude Cost ###
@@ -710,7 +710,7 @@ function build_c_sys5_re_fuel_cost(;
     forecast_data[DayAhead2[1]] = TimeArray(DayAhead2, fuel_cost_day2)
 
     operation_cost_solitude = th_solitude.operation_cost
-    operation_cost_solitude.variable = FuelCurve(LinearCurve(1.0), 1.0) # Use Linear for Solitude
+    operation_cost_solitude.variable_operation_cost = FuelCurve(LinearCurve(1.0), 1.0) # Use Linear for Solitude
     set_fuel_cost!(c_sys5_re, th_solitude, Deterministic("fuel_cost", forecast_data))
 
     return c_sys5_re
