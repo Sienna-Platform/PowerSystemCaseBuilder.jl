@@ -1598,7 +1598,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         # purposes
         direction = occursin("twin", PSY.get_name(g)) ? -1 : 1
         noise_values = rand(MersenneTwister(COST_PERTURBATION_NOISE_SEED), 10_000_000)
-        old_value_curve = get_value_curve(get_variable(get_operation_cost(g)))
+        old_value_curve = get_value_curve(get_variable_operation_cost(get_operation_cost(g)))
         old_slopes = get_slopes(old_value_curve)
         new_slopes = zeros(size(old_slopes))
         noise_val, rand_ix = iterate(noise_values, rand_ix)

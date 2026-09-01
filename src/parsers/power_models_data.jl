@@ -1031,7 +1031,7 @@ function make_thermal_gen(
     else
         @warn "Generator cost data not included for Generator: $gen_name"
         tmpcost = ThermalGenerationCost(nothing)
-        cost = tmpcost.variable
+        cost = tmpcost.variable_operation_cost
         fixed = tmpcost.fixed
         startup = tmpcost.start_up
         shutdn = tmpcost.shut_down
