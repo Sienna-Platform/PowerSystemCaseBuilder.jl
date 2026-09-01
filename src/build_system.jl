@@ -115,14 +115,12 @@ function _build_system(
         start = time()
         if !skip_serialization && isempty(sys_args) &&
            _is_losslessly_serializable(sys, name)
-            # `unit_system = :device_base`, not the `:original` default: that one reproduces the
-            # document a System was read from and needs the round-trip ledger, which only
-            # document-built systems carry. Device base is what PSY stores internally, so the
-            # cache is a direct read of stored values with no unit conversion either way.
+            # Component base is what PSY stores internally, so the cache is a direct
+            # write of stored values with no unit conversion.
             PSY.to_file(
                 sys,
                 get_serialized_dirpath(name, case_args);
-                unit_system = :device_base,
+                power_units = :component_base,
                 force = true,
             )
             #serialize_time = time() - start
