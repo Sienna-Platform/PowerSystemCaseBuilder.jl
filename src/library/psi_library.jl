@@ -571,8 +571,8 @@ function make_modified_RTS_GMLC_sys(
             PSY.get_start_up(PSY.get_operation_cost(d)) / 2.0,
         )
         if PSY.get_rating(d, IS.DU) < 3
-            PSY.set_status!(d, false)
-            PSY.set_status!(d, false)
+            PSY.set_status!(d, PSY.OperationalStates.OFFLINE)
+            PSY.set_status!(d, PSY.OperationalStates.OFFLINE)
             PSY.set_active_power!(d, 0.0 * IS.DU)
             continue
         end
@@ -952,7 +952,7 @@ function build_two_zone_5_bus(; kwargs...)
         ThermalStandard(;
             name = "Alta",
             available = true,
-            status = true,
+            status = OperationalStates.ONLINE,
             bus = nodes10[1],
             active_power = 0.40,
             reactive_power = 0.010,
@@ -975,7 +975,7 @@ function build_two_zone_5_bus(; kwargs...)
         ThermalStandard(;
             name = "Park City",
             available = true,
-            status = true,
+            status = OperationalStates.ONLINE,
             bus = nodes10[1],
             active_power = 1.70,
             reactive_power = 0.20,
@@ -997,7 +997,7 @@ function build_two_zone_5_bus(; kwargs...)
         ThermalStandard(;
             name = "Solitude",
             available = true,
-            status = true,
+            status = OperationalStates.ONLINE,
             bus = nodes10[3],
             active_power = 5.2,
             reactive_power = 1.00,
@@ -1019,7 +1019,7 @@ function build_two_zone_5_bus(; kwargs...)
         ThermalStandard(;
             name = "Sundance",
             available = true,
-            status = true,
+            status = OperationalStates.ONLINE,
             bus = nodes10[4],
             active_power = 2.0,
             reactive_power = 0.40,
@@ -1041,7 +1041,7 @@ function build_two_zone_5_bus(; kwargs...)
         ThermalStandard(;
             name = "Brighton",
             available = true,
-            status = true,
+            status = OperationalStates.ONLINE,
             bus = nodes10[5],
             active_power = 6.0,
             reactive_power = 1.50,
@@ -1063,7 +1063,7 @@ function build_two_zone_5_bus(; kwargs...)
         ThermalStandard(;
             name = "Alta-2",
             available = true,
-            status = true,
+            status = OperationalStates.ONLINE,
             bus = nodes10[6],
             active_power = 0.40,
             reactive_power = 0.010,
@@ -1085,7 +1085,7 @@ function build_two_zone_5_bus(; kwargs...)
         ThermalStandard(;
             name = "Park City-2",
             available = true,
-            status = true,
+            status = OperationalStates.ONLINE,
             bus = nodes10[6],
             active_power = 1.70,
             reactive_power = 0.20,
@@ -1107,7 +1107,7 @@ function build_two_zone_5_bus(; kwargs...)
         ThermalStandard(;
             name = "Solitude-2",
             available = true,
-            status = true,
+            status = OperationalStates.ONLINE,
             bus = nodes10[8],
             active_power = 5.2,
             reactive_power = 1.00,
@@ -1129,7 +1129,7 @@ function build_two_zone_5_bus(; kwargs...)
         ThermalStandard(;
             name = "Sundance-2",
             available = true,
-            status = true,
+            status = OperationalStates.ONLINE,
             bus = nodes10[9],
             active_power = 2.0,
             reactive_power = 0.40,
@@ -1151,7 +1151,7 @@ function build_two_zone_5_bus(; kwargs...)
         ThermalStandard(;
             name = "Brighton-2",
             available = true,
-            status = true,
+            status = OperationalStates.ONLINE,
             bus = nodes10[10],
             active_power = 6.0,
             reactive_power = 1.50,
@@ -1363,7 +1363,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         end
         for d in
             get_components(x -> get_fuel(x) == ThermalFuels.NUCLEAR, ThermalStandard, sys)
-            set_must_run!(d, true)
+            set_commitment_mode!(d, PSY.CommitmentModes.MUST_RUN)
         end
     end
 

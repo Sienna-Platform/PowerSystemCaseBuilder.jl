@@ -2946,7 +2946,7 @@ function build_sys_ramp_testing(; raw_data, kwargs...)
         PSY.ThermalStandard(;
             name = "Alta",
             available = true,
-            status = true,
+            status = PSY.OperationalStates.ONLINE,
             bus = node,
             active_power = 0.20, # Active power
             reactive_power = 0.010,
@@ -2968,7 +2968,7 @@ function build_sys_ramp_testing(; raw_data, kwargs...)
         PSY.ThermalStandard(;
             name = "Park City",
             available = true,
-            status = true,
+            status = PSY.OperationalStates.ONLINE,
             bus = node,
             active_power = 0.70, # Active Power
             reactive_power = 0.20,
@@ -5242,7 +5242,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
         PSY.ThermalStandard(;
             name = "Alta",
             available = true,
-            status = true,
+            status = PSY.OperationalStates.ONLINE,
             bus = node,
             active_power = 0.40,
             reactive_power = 0.010,
@@ -5265,7 +5265,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
         PSY.ThermalStandard(;
             name = "Park City",
             available = true,
-            status = false,
+            status = PSY.OperationalStates.OFFLINE,
             bus = node,
             active_power = 1.70,
             reactive_power = 0.20,
@@ -7598,7 +7598,7 @@ function _build_cost_base_test_sys(; kwargs...)
     gen = ThermalStandard(;
         name = "Cheap Unit",
         available = true,
-        status = true,
+        status = OperationalStates.ONLINE,
         bus = node,
         active_power = 1.70,
         reactive_power = 0.20,

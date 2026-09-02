@@ -979,6 +979,14 @@ function _is_likely_motor_load(d::Dict, gen_name::Union{SubString{String}, Strin
     return
 end
 
+function _thermal_status(gen_status)
+    if !iszero(gen_status)
+        return OperationalStates.ONLINE
+    else
+        return OperationalStates.OFFLINE
+    end
+end
+
 # TODO test this more directly?
 """
 The polynomial term follows the convention that for an n-degree polynomial, at least n + 1 components are needed.
@@ -1070,7 +1078,7 @@ function make_thermal_gen(
     _is_likely_motor_load(d, gen_name)
     thermal_gen = ThermalStandard(;
         name = gen_name,
-        status = Bool(d["gen_status"]),
+        status = _thermal_status(d["gen_status"]),
         available = Bool(d["gen_status"]),
         bus = bus,
         active_power = d["pg"] * base_conversion,
