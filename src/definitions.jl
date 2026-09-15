@@ -73,7 +73,7 @@ name for the reader to resolve, and leaves the scaling to the consumer.
 `units` stays `nothing`: a per-unit basis is not a units label.
 """
 per_unit_of(quantity_kind::AbstractString) =
-    (unit_system = IS.DU, units = nothing, quantity_kind = quantity_kind)
+    (unit_system = IS.CU, units = nothing, quantity_kind = quantity_kind)
 
 """
 The quantity a profile normalized against a reservoir's storage capacity scales to.

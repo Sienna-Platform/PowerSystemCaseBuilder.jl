@@ -917,7 +917,7 @@ function _consolidate_zip_model!(load::PSY.StandardLoad, bucket::Symbol)
         for b in _ZIP_BUCKETS
             value = b === bucket ? total : 0.0
             setter = getproperty(PSY, Symbol("set_", prefix, b, "_", suffix, "!"))
-            setter(load, value * IS.DU)
+            setter(load, value * IS.CU)
         end
     end
     return
@@ -937,7 +937,7 @@ function _total_zip_power(
     suffix::AbstractString,
 )
     return sum(
-        getproperty(PSY, Symbol("get_", prefix, b, "_", suffix))(load, IS.DU)
+        getproperty(PSY, Symbol("get_", prefix, b, "_", suffix))(load, IS.CU)
         for b in _ZIP_BUCKETS
     )
 end

@@ -1025,7 +1025,7 @@ function make_thermal_gen(
             cost = QuadraticFunctionData(get.(Ref(coeffs), quadratic_degrees, 0)...)
             fixed = (d["ncost"] >= 1) ? last(d["cost"]) : 0.0
         end
-        cost = CostCurve(InputOutputCurve((cost)), IS.DU)
+        cost = CostCurve(InputOutputCurve((cost)), IS.CU)
         startup = d["startup"]
         shutdn = d["shutdown"]
     else

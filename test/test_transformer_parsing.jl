@@ -62,7 +62,7 @@
                 @test PSY.get_number_of_tap_positions(w) >= 0
             end
         end
-        @test PSY.get_x_12(t, DU) != 0.0
+        @test PSY.get_x_12(t, CU) != 0.0
         @test PSY.get_star_bus(t) in get_components(ACBus, sys)
         @test all(w -> PSY.get_arc(w) in get_components(Arc, sys), get_circuits(t))
     end
@@ -77,7 +77,7 @@ end
 @testset "transformer base convention (hand-computed)" begin
     # --- 2W passthrough (case14_with_pst3w) ---
     # Every 2W record in the corpus has SBASE1-2 == system base (100), so device
-    # base == system base for 2W and DU == SU. "TRAFO 2W 1" (106-105) has
+    # base == system base for 2W and CU == SU. "TRAFO 2W 1" (106-105) has
     # raw X1-2 = 1.0e-4, CZ=1, CW=1, NOMV1=0, WINDV1=0.85, WINDV2=1.0, so the
     # device-base reactance is X1-2 * (base_power/system_base) * WINDV2^2 = 1.0e-4
     # and its tap is WINDV1/WINDV2 = 0.85. This proves the maker passes br_r/br_x
@@ -91,13 +91,13 @@ end
     t_2w1 = only(
         t for t in t2ws if isapprox(PSY.get_tap(PSY.get_circuit(t)), 0.85; atol = 1e-9)
     )
-    @test PSY.get_x(t_2w1, DU) ≈ 1.0e-4 atol = 1e-12
-    @test PSY.get_r(t_2w1, DU) ≈ 0.0 atol = 1e-12
+    @test PSY.get_x(t_2w1, CU) ≈ 1.0e-4 atol = 1e-12
+    @test PSY.get_r(t_2w1, CU) ≈ 0.0 atol = 1e-12
 
     # --- 3W discriminating proof (case4_zero_impedance_3wt) ---
     # raw 3W record 102-103-104: CZ=2 (per-pair-base pu, passthrough) with
     # SBASE1-2 = 15.00, R1-2 = 5.0e-3, X1-2 = 5.0e-2. Device (pair) base = 15,
-    # system base = 100. PSY.get_x_12(DU) must equal the raw device-base value 5.0e-2
+    # system base = 100. PSY.get_x_12(CU) must equal the raw device-base value 5.0e-2
     # (i.e. NOT rebased to system base, which would give 5.0e-2 * 15/100), and the
     # SU value is that device value converted with the 15-MVA base.
     sys4 = build_system(
@@ -108,8 +108,8 @@ end
     t = first(get_components(ThreeWindingTransformer, sys4))
     @test PowerSystems.get_base_power_12(t) == 15.0
     @test PSY.get_base_power(PSY.get_primary_circuit(t)) == 15.0
-    @test PSY.get_x_12(t, DU) ≈ 5.0e-2 atol = 1e-9
-    @test PSY.get_r_12(t, DU) ≈ 5.0e-3 atol = 1e-9
+    @test PSY.get_x_12(t, CU) ≈ 5.0e-2 atol = 1e-9
+    @test PSY.get_r_12(t, CU) ≈ 5.0e-3 atol = 1e-9
     @test PSY.get_x_12(t, SU) ≈ 5.0e-2 * (100.0 / 15.0) atol = 1e-9
 end
 
@@ -160,9 +160,9 @@ end
             # the parser converts to device pu by dividing by mva_ratio_12 =
             # base_power_12 / baseMVA = 100.0 / 100.0 = 1.0, giving g = MAG1 = 0.005 and
             # b = MAG2 = 0.00674. The maker stores the transformer-level magnetizing shunt
-            # as Complex(g, b); base_power_12 equals the system base here, so DU == SU.
+            # as Complex(g, b); base_power_12 equals the system base here, so CU == SU.
             t3w = first(get_components(ThreeWindingTransformer, sys))
-            @test PSY.get_magnetizing_shunt(t3w, DU) ≈ complex(0.005, 0.00674)
+            @test PSY.get_magnetizing_shunt(t3w, CU) ≈ complex(0.005, 0.00674)
             @test PSY.get_shunt_location(t3w) ==
                   ThreeWindingTransformerShuntLocation.PRIMARY
         end
@@ -205,7 +205,7 @@ end
     @test PSY.get_base_voltage(w_a7) == 138.0
     # B = 0 for every transformer row in this fixture, so magnetizing_shunt
     # (mapped straight from `primary_shunt`) is a pure-real zero.
-    @test PSY.get_magnetizing_shunt(t_a7, DU) == 0.0
+    @test PSY.get_magnetizing_shunt(t_a7, CU) == 0.0
 
     # A14: From Bus 109 ("Ali", 138 kV) -> To Bus 111, Tr Ratio = 1.03.
     t_a14 = get_component(TwoWindingTransformer, sys, "A14")
