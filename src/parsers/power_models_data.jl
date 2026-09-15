@@ -1937,8 +1937,13 @@ function make_switched_shunt(name::String, d::Dict, bus::ACBus)
         :ext => d["ext"],
     )
 
-    if haskey(d, "initial_status")
-        params[:initial_status] = d["initial_status"]
+    if haskey(d, "number_engaged")
+        params[:number_engaged] = d["number_engaged"]
+    end
+    # PSS/E BINIT, carried in its own key since PowerSystems.jl#1774. Per-unit on the system
+    # base like `gs`/`bs`/`y_increment` above, all rescaled together in pm_io/data.jl.
+    if haskey(d, "solved_admittance")
+        params[:solved_admittance] = d["solved_admittance"]
     end
 
     return SwitchedAdmittance(; params...)
