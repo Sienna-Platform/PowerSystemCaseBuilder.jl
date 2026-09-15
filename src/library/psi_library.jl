@@ -934,7 +934,7 @@ function build_two_zone_5_bus(; kwargs...)
             3.29, # min for 230kV
             (min = -0.7, max = 0.7),
         ),
-        TwoTerminalHVDCLine(
+        TwoTerminalGenericHVDCLine(
             "nodeC-nodeC2",
             true,
             0.0,
@@ -943,7 +943,7 @@ function build_two_zone_5_bus(; kwargs...)
             (min = -2.0, max = 2.0),
             (min = -2.0, max = 2.0),
             (min = -2.0, max = 2.0),
-            LinearCurve(0.0),
+            LossCurve(LinearCurve(0.0), NaturalUnit()),
         ),
     ]
 
@@ -1523,7 +1523,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
     PSY.add_component!(main_sys, new_ACArc)
 
     if HVDC_line
-        new_HVDCLine = PSY.TwoTerminalHVDCLine(;
+        new_HVDCLine = PSY.TwoTerminalGenericHVDCLine(;
             name = "HVDC_interconnection",
             available = true,
             active_power_flow = 0.0,
