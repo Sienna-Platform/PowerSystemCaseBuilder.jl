@@ -582,7 +582,8 @@ function make_modified_RTS_GMLC_sys(
         end
         PSY.clear_services!(d)
         if PSY.get_fuel(d) == PSY.ThermalFuels.NUCLEAR
-            PSY.set_ramp_limits!(d, (up = 0.0, down = 0.0))
+            no_ramp = 0.0 * IS.CU / PSY.u"minute"
+            PSY.set_ramp_limits!(d, (up = no_ramp, down = no_ramp))
             PSY.set_time_limits!(d, (up = 4380.0, down = 4380.0))
         end
     end
