@@ -87,7 +87,7 @@ function build_c_sys5_pjm(; add_forecasts, raw_data, sys_kwargs...)
     bus_dist_fact = Dict("Bus2" => 0.33, "Bus3" => 0.33, "Bus4" => 0.34)
     peak_load = maximum(da_load_time_series_val)
     if add_forecasts
-        for (ix, l) in enumerate(PSY.get_components(PowerLoad, c_sys5))
+        for (ix, l) in enumerate(sorted_components(PowerLoad, c_sys5))
             set_max_active_power!(
                 l,
                 bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
@@ -101,7 +101,7 @@ function build_c_sys5_pjm(; add_forecasts, raw_data, sys_kwargs...)
                 ),
             )
         end
-        for (ix, g) in enumerate(PSY.get_components(RenewableDispatch, c_sys5))
+        for (ix, g) in enumerate(sorted_components(RenewableDispatch, c_sys5))
             add_time_series!(
                 c_sys5,
                 g,
@@ -211,7 +211,7 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
     bus_dist_fact = Dict("Bus2" => 0.33, "Bus3" => 0.33, "Bus4" => 0.34)
     peak_load = maximum(rt_load_time_series_val)
     if add_forecasts
-        for (ix, l) in enumerate(PSY.get_components(PowerLoad, c_sys5))
+        for (ix, l) in enumerate(sorted_components(PowerLoad, c_sys5))
             set_max_active_power!(
                 l,
                 bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
@@ -229,7 +229,7 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
                 ),
             )
         end
-        for (ix, g) in enumerate(PSY.get_components(RenewableDispatch, c_sys5))
+        for (ix, g) in enumerate(sorted_components(RenewableDispatch, c_sys5))
             add_time_series!(
                 c_sys5,
                 g,

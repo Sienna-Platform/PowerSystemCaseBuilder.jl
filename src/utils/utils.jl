@@ -1,3 +1,12 @@
+"""
+Components of `sys` sorted by name. The builders pair positional time-series arrays with
+components by index, and `get_components` iterates a `Dict`, whose order changes between
+Julia versions.
+"""
+function sorted_components(args...)
+    return sort!(collect(PSY.get_components(args...)); by = PSY.get_name)
+end
+
 function verify_storage_dir(folder::AbstractString = SERIALIZED_DIR)
     directory = abspath(normpath(folder))
     if !isdir(directory)
