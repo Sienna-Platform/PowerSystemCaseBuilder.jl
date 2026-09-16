@@ -1862,6 +1862,10 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         end,
         dc_setpoint_from = d["dc_setpoint_from"],
         ac_setpoint_from = d["ac_setpoint_from"],
+        # PSS/E VSC records carry no rated AC voltage; PowerFlowFileParser already
+        # stamps the terminal bus's base_kv onto base_voltage_from, so fall back to
+        # the bus itself only if that key is somehow absent.
+        rated_ac_voltage_from = get(d, "base_voltage_from", get_base_voltage(bus_f)),
         converter_loss_from = _as_loss_curve(d["converter_loss_from"]),
         max_dc_current_from = d["max_dc_current_from"],
         rating_from = d["rating_from"],
@@ -1882,6 +1886,7 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         end,
         dc_setpoint_to = d["dc_setpoint_to"],
         ac_setpoint_to = d["ac_setpoint_to"],
+        rated_ac_voltage_to = get(d, "base_voltage_to", get_base_voltage(bus_t)),
         converter_loss_to = _as_loss_curve(d["converter_loss_to"]),
         max_dc_current_to = d["max_dc_current_to"],
         rating_to = d["rating_to"],
