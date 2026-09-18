@@ -27,7 +27,7 @@ until the process exits.
 function system_from_document(oapi; kwargs...)
     return mktempdir() do dir
         _write_document(oapi, joinpath(dir, PowerSystems.SYSTEM_DOCUMENT_FILE))
-        PowerSystems.from_file(PowerSystems.System, dir; kwargs...)
+        PowerSystems.from_file(dir; kwargs...)
     end
 end
 

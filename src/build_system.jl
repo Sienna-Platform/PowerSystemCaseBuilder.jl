@@ -120,7 +120,7 @@ function _build_system(
             PSY.to_file(
                 sys,
                 get_serialized_dirpath(name, case_args);
-                power_units = :component_base,
+                units = PSY.CU,
                 force = true,
             )
             #serialize_time = time() - start
@@ -136,7 +136,7 @@ function _build_system(
                   "every load rebuilds components with fresh UUIDs"
         end
         sys =
-            PSY.from_file(PSY.System, get_serialized_dirpath(name, case_args); sys_args...)
+            PSY.from_file(get_serialized_dirpath(name, case_args); sys_args...)
         PSY.get_runchecks(sys)
         # update_stats!(sys_descriptor, time() - start)
     end
