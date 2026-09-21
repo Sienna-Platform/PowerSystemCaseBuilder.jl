@@ -211,7 +211,7 @@ Parses ITC data from a dictionary and constructs a lookup table
 of piecewise linear scaling functions.
 """
 function _impedance_correction_table_lookup(data::Dict)
-    ict_instances = Dict{Tuple{Int64, WindingCategory}, ImpedanceCorrectionData}()
+    ict_instances = Dict{Tuple{Int64, WindingCategory.Value}, ImpedanceCorrectionData}()
 
     @info "Reading Impedance Correction Table data"
     if !haskey(data, "impedance_correction")
@@ -240,7 +240,7 @@ function _impedance_correction_table_lookup(data::Dict)
                     ImpedanceCorrectionTransformerControlMode.PHASE_SHIFT_ANGLE
                 end
 
-            for winding_index in instances(WindingCategory)
+            for winding_index in instances(WindingCategory.Value)
                 ict_instances[(table_number, winding_index)] = ImpedanceCorrectionData(;
                     table_number = table_number,
                     impedance_correction_curve = pwl_data,
@@ -269,8 +269,8 @@ function _attach_single_ict!(
     name::String,
     d::Dict,
     table_key::String,
-    winding_idx::WindingCategory,
-    ict_instances::Dict{Tuple{Int64, WindingCategory}, ImpedanceCorrectionData},
+    winding_idx::WindingCategory.Value,
+    ict_instances::Dict{Tuple{Int64, WindingCategory.Value}, ImpedanceCorrectionData},
 )
     if isempty(ict_instances)
         return
@@ -296,7 +296,7 @@ function _attach_impedance_correction_tables!(
     transformer::TwoWindingTransformer,
     name::String,
     d::Dict,
-    ict_instances::Dict{Tuple{Int64, WindingCategory}, ImpedanceCorrectionData},
+    ict_instances::Dict{Tuple{Int64, WindingCategory.Value}, ImpedanceCorrectionData},
 )
     _attach_single_ict!(
         sys,
@@ -318,12 +318,12 @@ function _attach_impedance_correction_tables!(
     transformer::ThreeWindingTransformer,
     name::String,
     d::Dict,
-    ict_instances::Dict{Tuple{Int64, WindingCategory}, ImpedanceCorrectionData},
+    ict_instances::Dict{Tuple{Int64, WindingCategory.Value}, ImpedanceCorrectionData},
 )
     if isempty(ict_instances)
         return
     end
-    for winding_category in instances(WindingCategory)
+    for winding_category in instances(WindingCategory.Value)
         winding_category == WindingCategory.TR2W_WINDING && continue
         key = "$(WINDING_NAMES[winding_category])_correction_table"
         _attach_single_ict!(sys, transformer, name, d, key, winding_category, ict_instances)
@@ -393,7 +393,7 @@ function read_bus!(sys::System, data::Dict; kwargs...)
 
     bus_number_to_bus = Dict{Int, ACBus}()
 
-    bus_types = instances(ACBusTypes)
+    bus_types = instances(ACBusTypes.Value)
     unique_bus_names = true
     bus_data = SortedDict{Int, Any}()
     # Bus name uniqueness is not enforced by PSSE. This loop avoids forcing the users to have to
@@ -795,7 +795,7 @@ function make_hydro_dispatch(
         active_power = d["pg"] * base_conversion,
         reactive_power = d["qg"] * base_conversion,
         rating = calculate_gen_rating(d["pmax"], d["qmax"], base_conversion),
-        prime_mover_type = parse_enum_mapping(PrimeMovers, d["type"]),
+        prime_mover_type = parse_enum_mapping(PrimeMovers.Value, d["type"]),
         active_power_limits = (
             min = d["pmin"] * base_conversion,
             max = d["pmax"] * base_conversion,
@@ -836,7 +836,7 @@ function make_hydro_reservoir(
         active_power = d["pg"] * base_conversion,
         reactive_power = d["qg"] * base_conversion,
         rating = calculate_gen_rating(d["pmax"], d["qmax"], base_conversion),
-        prime_mover_type = parse_enum_mapping(PrimeMovers, d["type"]),
+        prime_mover_type = parse_enum_mapping(PrimeMovers.Value, d["type"]),
         active_power_limits = (
             min = d["pmin"] * base_conversion,
             max = d["pmax"] * base_conversion,
@@ -885,7 +885,7 @@ function make_renewable_dispatch(
         active_power = d["pg"] * base_conversion,
         reactive_power = d["qg"] * base_conversion,
         rating = rating * base_conversion,
-        prime_mover_type = parse_enum_mapping(PrimeMovers, d["type"]),
+        prime_mover_type = parse_enum_mapping(PrimeMovers.Value, d["type"]),
         reactive_power_limits = (
             min = d["qmin"] * base_conversion,
             max = d["qmax"] * base_conversion,
@@ -921,7 +921,7 @@ function make_renewable_fix(
         active_power = d["pg"] * base_conversion,
         reactive_power = d["qg"] * base_conversion,
         rating = float(d["pmax"]) * base_conversion,
-        prime_mover_type = parse_enum_mapping(PrimeMovers, d["type"]),
+        prime_mover_type = parse_enum_mapping(PrimeMovers.Value, d["type"]),
         power_factor = 1.0,
         base_power = mbase,
         ext = get(d, "ext", Dict{String, Any}()),
@@ -1000,7 +1000,7 @@ function make_thermal_gen(
     sys_mbase::Float64,
 )
     if haskey(d, "model")
-        model = PSY.GeneratorCostModels(d["model"])
+        model = PSY.GeneratorCostModels.Value(d["model"])
         # Input data layout: table B-4 of https://matpower.org/docs/MATPOWER-manual.pdf
         if model == PSY.GeneratorCostModels.PIECEWISE_LINEAR
             # For now, we make the fixed cost the y-intercept of the first segment of the
@@ -1084,8 +1084,8 @@ function make_thermal_gen(
         active_power = d["pg"] * base_conversion,
         reactive_power = d["qg"] * base_conversion,
         rating = calculate_gen_rating(d["pmax"], d["qmax"], base_conversion),
-        prime_mover_type = parse_enum_mapping(PrimeMovers, d["type"]),
-        fuel = parse_enum_mapping(ThermalFuels, d["fuel"]),
+        prime_mover_type = parse_enum_mapping(PrimeMovers.Value, d["type"]),
+        fuel = parse_enum_mapping(ThermalFuels.Value, d["fuel"]),
         active_power_limits = (
             min = d["pmin"] * base_conversion,
             max = d["pmax"] * base_conversion,
@@ -1422,7 +1422,7 @@ null state (no control block). Any other COD — including `0` (FIXED) and negat
 """
 function _transformer_control_fields(d::Dict, suffix::Int)
     cod = get(d, "COD$suffix", -99)
-    objective = TransformerControlObjective(cod)
+    objective = TransformerControlObjective.Value(cod)
     phase_shifting = objective in _PSSE_PHASE_SHIFT_OBJECTIVES
     # RMI/RMA and VMI/VMA are the lower/upper edges of a band. Some (typically
     # synthetic) PSS/E data has them numerically inverted by rounding
@@ -1928,7 +1928,7 @@ end
 
 function make_switched_shunt(name::String, d::Dict, bus::ACBus)
     control_mode_value = d["control_mode"]
-    valid_control_modes = map(mode -> mode.value, instances(SwitchedAdmittanceControlMode))
+    valid_control_modes = map(Integer, instances(SwitchedAdmittanceControlMode.Value))
     if !(control_mode_value in valid_control_modes)
         throw(
             IS.DataFormatError(
@@ -1945,7 +1945,7 @@ function make_switched_shunt(name::String, d::Dict, bus::ACBus)
         :number_of_steps => d["step_number"],
         :Y_increase => d["y_increment"],
         :admittance_limits => d["admittance_limits"],
-        :control_mode => SwitchedAdmittanceControlMode(control_mode_value),
+        :control_mode => SwitchedAdmittanceControlMode.Value(control_mode_value),
         :regulated_bus_number => d["regulated_bus_number"],
         :ext => d["ext"],
     )
