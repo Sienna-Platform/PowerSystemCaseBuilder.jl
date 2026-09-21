@@ -15,7 +15,9 @@ const PSSE_DYR_MAPPING_FILE =
     )
 
 const STRING2FUEL =
-    Dict((normalize(string(x); casefold = true) => x) for x in instances(ThermalFuels))
+    Dict(
+        (normalize(string(x); casefold = true) => x) for x in instances(ThermalFuels.Value)
+    )
 merge!(
     STRING2FUEL,
     Dict(
@@ -31,7 +33,7 @@ merge!(
 )
 
 const STRING2PRIMEMOVER =
-    Dict((normalize(string(x); casefold = true) => x) for x in instances(PrimeMovers))
+    Dict((normalize(string(x); casefold = true) => x) for x in instances(PrimeMovers.Value))
 merge!(
     STRING2PRIMEMOVER,
     Dict(
@@ -166,18 +168,18 @@ function calculate_ramp_limit(
     return nothing
 end
 
-function parse_enum_mapping(::Type{ThermalFuels}, fuel::AbstractString)
+function parse_enum_mapping(::Type{ThermalFuels.Value}, fuel::AbstractString)
     return STRING2FUEL[normalize(fuel; casefold = true)]
 end
 
-function parse_enum_mapping(::Type{ThermalFuels}, fuel::Symbol)
-    return parse_enum_mapping(ThermalFuels, string(fuel))
+function parse_enum_mapping(::Type{ThermalFuels.Value}, fuel::Symbol)
+    return parse_enum_mapping(ThermalFuels.Value, string(fuel))
 end
 
-function parse_enum_mapping(::Type{PrimeMovers}, prime_mover::AbstractString)
+function parse_enum_mapping(::Type{PrimeMovers.Value}, prime_mover::AbstractString)
     return STRING2PRIMEMOVER[normalize(prime_mover; casefold = true)]
 end
 
-function parse_enum_mapping(::Type{PrimeMovers}, prime_mover::Symbol)
-    return parse_enum_mapping(PrimeMovers, string(prime_mover))
+function parse_enum_mapping(::Type{PrimeMovers.Value}, prime_mover::Symbol)
+    return parse_enum_mapping(PrimeMovers.Value, string(prime_mover))
 end
