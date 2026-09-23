@@ -122,8 +122,8 @@ function parse_export_metadata_dict(md::AbstractDict)
 
     function branch_name_formatter(
         device_dict::AbstractDict,
-        bus_f::ACBus,
-        bus_t::ACBus,
+        bus_f_name::AbstractString,
+        bus_t_name::AbstractString,
     )::String
         sid = device_dict["source_id"]
 
@@ -133,8 +133,6 @@ function parse_export_metadata_dict(md::AbstractDict)
         if sid[1] in ["switch", "breaker"]
             p_name = replace(p_name, r"[@*]" => "_")
         end
-        bus_f_name = get_name(bus_f)
-        bus_t_name = get_name(bus_t)
         key = ((p_bus_1, p_bus_2), p_name)
         def_name = "$(bus_f_name)-$(bus_t_name)-i_$(p_name)"
         new_name = get(all_branch_name_map, key, def_name)
@@ -143,13 +141,10 @@ function parse_export_metadata_dict(md::AbstractDict)
 
     function xfrm_3w_name_formatter(
         device_dict::AbstractDict,
-        p_bus::ACBus,
-        s_bus::ACBus,
-        t_bus::ACBus,
+        bus_primary::AbstractString,
+        bus_secondary::AbstractString,
+        bus_tertiary::AbstractString,
     )::String
-        bus_primary = get_name(p_bus)
-        bus_secondary = get_name(s_bus)
-        bus_tertiary = get_name(t_bus)
         ckt = device_dict["circuit"]
 
         return "$(bus_primary)-$(bus_secondary)-$(bus_tertiary)-i_$(ckt)"
@@ -174,9 +169,7 @@ function parse_export_metadata_dict(md::AbstractDict)
 
     function make_hvdc_name_formatter(mapping)
         reversed_mapping = reverse_dict(mapping)
-        return function (device_dict, bus_f::ACBus, bus_t::ACBus)
-            bus_f_name = get_name(bus_f)
-            bus_t_name = get_name(bus_t)
+        return function (device_dict, bus_f_name::AbstractString, bus_t_name::AbstractString)
             name = device_dict["name"]
             key = string(bus_f_name, "-", bus_t_name, "-i_", name)
             new_name = get(reversed_mapping, key, key)
@@ -218,7 +211,7 @@ function parse_export_metadata_dict(md::AbstractDict)
         :xfrm_3w_name_formatter => xfrm_3w_name_formatter,
         :switched_shunt_name_formatter => switched_shunt_name_formatter,
         :dcline_name_formatter => dcline_name_formatter,
-        :vscline_name_formatter => vscline_name_formatter,
+        :vsc_line_name_formatter => vscline_name_formatter,
     )
     bus_number_mapping = reverse_dict(md["bus_number_mapping"])  # PSS/E bus name -> Sienna bus name
 
@@ -226,15 +219,27 @@ function parse_export_metadata_dict(md::AbstractDict)
 end
 
 "Construct a System from a `.raw` file and a dictionary corresponding to the `<name>_export_metadata.json` file"
-function PSY.System(file_path::AbstractString, md::AbstractDict; kwargs...)
+function PSY.System(
+    file_path::AbstractString,
+    md::AbstractDict;
+    solved_case::Bool = false,
+    kwargs...,
+)
     sys_kwargs, bus_number_mapping = parse_export_metadata_dict(md)
-    sys = system_via_power_models(file_path; merge(sys_kwargs, kwargs)...)
+    sys = system_from_openapi(
+        PowerFlowFileParser.PowerModelsData(file_path; solved_case = solved_case);
+        merge(sys_kwargs, kwargs)...,
+    )
     # Remap bus numbers last because everything has been added to the system using PSS/E bus numbers
     remap_bus_numbers!(sys, bus_number_mapping)
     return sys
 end
 
-function system_from_psse_reimport(file_path::AbstractString; kwargs...)
+function system_from_psse_reimport(
+    file_path::AbstractString;
+    solved_case::Bool = false,
+    kwargs...,
+)
     md_path = joinpath(
         dirname(file_path),
         splitext(basename(file_path))[1] * PSSE_EXPORT_METADATA_EXTENSION,
@@ -242,9 +247,12 @@ function system_from_psse_reimport(file_path::AbstractString; kwargs...)
     if isfile(md_path)
         @info "Found a PowerFlows.jl PSS/E export metadata file at $md_path, will use it to perform remapping for round trip"
         md = JSON.parsefile(md_path)
-        return System(file_path, md; kwargs...)
+        return System(file_path, md; solved_case = solved_case, kwargs...)
     else
         @info "Did not find a PowerFlows.jl PSS/E export metadata file at $md_path, will not do any remapping"
-        return system_via_power_models(file_path; kwargs...)
+        return system_from_openapi(
+            PowerFlowFileParser.PowerModelsData(file_path; solved_case = solved_case);
+            kwargs...,
+        )
     end
 end
