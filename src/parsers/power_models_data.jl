@@ -1941,7 +1941,6 @@ function make_switched_shunt(name::String, d::Dict, bus::ACBus)
         :name => name,
         :available => Bool(d["status"]),
         :bus => bus,
-        :solved_admittance => d["bs"],
         :number_of_steps => d["step_number"],
         :Y_increase => d["y_increment"],
         :admittance_limits => d["admittance_limits"],
@@ -1953,8 +1952,8 @@ function make_switched_shunt(name::String, d::Dict, bus::ACBus)
     if haskey(d, "number_engaged")
         params[:number_engaged] = d["number_engaged"]
     end
-    # PSS/E BINIT, carried in its own key since PowerSystems.jl#1774. Per-unit on the system
-    # base like `gs`/`bs`/`y_increment` above, all rescaled together in pm_io/data.jl.
+    # BINIT arrives in its own key only when PFFP deems it authoritative; otherwise leave the
+    # PSY default so this path agrees with PFFP's OpenAPI importer.
     if haskey(d, "solved_admittance")
         params[:solved_admittance] = d["solved_admittance"]
     end
