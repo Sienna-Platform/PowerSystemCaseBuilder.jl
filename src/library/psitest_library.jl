@@ -5315,7 +5315,7 @@ function build_5_bus_matpower_DA(; raw_data, kwargs...)
 
     FORECASTS_DIR = joinpath(data_dir, "5-Bus", "5bus_ts", "7day")
 
-    sys = make_system(pm_data; sys_kwargs...)
+    sys = system_from_openapi(pm_data; sys_kwargs...)
     reserves = [
         OnlineReserve{ReserveUp}("REG1", true, 5.0, 0.1),
         OnlineReserve{ReserveUp}("REG2", true, 5.0, 0.06),
@@ -5343,7 +5343,7 @@ function build_5_bus_matpower_RT(; raw_data, kwargs...)
     FORECASTS_DIR = joinpath(data_dir, "5-Bus", "5bus_ts", "7day")
 
     pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
-    sys = make_system(pm_data; sys_kwargs...)
+    sys = system_from_openapi(pm_data; sys_kwargs...)
 
     PowerTableDataParser.add_time_series_from_pointers!(
         sys,
@@ -5361,7 +5361,7 @@ function build_5_bus_matpower_AGC(; raw_data, kwargs...)
 
     FORECASTS_DIR = joinpath(data_dir, "5-Bus", "5bus_ts", "7day")
 
-    sys = make_system(pm_data; sys_kwargs...)
+    sys = system_from_openapi(pm_data; sys_kwargs...)
 
     PowerTableDataParser.add_time_series_from_pointers!(
         sys,
