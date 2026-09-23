@@ -21,10 +21,10 @@ end
 
 function clear_serialized_systems(name::String)
     for dir in _get_system_directories(SERIALIZED_DIR)
-        bundle = joinpath(dir, name)
-        if isdir(bundle)
-            @debug "Deleting serialized system bundle" bundle
-            rm(bundle; recursive = true, force = true)
+        archive = joinpath(dir, _archive_filename(name))
+        if isfile(archive)
+            @debug "Deleting serialized system archive" archive
+            rm(archive; force = true)
         end
     end
     return
@@ -40,10 +40,10 @@ function clear_serialized_system(
     name::String,
     case_args::Dict{Symbol, <:Any} = Dict{Symbol, Any}(),
 )
-    dir_path = get_serialized_dirpath(name, case_args)
-    if isdir(dir_path)
-        @debug "Deleting serialized system bundle at " dir_path
-        rm(dir_path; recursive = true, force = true)
+    file_path = get_serialized_filepath(name, case_args)
+    if isfile(file_path)
+        @debug "Deleting serialized system archive at " file_path
+        rm(file_path; force = true)
     end
 
     return
@@ -67,31 +67,47 @@ function get_serialization_dir(case_args::Dict{Symbol, <:Any} = Dict{Symbol, Any
     return joinpath(PACKAGE_DIR, "data", "serialized_system", "$hash_value")
 end
 
-"""
-Directory holding one cached `System`, written by `PSY.to_file` and read by `PSY.from_file`.
+_archive_filename(name::AbstractString) = name * PSY.SYSTEM_ARCHIVE_EXTENSION
 
-A serialized `System` is a bundle directory (`system.json` + `time_series.h5`), not a single
-file, so a cache entry is a directory named after the system rather than `<name>.json` plus
-sibling files sharing its stem.
 """
-function get_serialized_dirpath(
+The `.sns` archive holding one cached `System`, written by `PSY.to_file` and read by
+`PSY.from_file`. The archive is the lossless form: it keeps subsystems, which the document
+forms drop.
+"""
+function get_serialized_filepath(
     name::String,
     case_args::Dict{Symbol, <:Any} = Dict{Symbol, Any}(),
 )
-    dir = get_serialization_dir(case_args)
-    return joinpath(dir, name)
+    return joinpath(get_serialization_dir(case_args), _archive_filename(name))
 end
 
 """
-Whether `name` has a complete cache entry.
+Write `sys` to the cache entry for `name`.
 
-Checks for the document rather than just the directory: a directory left behind by an
-interrupted write would otherwise look like a valid cache entry and fail confusingly on read.
+The archive is written under a temporary name and renamed into place, so an interrupted
+write never leaves a partial archive that [`is_serialized`](@ref) would report as complete,
+and concurrent builders of the same system never read each other's half-written file.
 """
+function serialize_system(
+    sys::PSY.System,
+    name::String,
+    case_args::Dict{Symbol, <:Any} = Dict{Symbol, Any}(),
+)
+    file_path = get_serialized_filepath(name, case_args)
+    mkpath(dirname(file_path))
+    staging = string(tempname(dirname(file_path)), PSY.SYSTEM_ARCHIVE_EXTENSION)
+    try
+        PSY.to_file(sys, staging)
+        mv(staging, file_path; force = true)
+    finally
+        rm(staging; force = true)
+    end
+    return
+end
+
+"""Whether `name` has a complete cache entry."""
 function is_serialized(name::String, case_args::Dict{Symbol, <:Any} = Dict{Symbol, Any}())
-    return isfile(
-        joinpath(get_serialized_dirpath(name, case_args), PSY.SYSTEM_DOCUMENT_FILE),
-    )
+    return isfile(get_serialized_filepath(name, case_args))
 end
 
 function get_raw_data(; kwargs...)

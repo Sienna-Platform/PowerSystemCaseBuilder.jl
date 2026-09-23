@@ -115,20 +115,13 @@ function _build_system(
         start = time()
         if !skip_serialization && isempty(sys_args) &&
            _is_losslessly_serializable(sys, name)
-            # Component base is what PSY stores internally, so the cache is a direct
-            # write of stored values with no unit conversion.
-            PSY.to_file(
-                sys,
-                get_serialized_dirpath(name, case_args);
-                units = PSY.CU,
-                force = true,
-            )
+            serialize_system(sys, name, case_args)
             #serialize_time = time() - start
             serialize_case_parameters(case_args)
         end
         # set_stats!(sys_descriptor, SystemBuildStats(construct_time, serialize_time))
     else
-        @debug "Deserialize system from bundle" sys_descriptor.name
+        @debug "Deserialize system from archive" sys_descriptor.name
         start = time()
         if !assign_new_uuids
             @warn "assign_new_uuids = false cannot be honored: a cached System is read from " *
@@ -136,7 +129,7 @@ function _build_system(
                   "every load rebuilds components with fresh UUIDs"
         end
         sys =
-            PSY.from_file(get_serialized_dirpath(name, case_args); sys_args...)
+            PSY.from_file(get_serialized_filepath(name, case_args); sys_args...)
         PSY.get_runchecks(sys)
         # update_stats!(sys_descriptor, time() - start)
     end
