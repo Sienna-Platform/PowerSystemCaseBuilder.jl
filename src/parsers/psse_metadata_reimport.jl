@@ -169,7 +169,11 @@ function parse_export_metadata_dict(md::AbstractDict)
 
     function make_hvdc_name_formatter(mapping)
         reversed_mapping = reverse_dict(mapping)
-        return function (device_dict, bus_f_name::AbstractString, bus_t_name::AbstractString)
+        return function (
+            device_dict,
+            bus_f_name::AbstractString,
+            bus_t_name::AbstractString,
+        )
             name = device_dict["name"]
             key = string(bus_f_name, "-", bus_t_name, "-i_", name)
             new_name = get(reversed_mapping, key, key)

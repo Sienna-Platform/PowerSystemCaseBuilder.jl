@@ -121,9 +121,10 @@ end
         get_component(TwoWindingTransformer, sys, "FAV SPOT 01-FAV SPOT 04-i_1"),
     )
 
-    sys = @test_logs (:warn, r"inverted controlled-quantity limits") match_mode = :any build(
-        raw,
-    )
+    sys =
+        @test_logs (:warn, r"inverted controlled-quantity limits") match_mode = :any build(
+            raw,
+        )
     @test get_controlled_quantity_limits(t1(sys)) == (min = 0.984, max = 0.985)
     @test get_control_limits(t1(sys)) == (min = 0.5, max = 1.5)
 
