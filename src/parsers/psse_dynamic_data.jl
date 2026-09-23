@@ -1,3 +1,10 @@
+const PSSE_DYR_MAPPING_FILE =
+    joinpath(
+        dirname(pathof(PowerSystemCaseBuilder)),
+        "parsers",
+        "psse_dynamic_mapping.yaml",
+    )
+
 # Additional constants for repeated structs
 const TGOV1DU = SteamTurbineGov1
 

@@ -33,10 +33,9 @@ end
 
 """
 Build a `System` from table data. `time_series_resolution` keeps only the series at that
-resolution, matching the retired `make_system`'s kwarg of the same name; the filter is
-applied to the parser's staged series, before the sidecar is written, because the sidecar's
-catalog — not the document's association rows — is what PowerSystems reads the series back
-through.
+resolution; the filter is applied to the parser's staged series, before the sidecar is
+written, because the sidecar's catalog — not the document's association rows — is what
+PowerSystems reads the series back through.
 """
 function system_from_openapi(
     rawsys::PowerTableDataParser.PowerSystemTableData;
