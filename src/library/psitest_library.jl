@@ -244,7 +244,7 @@ function build_c_sys14_hvdc_lcc(;
         arc = PSY.Arc(nodes[2], nodes[3]),
         active_power_flow = 0.0,
         r = 0.05,
-        transfer_setpoint = 50.0,
+        transfer_setpoint = 0.5,  # 50 MW on the 100 MVA system base
         scheduled_dc_voltage = 230.0,
         rectifier_bridges = 1,
         rectifier_delay_angle_limits = (min = 0.0, max = pi / 2),

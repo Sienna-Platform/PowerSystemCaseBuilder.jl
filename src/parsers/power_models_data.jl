@@ -1746,7 +1746,23 @@ end
 _as_loss_curve(loss::AnyLossCurve) = loss
 _as_loss_curve(curve::ValueCurve) = LossCurve(curve, NaturalUnit())
 
-function make_dcline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus, source_type::String)
+# PSY stores an LCC's power-mode `transfer_setpoint` per-unit on its base (always the system
+# base); PSS/E's SETVL is MW. A current-mode setpoint is amperes and has no power base.
+function _lcc_transfer_setpoint(d::Dict, base_power::Float64)
+    if d["power_mode"]
+        return d["transfer_setpoint"] / base_power
+    end
+    return d["transfer_setpoint"]
+end
+
+function make_dcline(
+    name::String,
+    d::Dict,
+    bus_f::ACBus,
+    bus_t::ACBus,
+    source_type::String,
+    base_power::Float64,
+)
     if source_type == "pti"
         return TwoTerminalLCCLine(;
             name = name,
@@ -1754,7 +1770,7 @@ function make_dcline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus, source_t
             arc = Arc(bus_f, bus_t),
             active_power_flow = get(d, "pf", 0.0),
             r = d["r"],
-            transfer_setpoint = d["transfer_setpoint"],
+            transfer_setpoint = _lcc_transfer_setpoint(d, base_power),
             scheduled_dc_voltage = d["scheduled_dc_voltage"],
             rectifier_bridges = d["rectifier_bridges"],
             rectifier_delay_angle_limits = d["rectifier_delay_angle_limits"],
@@ -1826,7 +1842,7 @@ function read_dcline!(
         bus_f = bus_number_to_bus[d["f_bus"]]
         bus_t = bus_number_to_bus[d["t_bus"]]
         name = _get_name(d, bus_f, bus_t)
-        dcline = make_dcline(name, d, bus_f, bus_t, source_type)
+        dcline = make_dcline(name, d, bus_f, bus_t, source_type, get_base_power(sys, IS.NU))
         add_component!(sys, dcline; skip_validation = SKIP_PM_VALIDATION)
     end
 end
@@ -1958,8 +1974,8 @@ function make_switched_shunt(name::String, d::Dict, bus::ACBus)
     if haskey(d, "number_engaged")
         params[:number_engaged] = d["number_engaged"]
     end
-    # PSS/E BINIT, carried in its own key since PowerSystems.jl#1774. Per-unit on the system
-    # base like `gs`/`bs`/`y_increment` above, all rescaled together in pm_io/data.jl.
+    # BINIT arrives in its own key only when PFFP deems it authoritative; otherwise leave the
+    # PSY default so this path agrees with PFFP's OpenAPI importer.
     if haskey(d, "solved_admittance")
         params[:solved_admittance] = d["solved_admittance"]
     end
