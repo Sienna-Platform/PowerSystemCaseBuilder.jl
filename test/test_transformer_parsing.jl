@@ -28,7 +28,6 @@
 
     # The 2W magnetizing shunt is transformer-level and typed with the 2W enum;
     # the default placement is PRIMARY.
-    @test PSY.get_shunt_location(first(t2ws)) isa TwoWindingTransformerShuntLocation
     @test PSY.get_shunt_location(first(t2ws)) == TwoWindingTransformerShuntLocation.PRIMARY
 
     # Select the 50 deg shifter by its angle (raw ANG1 = 50.0 deg).
@@ -48,7 +47,6 @@
     @test PSY.get_control_limits(w_pst) == (min = 0.9, max = 1.1)      # RMI1 / RMA1
 
     # The 3W magnetizing shunt is transformer-level and typed with the 3W enum.
-    @test PSY.get_shunt_location(first(t3ws)) isa ThreeWindingTransformerShuntLocation
     @test PSY.get_shunt_location(first(t3ws)) ==
           ThreeWindingTransformerShuntLocation.PRIMARY
 
