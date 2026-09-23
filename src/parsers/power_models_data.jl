@@ -65,10 +65,16 @@ end
 """
 Construct a System from a PSS/E raw file via the PowerModels dict pipeline. Thin shim
 over [`make_system`](@ref); the metadata-reimport path threads its name-formatter kwargs
-through it.
+through it. `solved_case = true` declares the RAW written out after a converged power flow,
+so every switched shunt keeps its BINIT as `solved_admittance`.
 """
-function system_via_power_models(file_path::AbstractString; kwargs...)
-    return make_system(PowerFlowFileParser.PowerModelsData(file_path); kwargs...)
+function system_via_power_models(
+    file_path::AbstractString;
+    solved_case::Bool = false,
+    kwargs...,
+)
+    pm_data = PowerFlowFileParser.PowerModelsData(file_path; solved_case = solved_case)
+    return make_system(pm_data; kwargs...)
 end
 
 """
@@ -1941,7 +1947,6 @@ function make_switched_shunt(name::String, d::Dict, bus::ACBus)
         :name => name,
         :available => Bool(d["status"]),
         :bus => bus,
-        :solved_admittance => d["bs"],
         :number_of_steps => d["step_number"],
         :Y_increase => d["y_increment"],
         :admittance_limits => d["admittance_limits"],
