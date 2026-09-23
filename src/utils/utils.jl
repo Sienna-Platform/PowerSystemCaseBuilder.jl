@@ -159,6 +159,7 @@ function convert_to_hydropump!(d::EnergyReservoirStorage, sys::System)
         ),
         active_power_pump = 0.0,
         efficiency = (turbine = d.efficiency.out, pump = d.efficiency.in),
+        input_basis = CU,
     )
     head_reservoir = HydroReservoir(;
         name = "$(d.name)_head_reservoir",

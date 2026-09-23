@@ -968,6 +968,7 @@ function build_psid_psse_test_exp_load(; kwargs...)
             base_power = PSY.get_base_power(l, IS.NU),
             max_active_power = _total_zip_power(l, "max_", "active_power"),
             max_reactive_power = _total_zip_power(l, "max_", "reactive_power"),
+            input_basis = CU,
         )
         PSY.remove_component!(sys, l)
         PSY.add_component!(sys, exp_load)

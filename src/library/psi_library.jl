@@ -976,6 +976,7 @@ function build_two_zone_5_bus(; kwargs...)
                 2.0,
             ),
             base_power = 100.0,
+            input_basis = CU,
         ),
         ThermalStandard(;
             name = "Park City",
@@ -998,6 +999,7 @@ function build_two_zone_5_bus(; kwargs...)
                 0.75,
             ),
             base_power = 100.0,
+            input_basis = CU,
         ),
         ThermalStandard(;
             name = "Solitude",
@@ -1020,6 +1022,7 @@ function build_two_zone_5_bus(; kwargs...)
                 1.5,
             ),
             base_power = 100.0,
+            input_basis = CU,
         ),
         ThermalStandard(;
             name = "Sundance",
@@ -1042,6 +1045,7 @@ function build_two_zone_5_bus(; kwargs...)
                 2.0,
             ),
             base_power = 100.0,
+            input_basis = CU,
         ),
         ThermalStandard(;
             name = "Brighton",
@@ -1064,6 +1068,7 @@ function build_two_zone_5_bus(; kwargs...)
                 0.75,
             ),
             base_power = 100.0,
+            input_basis = CU,
         ),
         ThermalStandard(;
             name = "Alta-2",
@@ -1086,6 +1091,7 @@ function build_two_zone_5_bus(; kwargs...)
                 2.0,
             ),
             base_power = 100.0,
+            input_basis = CU,
         ),
         ThermalStandard(;
             name = "Park City-2",
@@ -1108,6 +1114,7 @@ function build_two_zone_5_bus(; kwargs...)
                 0.75,
             ),
             base_power = 100.0,
+            input_basis = CU,
         ),
         ThermalStandard(;
             name = "Solitude-2",
@@ -1130,6 +1137,7 @@ function build_two_zone_5_bus(; kwargs...)
                 1.5,
             ),
             base_power = 100.0,
+            input_basis = CU,
         ),
         ThermalStandard(;
             name = "Sundance-2",
@@ -1152,6 +1160,7 @@ function build_two_zone_5_bus(; kwargs...)
                 2.0,
             ),
             base_power = 100.0,
+            input_basis = CU,
         ),
         ThermalStandard(;
             name = "Brighton-2",
@@ -1174,6 +1183,7 @@ function build_two_zone_5_bus(; kwargs...)
                 0.75,
             ),
             base_power = 100.0,
+            input_basis = CU,
         ),
     ]
 
@@ -1540,6 +1550,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
             loss = PSY.LossCurve(PSY.LinearCurve(0.1), PSY.NaturalUnit()),
             services = Vector{Service}[],
             ext = Dict{String, Any}(),
+            input_basis = CU,
         )
         PSY.add_component!(main_sys, new_HVDCLine)
     else
@@ -1558,6 +1569,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
             angle_limits = (min = -1.57079, max = 1.57079),
             services = Vector{Service}[],
             ext = Dict{String, Any}(),
+            input_basis = CU,
         )
         PSY.add_component!(main_sys, new_ACLine)
     end
@@ -1820,6 +1832,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             active_power_limits_to = (min = 0.0, max = limit),
             # base_current (A) = S_base / V_base
             base_current = 100.0e6 / (PSY.get_base_voltage(bus_from) * 1e3),
+            input_basis = CU,
         )
         push!(dclines, dcline)
     end
@@ -1872,6 +1885,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             active_power_limits_to = (min = 0.0, max = limit),
             # base_current (A) = S_base / V_base (all 9T buses are 300 kV).
             base_current = 100.0e6 / (PSY.get_base_voltage(bus_from) * 1e3),
+            input_basis = CU,
         )
         push!(dclines, dcline)
     end
@@ -1981,6 +1995,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
                 PSY.QuadraticCurve(c_pu[ix], b_pu[ix], a_pu[ix]),
                 PSY.NaturalUnit(),
             ),
+            input_basis = CU,
         )
         PSY.add_component!(sys, ipc)
     end
@@ -2001,6 +2016,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
                 PSY.QuadraticCurve(c_pu_9T, b_pu_9T, a_pu_9T),
                 PSY.NaturalUnit(),
             ),
+            input_basis = CU,
         )
         PSY.add_component!(sys, ipc)
     end
