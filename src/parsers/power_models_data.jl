@@ -109,14 +109,26 @@ function _get_pm_bus_name(device_dict::Dict, unique_names::Bool)
 end
 
 """
-Internal branch name retrieval from pm2ps_dict
+Internal branch name retrieval from pm2ps_dict.
+
+A PSS(R)E circuit id occupies a two-character field, so " 1" and "1 " identify different
+circuits on the same bus pair. `strip_circuit_id` drops that padding, which is what names
+have always used and what virtually every record wants, since padding is almost always on
+the right. Pass `false` to keep the id verbatim; [`_unique_branch_name`](@ref) does that for
+the rare pair of parallel circuits padded on opposite sides, whose stripped names collide.
 """
-function _get_pm_branch_name(device_dict, bus_f::ACBus, bus_t::ACBus)
+function _get_pm_branch_name(
+    device_dict,
+    bus_f::ACBus,
+    bus_t::ACBus;
+    strip_circuit_id::Bool = true,
+)
+    _circuit_id(id) = strip_circuit_id ? strip(id) : id
     # Additional if-else are used to catch line id in PSSe parsing cases
     if haskey(device_dict, "name")
         index = device_dict["name"]
     elseif device_dict["source_id"][1] == "branch" && length(device_dict["source_id"]) > 2
-        index = strip(device_dict["source_id"][4])
+        index = _circuit_id(device_dict["source_id"][4])
     elseif (
         device_dict["source_id"][1] == "switch" ||
         device_dict["source_id"][1] == "breaker" ||
@@ -125,16 +137,49 @@ function _get_pm_branch_name(device_dict, bus_f::ACBus, bus_t::ACBus)
         # Legacy switches/breakers modeled as branches carry a marker-prefixed CKT
         # (e.g. "@1", "*2"); strip the leading '@'/'*' marker to get the circuit id.
         # Switching devices from a SWITCHING DEVICE record (including node-breaker
-        # substation devices) carry a plain circuit id with no marker.
-        ckt = strip(string(device_dict["source_id"][4]))
-        index = (!isempty(ckt) && first(ckt) in ('@', '*')) ? ckt[2:end] : ckt
+        # substation devices) carry a plain circuit id with no marker. The marker is
+        # removed regardless of `strip_circuit_id`; only the padding is at stake here.
+        ckt = _circuit_id(string(device_dict["source_id"][4]))
+        marked = lstrip(ckt)
+        index = if (!isempty(marked) && first(marked) in ('@', '*'))
+            marked[nextind(marked, 1):end]
+        else
+            ckt
+        end
     elseif device_dict["source_id"][1] == "transformer" &&
            length(device_dict["source_id"]) > 3
-        index = strip(device_dict["source_id"][5])
+        index = _circuit_id(device_dict["source_id"][5])
     else
         index = device_dict["index"]
     end
     return "$(get_name(bus_f))-$(get_name(bus_t))-i_$index"
+end
+
+"""
+Name for a branch-like component, keeping circuit-id padding only when it is needed to tell
+two components apart.
+
+Names strip the PSS(R)E circuit id, so two parallel circuits whose ids differ only in where
+the padding sits (" 1" versus "1 ") would both claim one name and the second `add_component!`
+would fail. When that happens, fall back to the unstripped id, which distinguishes them by
+construction. Every other name is unchanged, which matters: nearly every record in a PSS(R)E
+file carries a right-padded id, so naming them all verbatim would rename most of the system.
+
+A caller-supplied `name_formatter` is left alone -- only the default naming is disambiguated.
+"""
+function _unique_branch_name(
+    sys::System,
+    ::Type{T},
+    name::AbstractString,
+    device_dict,
+    bus_f::ACBus,
+    bus_t::ACBus,
+    name_formatter,
+) where {T <: Component}
+    if name_formatter !== _get_pm_branch_name || !has_component(T, sys, name)
+        return name
+    end
+    return _get_pm_branch_name(device_dict, bus_f, bus_t; strip_circuit_id = false)
 end
 
 """
@@ -1401,6 +1446,12 @@ function read_switch_breaker!(
         bus_t = bus_number_to_bus[d["t_bus"]]
         name = _get_name(d, bus_f, bus_t)
         value = make_switch_breaker(name, d, bus_f, bus_t)
+        unique_name =
+            _unique_branch_name(sys, typeof(value), name, d, bus_f, bus_t, _get_name)
+        if unique_name != name
+            name = unique_name
+            value = make_switch_breaker(name, d, bus_f, bus_t)
+        end
 
         add_component!(sys, value; skip_validation = SKIP_PM_VALIDATION)
     end
@@ -1681,12 +1732,17 @@ function read_branch!(
         bus_t = bus_number_to_bus[d["t_bus"]]
         name = _get_name(d, bus_f, bus_t)
         value = make_branch(name, d, bus_f, bus_t, source_type)
-
-        if !isnothing(value)
-            add_component!(sys, value; skip_validation = SKIP_PM_VALIDATION)
-        else
+        if isnothing(value)
             continue
         end
+        unique_name =
+            _unique_branch_name(sys, typeof(value), name, d, bus_f, bus_t, _get_name)
+        if unique_name != name
+            name = unique_name
+            value = make_branch(name, d, bus_f, bus_t, source_type)
+        end
+
+        add_component!(sys, value; skip_validation = SKIP_PM_VALIDATION)
 
         if isa(value, TwoWindingTransformer)
             _attach_impedance_correction_tables!(
@@ -1827,6 +1883,13 @@ function read_dcline!(
         bus_t = bus_number_to_bus[d["t_bus"]]
         name = _get_name(d, bus_f, bus_t)
         dcline = make_dcline(name, d, bus_f, bus_t, source_type)
+        unique_name =
+            _unique_branch_name(sys, typeof(dcline), name, d, bus_f, bus_t, _get_name)
+        if unique_name != name
+            name = unique_name
+            dcline = make_dcline(name, d, bus_f, bus_t, source_type)
+        end
+
         add_component!(sys, dcline; skip_validation = SKIP_PM_VALIDATION)
     end
 end
@@ -1928,6 +1991,13 @@ function read_vscline!(
         bus_t = bus_number_to_bus[d["t_bus"]]
         name = _get_name(d, bus_f, bus_t)
         vscline = make_vscline(name, d, bus_f, bus_t)
+        unique_name =
+            _unique_branch_name(sys, typeof(vscline), name, d, bus_f, bus_t, _get_name)
+        if unique_name != name
+            name = unique_name
+            vscline = make_vscline(name, d, bus_f, bus_t)
+        end
+
         add_component!(sys, vscline; skip_validation = SKIP_PM_VALIDATION)
     end
 end
