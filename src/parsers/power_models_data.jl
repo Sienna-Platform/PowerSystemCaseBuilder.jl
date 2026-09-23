@@ -522,6 +522,7 @@ function read_bus!(sys::System, data::Dict; kwargs...)
                 to_area = to_area,
                 flow_limits = flow_limits,
                 ext = ext,
+                input_basis = CU,
             )
 
             add_component!(sys, interarea_inter; skip_validation = SKIP_PM_VALIDATION)
@@ -549,6 +550,7 @@ function make_interruptible_powerload(d::Dict, bus::ACBus, sys_mbase::Float64; k
         base_power = sys_mbase,
         operation_cost = operation_cost,
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 end
 
@@ -579,6 +581,7 @@ function make_interruptible_standardload(d::Dict, bus::ACBus, sys_mbase::Float64
         max_impedance_active_power = d["py"],
         max_impedance_reactive_power = d["qy"],
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 end
 
@@ -595,6 +598,7 @@ function make_power_load(d::Dict, bus::ACBus, sys_mbase::Float64; kwargs...)
         base_power = sys_mbase,
         conformity = d["conformity"],
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 end
 
@@ -619,6 +623,7 @@ function make_standard_load(d::Dict, bus::ACBus, sys_mbase::Float64; kwargs...)
         base_power = sys_mbase,
         conformity = d["conformity"],
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 end
 
@@ -684,6 +689,7 @@ function read_loads!(sys::System, data, bus_number_to_bus::Dict{Int, ACBus}; kwa
                     # contract, which reports net P/Q with a unity-power-factor placeholder.
                     power_factor = 1.0,
                     base_power = sys_mbase,
+                    input_basis = CU,
                 )
                 has_component(RenewableNonDispatch, sys, get_name(dgen_load)) && throw(
                     IS.DataFormatError(
@@ -710,6 +716,7 @@ function make_loadzone(
         name = name,
         peak_active_power = active_power,
         peak_reactive_power = reactive_power,
+        input_basis = CU,
     )
 end
 
@@ -809,6 +816,7 @@ function make_hydro_dispatch(
         operation_cost = curtailcost,
         base_power = mbase,
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 end
 
@@ -850,6 +858,7 @@ function make_hydro_reservoir(
         operation_cost = curtailcost,
         base_power = mbase,
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 end
 
@@ -894,6 +903,7 @@ function make_renewable_dispatch(
         operation_cost = cost,
         base_power = mbase,
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 
     return generator
@@ -925,6 +935,7 @@ function make_renewable_fix(
         power_factor = 1.0,
         base_power = mbase,
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 
     return generator
@@ -954,6 +965,7 @@ function make_generic_battery(
         reactive_power_limits = (min = d["qmin"], max = d["qmax"]),
         base_power = d["thermal_rating"],
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
     return storage
 end
@@ -1099,6 +1111,7 @@ function make_thermal_gen(
         operation_cost = operation_cost,
         base_power = mbase,
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 
     return thermal_gen
@@ -1143,6 +1156,7 @@ function make_synchronous_condenser(
         ),
         base_power = mbase,
         ext = ext,
+        input_basis = CU,
     )
 
     return synchronous_condenser
@@ -1310,6 +1324,7 @@ function _make_switch_from_zero_impedance_line(
         rating = _get_rating("Line", name, d, "rate_a"),
         discrete_branch_type = DiscreteControlledBranchType.SWITCH,
         branch_status = status_value,
+        input_basis = CU,
     )
 end
 
@@ -1356,6 +1371,7 @@ function make_line(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         rating_b = _get_rating("Line", name, d, "rate_b"),
         rating_c = _get_rating("Line", name, d, "rate_c"),
         ext = ext,
+        input_basis = CU,
     )
 end
 
@@ -1372,6 +1388,7 @@ function make_switch_breaker(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         discrete_branch_type = d["discrete_branch_type"],
         branch_status = d["state"],
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 end
 
@@ -1505,6 +1522,7 @@ function _make_transformer_circuit(
         base_power = base_power,
         base_voltage_primary = base_voltage_primary,
         base_voltage_secondary = base_voltage_secondary,
+        input_basis = CU,
     )
 end
 
@@ -1562,6 +1580,7 @@ function make_transformer_2w(
         circuit = circuit,
         magnetizing_shunt = Complex(d["g_fr"], d["b_fr"]),
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 end
 
@@ -1652,6 +1671,7 @@ function make_3w_transformer(
         base_power_23 = d["base_power_23"],
         base_power_31 = d["base_power_31"],
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 end
 
@@ -1782,6 +1802,7 @@ function make_dcline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus, source_t
             reactive_power_limits_to = d["reactive_power_limits_to"],
             loss = LossCurve(LinearCurve(d["loss1"], d["loss0"]), NaturalUnit()),
             ext = get(d, "ext", Dict{String, Any}()),
+            input_basis = CU,
         )
     elseif source_type == "matpower"
         return TwoTerminalGenericHVDCLine(;
@@ -1794,6 +1815,7 @@ function make_dcline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus, source_t
             reactive_power_limits_from = (min = d["qminf"], max = d["qmaxf"]),
             reactive_power_limits_to = (min = d["qmint"], max = d["qmaxt"]),
             loss = LossCurve(LinearCurve(d["loss1"], d["loss0"]), NaturalUnit()),
+            input_basis = CU,
         )
     else
         error("Not supported source type for DC lines: $source_type")
@@ -1895,6 +1917,7 @@ function make_vscline(name::String, d::Dict, bus_f::ACBus, bus_t::ACBus)
         reactive_power_limits_to = (min = d["qmint"], max = d["qmaxt"]),
         power_factor_weighting_fraction_to = d["power_factor_weighting_fraction_to"],
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 end
 
@@ -2013,6 +2036,7 @@ function make_facts(name::String, d::Dict, bus::ACBus)
         max_shunt_current = d["max_shunt_current"],
         regulated_bus_number = d["regulated_bus_number"],
         ext = get(d, "ext", Dict{String, Any}()),
+        input_basis = CU,
     )
 end
 

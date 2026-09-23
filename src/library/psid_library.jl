@@ -179,6 +179,7 @@ function build_psid_load_tutorial_omib(; raw_data, kwargs...)
         base_power = PSY.get_base_power(l, IS.NU),
         max_active_power = PSY.get_max_constant_active_power(l, IS.SU),
         max_reactive_power = PSY.get_max_constant_reactive_power(l, IS.SU),
+        input_basis = CU,
     )
     remove_component!(sys, l)
     add_component!(sys, exp_load)

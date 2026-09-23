@@ -130,6 +130,7 @@ function _make_source(g::StaticInjection, r::Float64, x::Float64, sys_base::Floa
         reactive_power = get_reactive_power(g, IS.SU),
         R_th = r_sysbase,
         X_th = x_sysbase,
+        input_basis = CU,
     )
 end
 
