@@ -59,8 +59,19 @@ errors on an LCC line: `_hvdc_loss_curve` (PSY `import_handwritten.jl`) reads a 
 field off the loss curve's function data, which only exists after a JSON round trip
 normalizes it — PSY's importer is written against the round-tripped shape. Take the
 shortcut once that is fixed, not before.
+
+The document carries no system base, so the case's `baseMVA` is handed to the importer
+directly; left out, it would default to 100 MVA.
 """
 function system_from_openapi(pm_data::PowerFlowFileParser.PowerModelsData; kwargs...)
     oapi = PowerFlowFileParser.build_openapi_system(pm_data; kwargs...)
-    return system_from_document(oapi; filter_kwargs(; kwargs...)...)
+    sys = system_from_document(
+        oapi;
+        base_power = Float64(pm_data.data["baseMVA"]),
+        filter_kwargs(; kwargs...)...,
+    )
+    if get(kwargs, :runchecks, true)
+        check(sys)
+    end
+    return sys
 end
