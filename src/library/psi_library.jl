@@ -246,7 +246,7 @@ end
 
 function build_5_bus_hydro_uc_sys(; add_forecasts, raw_data, sys_kwargs...)
     # `timeseries_metadata_file` is only known once `add_forecasts` is resolved, and
-    # `system_from_openapi` (unlike the retired `make_system`) has no per-call override
+    # `system_from_openapi` has no per-call override
     # for it — it always reads whatever is set on `rawsys` itself, so `rawsys` is built
     # per branch rather than shared.
     if add_forecasts

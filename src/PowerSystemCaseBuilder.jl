@@ -39,9 +39,6 @@ import PrettyTables
 import PowerFlowFileParser
 import PowerTableDataParser
 
-# imports for parsers/ to work
-import Unicode: normalize
-
 #TimeStamp Management Imports
 import TimeSeries
 import Dates
@@ -147,10 +144,8 @@ Category for SiennaPRASInterface.jl examples.
 struct SPISystems <: SystemCategory end
 
 # Include Parsing files
-include("parsers/common.jl")
 include("parsers/known_stale_fixture_data.jl")
 include("parsers/openapi_pipeline.jl")
-include("parsers/power_models_data.jl")
 include("parsers/psse_dynamic_data.jl")
 include("parsers/psse_metadata_reimport.jl")
 

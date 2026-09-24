@@ -112,34 +112,34 @@ end
 end
 
 @testset "inverted control band warns and normalizes" begin
-    # Mirrors frankenstein_70.raw, where VMA1 = 0.984 < VMI1 = 0.985 (a benign
-    # rounding artifact). The maker must warn (naming the record) and normalize
-    # the band rather than silently swallowing potentially corrupt data.
-    d = Dict{String, Any}(
-        "name" => "synthetic-record",
-        "COD1" => 0,
-        "CONT1" => 0,
-        "RMA1" => 1.5,
-        "RMI1" => 0.5,
-        "VMA1" => 0.984,
-        "VMI1" => 0.985,
-        "NTP1" => 33,
+    # frankenstein_70.raw's T1 has VMA1 = 0.984 < VMI1 = 0.985 (a benign rounding
+    # artifact). The parser must warn (naming the record) and normalize the band rather
+    # than silently swallowing potentially corrupt data.
+    raw = joinpath(PSB.DATA_DIR, "psse_raw", "frankenstein_70.raw")
+    build(path) = PSB.system_from_openapi(PSB.PowerFlowFileParser.PowerModelsData(path))
+    t1(sys) = get_circuit(
+        get_component(TwoWindingTransformer, sys, "FAV SPOT 01-FAV SPOT 04-i_1"),
     )
-    ctrl =
-        @test_logs (:warn, r"synthetic-record.*inverted controlled-quantity limits") match_mode =
-            :any PSB._transformer_control_fields(d, 1)
-    @test ctrl.controlled_quantity_limits == (min = 0.984, max = 0.985)
-    @test ctrl.control_limits == (min = 0.5, max = 1.5)
 
-    # Inverted RMI/RMA warns too.
-    d["RMI1"], d["RMA1"] = 1.5, 0.5
-    d["VMI1"], d["VMA1"] = 0.9, 1.1
-    ctrl2 =
-        @test_logs (:warn, r"synthetic-record.*inverted control limits") match_mode = :any PSB._transformer_control_fields(
-            d,
-            1,
+    sys =
+        @test_logs (:warn, r"inverted controlled-quantity limits") match_mode = :any build(
+            raw,
         )
-    @test ctrl2.control_limits == (min = 0.5, max = 1.5)
+    @test get_controlled_quantity_limits(t1(sys)) == (min = 0.984, max = 0.985)
+    @test get_control_limits(t1(sys)) == (min = 0.5, max = 1.5)
+
+    # Inverted RMI/RMA warns too: T1's RMA1/RMI1 swapped, VMA1/VMI1 set to a valid band.
+    inverted = joinpath(mktempdir(), "frankenstein_70.raw")
+    write(
+        inverted,
+        replace(
+            read(raw, String),
+            "1.500000,0.500000,0.984000,0.985000" => "0.500000,1.500000,1.100000,0.900000",
+        ),
+    )
+    sys2 = @test_logs (:warn, r"inverted control limits") match_mode = :any build(inverted)
+    @test get_control_limits(t1(sys2)) == (min = 0.5, max = 1.5)
+    @test get_controlled_quantity_limits(t1(sys2)) == (min = 0.9, max = 1.1)
 end
 
 @testset "3W zero-impedance and mag fixtures build" begin

@@ -1,6 +1,6 @@
 # PowerSystemCaseBuilder.jl (PSB) — psy6 branch
 
-The Sienna **test-system fixture factory**: a registry of 200+ named `PSY.System` cases built from raw data (Matpower, PSSE raw/dyr, tabular CSV, PowerFlowData) with an on-disk serialized cache, so downstream test suites (PSY, PNM, PF, POM) get systems in seconds. Not an optimization package. Its serialization is PSY's own IS-based JSON+HDF5 — **not** the OpenAPI/GridDB pipeline. Platform conventions: the `sienna-psy6` skill; workspace architecture: the psy6 workspace root `CLAUDE.md`.
+The Sienna **test-system fixture factory**: a registry of 200+ named `PSY.System` cases built from raw data (Matpower, PSSE raw/dyr, tabular CSV, PowerFlowData) with an on-disk serialized cache, so downstream test suites (PSY, PNM, PF, POM) get systems in seconds. Not an optimization package. Both building and caching go through the OpenAPI document: parsers emit one, `PSY.from_file` reads it, and the cache is PSY's `.sns` archive of it. Platform conventions: the `sienna-psy6` skill; workspace architecture: the psy6 workspace root `CLAUDE.md`.
 
 ## Why this package matters platform-wide
 
@@ -16,7 +16,7 @@ build_system(PSITestSystems, "c_sys5"; force_build=true)   # categories: PSY/PSI
 list_systems(...); show_systems(...); list_categories()
 ```
 
-- Flow (`src/build_system.jl` + `src/utils/utils.jl`): cache check → optional artifact download → registered `build_func(; raw_data, …)` → serialize (unless `skip_serialization`) → later calls deserialize. Cache dir: `data/serialized_system/<sha256 of case-args>/<name>.json` + `_metadata.json` + `_validation_descriptors.json` + `_time_series_storage.h5`.
+- Flow (`src/build_system.jl` + `src/utils/utils.jl`): cache check → optional artifact download → registered `build_func(; raw_data, …)` → serialize (unless `skip_serialization`) → later calls deserialize. Cache entry: `data/serialized_system/<sha256 of case-args>/<name>.sns`, written by `PSY.to_file`.
 - `build_system` splits kwargs: keys in `PSY.SYSTEM_KWARGS` forward to `PSY.System`; the rest must match the descriptor's `supported_arguments` or error. Non-encodable `sys_args` skip caching entirely.
 - Catalog: `SYSTEM_CATALOG` in `src/system_descriptor_data.jl` (~228 `SystemDescriptor` entries; duplicate names error); builders in `src/library/` (8 catalog files); include order puts the catalog last, after all builders.
 - Raw data via lazy artifacts (`Artifacts.toml`): `CaseData` = PowerSystemsTestData tarball (currently a 5.0-dev tag), `rts` = RTS-GMLC. **The CaseData download can flake — retry once before digging**; there is no retry in the code. Re-pin the sha256 when PowerSystemsTestData re-tags.
@@ -37,7 +37,7 @@ Why PSB feels this harder than other packages: **the cache stores serialized sys
 - Branch `psy6`; `[sources]` pins in **both** root and `test/Project.toml`: IS→`IS4`, PowerSystems→`psy6`, PowerFlowFileParser→`psy6`, PowerTableDataParser→`psy6`. ⚠️ Org URLs are inconsistent across the manifests, but note which way: **`NLR-Sienna/PowerTableDataParser.jl` is correct, not a typo** — it is the canonical location, and `NREL-Sienna/PowerTableDataParser.jl` only reaches it via a GitHub 301 (`Sienna-Platform/PowerTableDataParser.jl` is a 404). Every *other* Sienna repo has moved the opposite way: `NREL-Sienna/*` now 301-redirects to `Sienna-Platform/*`. So most `NREL-Sienna` URLs here are stale-but-working, while the one that looks misspelled is the accurate one. Verify with `curl -sI` before "correcting" any of them.
 - ⚠️ `test/Project.toml` may still pin PSY to `transformer-refactor` and PowerFlowFileParser to `mb/transformer-refactor`. Both are merged now — PSY `d19f3244f`, PFFP `adf5cb1` — so those revs are stale and should read `psy6`. The *root* `Project.toml` pin was always correct, which is why PSB works as a dependency even when its own test env does not resolve.
 - **`src/utils/psy6_compat.jl` is a sanctioned exception to the no-shims policy**: method overloads accepting old `Nothing`/Float64 signatures (`ReserveDemandCurve`/`MarketBidCost`) because the pinned PowerSystemsTestData artifact still uses pre-psy6 constructor calls. Scoped to external artifact data only; include-order sensitive (after `definitions.jl`, before `system_library.jl`). Remove it when the artifact is regenerated — never widen it.
-- Parsing goes through PowerFlowFileParser/PowerTableDataParser (PSY has no parsers in this line).
+- Parsing goes through PowerFlowFileParser/PowerTableDataParser (PSY has no parsers in this line). Every PSS/E, Matpower and tabular case builds via `system_from_openapi` (`src/parsers/openapi_pipeline.jl`): parser → OpenAPI document → `PSY.from_file`. `.dyr` dynamics are still attached afterwards by PSB's own `add_dyn_injectors!` (`src/parsers/psse_dynamic_data.jl`); PowerFlowFileParser does not read `.dyr`.
 - Reduction fixtures (for PNM/PF/POM work): `c_sys5`/`c_sys14` reduce **nothing**; `case11_network_reductions` has real series arcs but no forecasts; matpower RTS/case24 for larger cases.
 - Compat still reads PSY ^5.10 / IS ^3.2 — the `[sources]` revs, not compat, select the breaking line. No version bumps until release.
 

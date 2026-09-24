@@ -92,7 +92,7 @@ function build_psse_Benchmark_4ger_33_2015_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "Benchmark_4ger_33_2015.RAW")
     dyr_file = joinpath(raw_data, "psse_dyr", "Benchmark_4ger_33_2015.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = make_system(pm_data; sys_kwargs...)
+    sys = system_from_openapi(pm_data; sys_kwargs...)
     add_dyn_injectors!(sys, dyr_file)
     return sys
 end
@@ -102,7 +102,7 @@ function build_psse_OMIB_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "OMIB.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "OMIB.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = make_system(pm_data; sys_kwargs...)
+    sys = system_from_openapi(pm_data; sys_kwargs...)
     add_dyn_injectors!(sys, dyr_file)
     return sys
 end
@@ -112,7 +112,7 @@ function build_psse_3bus_gen_cls_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "ThreeBusNetwork.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "TestGENCLS.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = make_system(pm_data; sys_kwargs...)
+    sys = system_from_openapi(pm_data; sys_kwargs...)
     add_dyn_injectors!(sys, dyr_file)
     return sys
 end
@@ -122,7 +122,7 @@ function psse_renewable_parsing_1(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "Benchmark_4ger_33_2015_RENA.RAW")
     dyr_file = joinpath(raw_data, "psse_dyr", "Benchmark_4ger_33_2015_RENA.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = make_system(pm_data; sys_kwargs...)
+    sys = system_from_openapi(pm_data; sys_kwargs...)
     add_dyn_injectors!(sys, dyr_file)
     return sys
 end
@@ -132,7 +132,7 @@ function build_psse_3bus_sexs_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "ThreeBusNetwork.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "test_SEXS.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = make_system(pm_data; sys_kwargs...)
+    sys = system_from_openapi(pm_data; sys_kwargs...)
     add_dyn_injectors!(sys, dyr_file)
     return sys
 end
@@ -142,7 +142,7 @@ function build_psse_original_240_case(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "240busWECC_2018_PSS33.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "240busWECC_2018_PSS.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = make_system(
+    sys = system_from_openapi(
         pm_data;
         bus_name_formatter = x -> string(x["name"]) * "-" * string(x["index"]),
         sys_kwargs...,
@@ -156,7 +156,7 @@ function build_psse_3bus_no_cls_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "ThreeBusNetwork.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "Test-NoCLS.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = make_system(pm_data; sys_kwargs...)
+    sys = system_from_openapi(pm_data; sys_kwargs...)
     add_dyn_injectors!(sys, dyr_file)
     return sys
 end
