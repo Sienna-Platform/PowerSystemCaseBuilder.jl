@@ -42,7 +42,7 @@
     w_pst = PSY.get_circuit(pst)
     @test PSY.get_control_objective(w_pst) != TransformerControlObjective.UNDEFINED
     @test PSY.get_control_objective(w_pst) == TransformerControlObjective.FIXED  # COD1 = 0
-    @test PSY.get_regulated_bus_number(w_pst) == 0                     # CONT1 = 0
+    @test isnothing(PSY.get_regulated_bus(w_pst))                      # COD1 = 0: no bus
     @test PSY.get_number_of_tap_positions(w_pst) == 33                 # NTP1 = 33
     @test PSY.get_control_limits(w_pst) == (min = 0.9, max = 1.1)      # RMI1 / RMA1
 

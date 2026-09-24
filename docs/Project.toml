@@ -7,7 +7,7 @@ PowerSystems = "bcd98974-b02a-5e2f-9ee0-a103f5c450dd"
 
 [sources]
 PowerSystemCaseBuilder = {path = ".."}
-PowerSystems = {url = "https://github.com/Sienna-Platform/PowerSystems.jl.git", rev = "psy6"}
+PowerSystems = {url = "https://github.com/Sienna-Platform/PowerSystems.jl.git", rev = "mb/remote-control"}
 
 [compat]
 Documenter = "^1.8"
