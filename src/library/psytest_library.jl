@@ -207,7 +207,7 @@ function build_dynamic_inverter_sys(; kwargs...)
         reactive_power_limits = (min = -50.0, max = 50.0),
         efficiency = (in = 0.80, out = 0.90),
         base_power = 100.0,
-        input_basis = CU,
+        input_basis = u"CU",
     )
     converter = PSY.AverageConverter(
         138.0, #Rated Voltage

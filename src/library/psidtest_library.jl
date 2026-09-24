@@ -3,39 +3,39 @@ function transform_load_to_constant_impedance(load::PSY.StandardLoad)
     active_power, reactive_power, max_active_power, max_reactive_power =
         _compute_total_load_parameters(load)
     # Set Impedance Power
-    PSY.set_impedance_active_power!(load, active_power * IS.SU)
-    PSY.set_impedance_reactive_power!(load, reactive_power * IS.SU)
-    PSY.set_max_impedance_active_power!(load, max_active_power * IS.SU)
-    PSY.set_max_impedance_reactive_power!(load, max_reactive_power * IS.SU)
+    PSY.set_impedance_active_power!(load, active_power * u"SU")
+    PSY.set_impedance_reactive_power!(load, reactive_power * u"SU")
+    PSY.set_max_impedance_active_power!(load, max_active_power * u"SU")
+    PSY.set_max_impedance_reactive_power!(load, max_reactive_power * u"SU")
     # Set everything else to zero
-    PSY.set_constant_active_power!(load, 0.0 * IS.SU)
-    PSY.set_constant_reactive_power!(load, 0.0 * IS.SU)
-    PSY.set_max_constant_active_power!(load, 0.0 * IS.SU)
-    PSY.set_max_constant_reactive_power!(load, 0.0 * IS.SU)
-    PSY.set_current_active_power!(load, 0.0 * IS.SU)
-    PSY.set_current_reactive_power!(load, 0.0 * IS.SU)
-    PSY.set_max_current_active_power!(load, 0.0 * IS.SU)
-    PSY.set_max_current_reactive_power!(load, 0.0 * IS.SU)
+    PSY.set_constant_active_power!(load, 0.0 * u"SU")
+    PSY.set_constant_reactive_power!(load, 0.0 * u"SU")
+    PSY.set_max_constant_active_power!(load, 0.0 * u"SU")
+    PSY.set_max_constant_reactive_power!(load, 0.0 * u"SU")
+    PSY.set_current_active_power!(load, 0.0 * u"SU")
+    PSY.set_current_reactive_power!(load, 0.0 * u"SU")
+    PSY.set_max_current_active_power!(load, 0.0 * u"SU")
+    PSY.set_max_current_reactive_power!(load, 0.0 * u"SU")
     return
 end
 
 function _compute_total_load_parameters(load::PSY.StandardLoad)
     @warn "Load data is transformed under the assumption of a 1.0 p.u. Voltage Magnitude"
     # Constant Power Data
-    constant_active_power = PSY.get_constant_active_power(load, IS.SU)
-    constant_reactive_power = PSY.get_constant_reactive_power(load, IS.SU)
-    max_constant_active_power = PSY.get_max_constant_active_power(load, IS.SU)
-    max_constant_reactive_power = PSY.get_max_constant_reactive_power(load, IS.SU)
+    constant_active_power = PSY.get_constant_active_power(load, u"SU")
+    constant_reactive_power = PSY.get_constant_reactive_power(load, u"SU")
+    max_constant_active_power = PSY.get_max_constant_active_power(load, u"SU")
+    max_constant_reactive_power = PSY.get_max_constant_reactive_power(load, u"SU")
     # Constant Current Data
-    current_active_power = PSY.get_current_active_power(load, IS.SU)
-    current_reactive_power = PSY.get_current_reactive_power(load, IS.SU)
-    max_current_active_power = PSY.get_max_current_active_power(load, IS.SU)
-    max_current_reactive_power = PSY.get_max_current_reactive_power(load, IS.SU)
+    current_active_power = PSY.get_current_active_power(load, u"SU")
+    current_reactive_power = PSY.get_current_reactive_power(load, u"SU")
+    max_current_active_power = PSY.get_max_current_active_power(load, u"SU")
+    max_current_reactive_power = PSY.get_max_current_reactive_power(load, u"SU")
     # Constant Admittance Data
-    impedance_active_power = PSY.get_impedance_active_power(load, IS.SU)
-    impedance_reactive_power = PSY.get_impedance_reactive_power(load, IS.SU)
-    max_impedance_active_power = PSY.get_max_impedance_active_power(load, IS.SU)
-    max_impedance_reactive_power = PSY.get_max_impedance_reactive_power(load, IS.SU)
+    impedance_active_power = PSY.get_impedance_active_power(load, u"SU")
+    impedance_reactive_power = PSY.get_impedance_reactive_power(load, u"SU")
+    max_impedance_active_power = PSY.get_max_impedance_active_power(load, u"SU")
+    max_impedance_reactive_power = PSY.get_max_impedance_reactive_power(load, u"SU")
     # Total Load Calculations
     active_power = constant_active_power + current_active_power + impedance_active_power
     reactive_power =
@@ -917,7 +917,7 @@ function _consolidate_zip_model!(load::PSY.StandardLoad, bucket::Symbol)
         for b in _ZIP_BUCKETS
             value = b === bucket ? total : 0.0
             setter = getproperty(PSY, Symbol("set_", prefix, b, "_", suffix, "!"))
-            setter(load, value * IS.CU)
+            setter(load, value * u"CU")
         end
     end
     return
@@ -937,7 +937,7 @@ function _total_zip_power(
     suffix::AbstractString,
 )
     return sum(
-        getproperty(PSY, Symbol("get_", prefix, b, "_", suffix))(load, IS.CU)
+        getproperty(PSY, Symbol("get_", prefix, b, "_", suffix))(load, u"CU")
         for b in _ZIP_BUCKETS
     )
 end
@@ -965,10 +965,10 @@ function build_psid_psse_test_exp_load(; kwargs...)
             # Same meaning: the voltage exponent, 0 = constant power.
             α = 0.0,
             β = 0.0,
-            base_power = PSY.get_base_power(l, IS.NU),
+            base_power = PSY.get_base_power(l, u"NU"),
             max_active_power = _total_zip_power(l, "max_", "active_power"),
             max_reactive_power = _total_zip_power(l, "max_", "reactive_power"),
-            input_basis = CU,
+            input_basis = u"CU",
         )
         PSY.remove_component!(sys, l)
         PSY.add_component!(sys, exp_load)

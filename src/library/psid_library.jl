@@ -78,9 +78,9 @@ function build_psid_wecc_9_dynamic(; raw_data, kwargs...)
     sys = system_from_openapi(pm_data; runchecks = false, sys_kwargs...)
 
     # Manually change reactance of three branches to match Sauer & Pai (2007) Figure 7.4
-    set_x!(get_component(Branch, sys, "Bus 5-Bus 4-i_1"), 0.085 * IS.SU)
-    set_x!(get_component(Branch, sys, "Bus 9-Bus 6-i_1"), 0.17 * IS.SU)
-    set_x!(get_component(Branch, sys, "Bus 7-Bus 8-i_1"), 0.072 * IS.SU)
+    set_x!(get_component(Branch, sys, "Bus 5-Bus 4-i_1"), 0.085 * u"SU")
+    set_x!(get_component(Branch, sys, "Bus 9-Bus 6-i_1"), 0.17 * u"SU")
+    set_x!(get_component(Branch, sys, "Bus 7-Bus 8-i_1"), 0.072 * u"SU")
 
     # Loads from raw file are constant power, consistent with Sauer & Pai (p169)
 
@@ -172,14 +172,14 @@ function build_psid_load_tutorial_omib(; raw_data, kwargs...)
         name = PSY.get_name(l),
         available = PSY.get_available(l),
         bus = PSY.get_bus(l),
-        active_power = PSY.get_constant_active_power(l, IS.SU),
-        reactive_power = PSY.get_constant_reactive_power(l, IS.SU),
+        active_power = PSY.get_constant_active_power(l, u"SU"),
+        reactive_power = PSY.get_constant_reactive_power(l, u"SU"),
         α = 0.0, # Constant Power
         β = 0.0, # Constant Power
-        base_power = PSY.get_base_power(l, IS.NU),
-        max_active_power = PSY.get_max_constant_active_power(l, IS.SU),
-        max_reactive_power = PSY.get_max_constant_reactive_power(l, IS.SU),
-        input_basis = CU,
+        base_power = PSY.get_base_power(l, u"NU"),
+        max_active_power = PSY.get_max_constant_active_power(l, u"SU"),
+        max_reactive_power = PSY.get_max_constant_reactive_power(l, u"SU"),
+        input_basis = u"CU",
     )
     remove_component!(sys, l)
     add_component!(sys, exp_load)
