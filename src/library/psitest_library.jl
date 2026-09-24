@@ -31,7 +31,7 @@ function _get_generic_hydro_reservoir_pair(node)
         conversion_factor = 1.0,
         outflow_limits = nothing,
         powerhouse_elevation = 0.0,
-        input_basis = CU,
+        input_basis = u"CU",
     )
     return hydro, reservoir
 end
@@ -184,7 +184,7 @@ function build_c_sys14_hvdc_vsc(;
         ac_control_to = PSY.VSCACControlModes.AC_REACTIVE_POWER,
         dc_setpoint_to = 0.4,
         reactive_power_to = 0.1,
-        input_basis = CU,
+        input_basis = u"CU",
     )
     _replace_2_3_line_with_hvdc!(c_sys14_hvdc_vsc, vsc)
 
@@ -279,7 +279,7 @@ function build_c_sys14_hvdc_lcc(;
         active_power_limits_to = (min = 0.0, max = 0.0),
         reactive_power_limits_from = (min = 0.0, max = 0.0),
         reactive_power_limits_to = (min = 0.0, max = 0.0),
-        input_basis = CU,
+        input_basis = u"CU",
     )
     _replace_2_3_line_with_hvdc!(c_sys14_hvdc_lcc, lcc)
 
@@ -2671,7 +2671,7 @@ function build_c_sys5_events(; add_forecasts, raw_data, sys_kwargs...)
         for (ix, l) in enumerate(sorted_components(PowerLoad, c_sys5))
             set_max_active_power!(
                 l,
-                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
+                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * u"SU",
             )
             add_time_series!(
                 c_sys5,
@@ -2813,7 +2813,7 @@ function build_c_sys5_events_rt(; add_forecasts, raw_data, sys_kwargs...)
         for (ix, l) in enumerate(sorted_components(PowerLoad, c_sys5))
             set_max_active_power!(
                 l,
-                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
+                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * u"SU",
             )
             rt_timearray =
                 TimeArray(rt_load_time_series, rt_load_time_series_val ./ peak_load)
@@ -2915,9 +2915,9 @@ function build_c_sys5_reg(; add_forecasts, raw_data, kwargs...)
     for g in PSY.get_components(PSY.Generator, c_sys5_reg)
         droop =
             if isa(g, PSY.ThermalStandard)
-                0.04 * PSY.get_base_power(g, IS.NU)
+                0.04 * PSY.get_base_power(g, u"NU")
             else
-                0.05 * PSY.get_base_power(g, IS.NU)
+                0.05 * PSY.get_base_power(g, u"NU")
             end
         p_factor = (up = 1.0, dn = 1.0)
         t = PSY.RegulationDevice(g; participation_factor = p_factor, droop = droop)
@@ -2967,7 +2967,7 @@ function build_sys_ramp_testing(; raw_data, kwargs...)
                 2.0,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         PSY.ThermalStandard(;
             name = "Park City",
@@ -2990,7 +2990,7 @@ function build_sys_ramp_testing(; raw_data, kwargs...)
                 0.75,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
     ]
     DA_ramp = collect(
@@ -5266,7 +5266,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
             ),
             base_power = 100.0,
             time_at_status = 2.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         PSY.ThermalStandard(;
             name = "Park City",
@@ -5290,7 +5290,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
             ),
             base_power = 100.0,
             time_at_status = 3.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
     ]
 
@@ -5425,7 +5425,7 @@ function build_test_RTS_GMLC_sys_with_hybrid(; raw_data, add_forecasts, kwargs..
         renewable_unit = renewable_unit,
         base_power = 100.0,
         operation_cost = MarketBidCost(nothing),
-        input_basis = CU,
+        input_basis = u"CU",
     )
     add_component!(sys, h_sys)
     return sys
@@ -5654,7 +5654,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
             energy_shortage_cost = 50.0,
             energy_surplus_cost = 40.0,
         ),
-        input_basis = CU,
+        input_basis = u"CU",
     )
     hyd = [
         HybridSystem(;
@@ -5674,7 +5674,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
             input_active_power_limits = (min = 0.0, max = 5.0),
             output_active_power_limits = (min = 0.0, max = 5.0),
             reactive_power_limits = (min = 0.0, max = 1.0),
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         HybridSystem(;
             name = "thermal+battery",
@@ -5693,7 +5693,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
             input_active_power_limits = (min = 0.0, max = 10.0),
             output_active_power_limits = (min = 0.0, max = 10.0),
             reactive_power_limits = (min = 0.0, max = 1.0),
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         HybridSystem(;
             name = "load+battery",
@@ -5711,7 +5711,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
             input_active_power_limits = (min = 0.0, max = 10.0),
             output_active_power_limits = (min = 0.0, max = 10.0),
             reactive_power_limits = (min = 0.0, max = 1.0),
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         HybridSystem(;
             name = "all_hybrid",
@@ -5730,7 +5730,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
             input_active_power_limits = (min = 0.0, max = 15.0),
             output_active_power_limits = (min = 0.0, max = 15.0),
             reactive_power_limits = (min = 0.0, max = 1.0),
-            input_basis = CU,
+            input_basis = u"CU",
         ),
     ]
     c_sys5_hybrid = PSY.System(
@@ -5889,7 +5889,7 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
             energy_shortage_cost = 50.0,
             energy_surplus_cost = 40.0,
         ),
-        input_basis = CU,
+        input_basis = u"CU",
     )
     hyd = [
         HybridSystem(;
@@ -5909,7 +5909,7 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
             input_active_power_limits = (min = 0.0, max = 5.0),
             output_active_power_limits = (min = 0.0, max = 5.0),
             reactive_power_limits = (min = 0.0, max = 1.0),
-            input_basis = CU,
+            input_basis = u"CU",
         ),
     ]
 
@@ -6066,7 +6066,7 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
             energy_shortage_cost = 50.0,
             energy_surplus_cost = 40.0,
         ),
-        input_basis = CU,
+        input_basis = u"CU",
     )
     hyd = [
         HybridSystem(;
@@ -6086,7 +6086,7 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
             input_active_power_limits = (min = 0.0, max = 5.0),
             output_active_power_limits = (min = 0.0, max = 5.0),
             reactive_power_limits = (min = 0.0, max = 1.0),
-            input_basis = CU,
+            input_basis = u"CU",
         ),
     ]
 
@@ -6581,7 +6581,7 @@ function build_batt_test_case_b_sys(; raw_data, kwargs...)
             energy_shortage_cost = 0.001,
             energy_surplus_cost = 10.0,
         ),
-        input_basis = CU,
+        input_basis = u"CU",
     )
     load_ts = [0.3, 0.6, 0.5]
     load_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, load_ts))
@@ -6677,7 +6677,7 @@ function build_batt_test_case_c_sys(; raw_data, kwargs...)
             energy_shortage_cost = 50.0,
             energy_surplus_cost = 0.0,
         ),
-        input_basis = CU,
+        input_basis = u"CU",
     )
     load_ts = [0.3, 0.6, 0.5]
     load_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, load_ts))
@@ -6773,7 +6773,7 @@ function build_batt_test_case_d_sys(; raw_data, kwargs...)
             energy_shortage_cost = 0.0,
             energy_surplus_cost = -10.0,
         ),
-        input_basis = CU,
+        input_basis = u"CU",
     )
     load_ts = [0.3, 0.6, 0.5, 0.8]
     load_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, load_ts))
@@ -6869,7 +6869,7 @@ function build_batt_test_case_e_sys(; raw_data, kwargs...)
             energy_shortage_cost = 50.0,
             energy_surplus_cost = 50.0,
         ),
-        input_basis = CU,
+        input_basis = u"CU",
     )
     load_ts = [0.3, 0.6, 0.5]
     load_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, load_ts))
@@ -6965,7 +6965,7 @@ function build_batt_test_case_f_sys(; raw_data, kwargs...)
             energy_shortage_cost = 50.0,
             energy_surplus_cost = -5.0,
         ),
-        input_basis = CU,
+        input_basis = u"CU",
     )
     load_ts = [0.3, 0.6, 0.5]
     load_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, load_ts))
@@ -7261,7 +7261,7 @@ function build_c_sys5_radial(; raw_data, kwargs...)
         b = (from = 0.00356, to = 0.00356),
         rating = 2.0,
         angle_limits = (min = -0.7, max = 0.7),
-        input_basis = CU,
+        input_basis = u"CU",
     )
 
     line_ext1_to_ext2 = Line(;
@@ -7276,7 +7276,7 @@ function build_c_sys5_radial(; raw_data, kwargs...)
         b = (from = 0.00356, to = 0.00356),
         rating = 2.0,
         angle_limits = (min = -0.7, max = 0.7),
-        input_basis = CU,
+        input_basis = u"CU",
     )
 
     add_components!(new_sys, [line_C_to_ext1, line_ext1_to_ext2])
@@ -7296,7 +7296,7 @@ function build_c_sys5_radial(; raw_data, kwargs...)
         base_power = 100.0,
         max_active_power = 1.0,
         max_reactive_power = 0.9861 / 3,
-        input_basis = CU,
+        input_basis = u"CU",
     )
 
     load_ext2 = PowerLoad(;
@@ -7308,7 +7308,7 @@ function build_c_sys5_radial(; raw_data, kwargs...)
         base_power = 100.0,
         max_active_power = 1.0,
         max_reactive_power = 0.9861 / 3,
-        input_basis = CU,
+        input_basis = u"CU",
     )
 
     add_components!(new_sys, [load_ext1, load_ext2])
@@ -7316,10 +7316,10 @@ function build_c_sys5_radial(; raw_data, kwargs...)
     copy_time_series!(load_ext1, load_bus3)
     copy_time_series!(load_ext2, load_bus3)
 
-    set_active_power!(load_bus3, 1.0 * IS.SU)
-    set_max_active_power!(load_bus3, 1.0 * IS.SU)
-    set_reactive_power!(load_bus3, 0.3287 * IS.SU)
-    set_max_reactive_power!(load_bus3, 0.3287 * IS.SU)
+    set_active_power!(load_bus3, 1.0 * u"SU")
+    set_max_active_power!(load_bus3, 1.0 * u"SU")
+    set_reactive_power!(load_bus3, 0.3287 * u"SU")
+    set_max_reactive_power!(load_bus3, 0.3287 * u"SU")
     return new_sys
 end
 
@@ -7378,8 +7378,8 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
         sys_kwargs...,
     )
 
-    area1 = Area(; name = "Area1", input_basis = CU)
-    area2 = Area(; name = "Area2", input_basis = CU)
+    area1 = Area(; name = "Area1", input_basis = u"CU")
+    area2 = Area(; name = "Area2", input_basis = u"CU")
 
     add_component!(sys, area1)
     add_component!(sys, area2)
@@ -7391,7 +7391,7 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
         from_area = area1,
         to_area = area2,
         flow_limits = (from_to = 1.5, to_from = 1.5),
-        input_basis = CU,
+        input_basis = u"CU",
     )
 
     PSY.add_component!(sys, exchange_1_2)
@@ -7408,7 +7408,7 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
         b = (from = 0.00337, to = 0.00337),
         flow_limits = (from_to = 7.0, to_from = 7.0),
         arc = PSY.Arc(; from = nodes_area1[3], to = nodes_area2[3]),
-        input_basis = CU,
+        input_basis = u"CU",
     )
 
     PSY.add_component!(sys, inter_area_line)
@@ -7510,7 +7510,7 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
         for (ix, l) in enumerate(sorted_components(PowerLoad, sys))
             set_max_active_power!(
                 l,
-                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
+                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * u"SU",
             )
             add_time_series!(
                 sys,
@@ -7643,7 +7643,7 @@ function _build_cost_base_test_sys(; kwargs...)
             0.75,
         ),
         base_power = 100.0,
-        input_basis = CU,
+        input_basis = u"CU",
     )
 
     DA_load_forecast = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()

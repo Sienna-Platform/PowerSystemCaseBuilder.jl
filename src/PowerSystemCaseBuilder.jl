@@ -32,6 +32,8 @@ import InfrastructureSystems:
     get_name,
     set_name!
 import PowerSystems
+# `u"CU"` resolves only where `PerUnit` is bound.
+using PowerSystems: @u_str, PerUnit
 import DataStructures: SortedDict
 import DataFrames
 import PrettyTables

@@ -90,7 +90,7 @@ function build_c_sys5_pjm(; add_forecasts, raw_data, sys_kwargs...)
         for (ix, l) in enumerate(sorted_components(PowerLoad, c_sys5))
             set_max_active_power!(
                 l,
-                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
+                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * u"SU",
             )
             add_time_series!(
                 c_sys5,
@@ -214,7 +214,7 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
         for (ix, l) in enumerate(sorted_components(PowerLoad, c_sys5))
             set_max_active_power!(
                 l,
-                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * IS.SU,
+                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * u"SU",
             )
             rt_timearray =
                 TimeArray(rt_load_time_series, rt_load_time_series_val ./ peak_load)
@@ -507,12 +507,12 @@ function make_modified_RTS_GMLC_sys(
     reg_reserve_up = PSY.get_component(PSY.OnlineReserve, sys, "Reg_Up")
     PSY.set_requirement!(
         reg_reserve_up,
-        1.75 * PSY.get_requirement(reg_reserve_up, IS.SU) * IS.SU,
+        1.75 * PSY.get_requirement(reg_reserve_up, u"SU") * u"SU",
     )
     reg_reserve_dn = PSY.get_component(PSY.OnlineReserve, sys, "Reg_Down")
     PSY.set_requirement!(
         reg_reserve_dn,
-        1.75 * PSY.get_requirement(reg_reserve_dn, IS.SU) * IS.SU,
+        1.75 * PSY.get_requirement(reg_reserve_dn, u"SU") * u"SU",
     )
     spin_reserve_R1 = PSY.get_component(PSY.OnlineReserve, sys, "Spin_Up_R1")
     spin_reserve_R2 = PSY.get_component(PSY.OnlineReserve, sys, "Spin_Up_R2")
@@ -530,7 +530,7 @@ function make_modified_RTS_GMLC_sys(
             PSY.get_operation_cost(g),
             PSY.get_start_up(PSY.get_operation_cost(g)) / 2.0,
         )
-        if PSY.get_base_power(g, IS.NU) > 3
+        if PSY.get_base_power(g, u"NU") > 3
             continue
         end
         PSY.clear_services!(g)
@@ -563,7 +563,7 @@ function make_modified_RTS_GMLC_sys(
         if PSY.get_fuel(d) == PSY.ThermalFuels.COAL
             # `ramp_limits` is a rate: the tag has to name the time unit as well as
             # the power base.
-            ramp = 0.001 * IS.CU / PSY.u"minute"
+            ramp = 0.001 * u"CU" / PSY.u"minute"
             PSY.set_ramp_limits!(d, (up = ramp, down = ramp))
         end
         if PSY.get_fuel(d) == PSY.ThermalFuels.DISTILLATE_FUEL_OIL
@@ -574,15 +574,15 @@ function make_modified_RTS_GMLC_sys(
             PSY.get_operation_cost(d),
             PSY.get_start_up(PSY.get_operation_cost(d)) / 2.0,
         )
-        if PSY.get_rating(d, IS.CU) < 3
+        if PSY.get_rating(d, u"CU") < 3
             PSY.set_status!(d, PSY.OperationalStates.OFFLINE)
             PSY.set_status!(d, PSY.OperationalStates.OFFLINE)
-            PSY.set_active_power!(d, 0.0 * IS.CU)
+            PSY.set_active_power!(d, 0.0 * u"CU")
             continue
         end
         PSY.clear_services!(d)
         if PSY.get_fuel(d) == PSY.ThermalFuels.NUCLEAR
-            no_ramp = 0.0 * IS.CU / PSY.u"minute"
+            no_ramp = 0.0 * u"CU" / PSY.u"minute"
             PSY.set_ramp_limits!(d, (up = no_ramp, down = no_ramp))
             PSY.set_time_limits!(d, (up = 4380.0, down = 4380.0))
         end
@@ -608,8 +608,8 @@ function make_modified_RTS_GMLC_sys(
         PSY.RenewableDispatch,
         sys,
     )
-        rat_ = PSY.get_rating(g, IS.CU)
-        PSY.set_rating!(g, DISPATCH_INCREASE * rat_ * IS.CU)
+        rat_ = PSY.get_rating(g, u"CU")
+        PSY.set_rating!(g, DISPATCH_INCREASE * rat_ * u"CU")
     end
 
     for g in PSY.get_components(
@@ -617,8 +617,8 @@ function make_modified_RTS_GMLC_sys(
         PSY.RenewableNonDispatch,
         sys,
     )
-        rat_ = PSY.get_rating(g, IS.CU)
-        PSY.set_rating!(g, FIX_DECREASE * rat_ * IS.CU)
+        rat_ = PSY.get_rating(g, u"CU")
+        PSY.set_rating!(g, FIX_DECREASE * rat_ * u"CU")
     end
 
     ### Update Buses to PQ that got devices removed ###
@@ -976,7 +976,7 @@ function build_two_zone_5_bus(; kwargs...)
                 2.0,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         ThermalStandard(;
             name = "Park City",
@@ -999,7 +999,7 @@ function build_two_zone_5_bus(; kwargs...)
                 0.75,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         ThermalStandard(;
             name = "Solitude",
@@ -1022,7 +1022,7 @@ function build_two_zone_5_bus(; kwargs...)
                 1.5,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         ThermalStandard(;
             name = "Sundance",
@@ -1045,7 +1045,7 @@ function build_two_zone_5_bus(; kwargs...)
                 2.0,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         ThermalStandard(;
             name = "Brighton",
@@ -1068,7 +1068,7 @@ function build_two_zone_5_bus(; kwargs...)
                 0.75,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         ThermalStandard(;
             name = "Alta-2",
@@ -1091,7 +1091,7 @@ function build_two_zone_5_bus(; kwargs...)
                 2.0,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         ThermalStandard(;
             name = "Park City-2",
@@ -1114,7 +1114,7 @@ function build_two_zone_5_bus(; kwargs...)
                 0.75,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         ThermalStandard(;
             name = "Solitude-2",
@@ -1137,7 +1137,7 @@ function build_two_zone_5_bus(; kwargs...)
                 1.5,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         ThermalStandard(;
             name = "Sundance-2",
@@ -1160,7 +1160,7 @@ function build_two_zone_5_bus(; kwargs...)
                 2.0,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
         ThermalStandard(;
             name = "Brighton-2",
@@ -1183,7 +1183,7 @@ function build_two_zone_5_bus(; kwargs...)
                 0.75,
             ),
             base_power = 100.0,
-            input_basis = CU,
+            input_basis = u"CU",
         ),
     ]
 
@@ -1517,11 +1517,11 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         end
         # change scale
         if typeof(b) <: RenewableGen
-            PSY.set_base_power!(b, 1.2 * PSY.get_base_power(b, IS.NU))
-            PSY.set_base_power!(main_comp, 0.9 * PSY.get_base_power(b, IS.NU))
+            PSY.set_base_power!(b, 1.2 * PSY.get_base_power(b, u"NU"))
+            PSY.set_base_power!(main_comp, 0.9 * PSY.get_base_power(b, u"NU"))
         end
         if typeof(b) <: PowerLoad
-            PSY.set_base_power!(main_comp, 1.2 * PSY.get_base_power(b, IS.NU))
+            PSY.set_base_power!(main_comp, 1.2 * PSY.get_base_power(b, u"NU"))
         end
     end
 
@@ -1550,7 +1550,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
             loss = PSY.LossCurve(PSY.LinearCurve(0.1), PSY.NaturalUnit()),
             services = Vector{Service}[],
             ext = Dict{String, Any}(),
-            input_basis = CU,
+            input_basis = u"CU",
         )
         PSY.add_component!(main_sys, new_HVDCLine)
     else
@@ -1569,13 +1569,13 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
             angle_limits = (min = -1.57079, max = 1.57079),
             services = Vector{Service}[],
             ext = Dict{String, Any}(),
-            input_basis = CU,
+            input_basis = u"CU",
         )
         PSY.add_component!(main_sys, new_ACLine)
     end
 
     for bat in get_components(EnergyReservoirStorage, main_sys)
-        set_base_power!(bat, get_base_power(bat, IS.NU) * 10)
+        set_base_power!(bat, get_base_power(bat, u"NU") * 10)
     end
 
     for r in get_components(
@@ -1624,10 +1624,10 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         get_initial_input(old_value_curve)
         old_y =
             get_initial_input(old_value_curve) /
-            (get_active_power_limits(g, IS.SU).min * PSY.get_base_power(g, IS.NU))
+            (get_active_power_limits(g, u"SU").min * PSY.get_base_power(g, u"NU"))
         new_first_input =
-            (old_y + direction * cost_noise) * get_active_power_limits(g, IS.SU).min *
-            PSY.get_base_power(g, IS.NU)
+            (old_y + direction * cost_noise) * get_active_power_limits(g, u"SU").min *
+            PSY.get_base_power(g, u"NU")
         new_slopes[1] = old_slopes[1] + direction * cost_noise
         @assert new_slopes[1] > 0.0
         for ix in 2:length(old_slopes)
@@ -1832,7 +1832,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             active_power_limits_to = (min = 0.0, max = limit),
             # base_current (A) = S_base / V_base
             base_current = 100.0e6 / (PSY.get_base_voltage(bus_from) * 1e3),
-            input_basis = CU,
+            input_basis = u"CU",
         )
         push!(dclines, dcline)
     end
@@ -1885,7 +1885,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             active_power_limits_to = (min = 0.0, max = limit),
             # base_current (A) = S_base / V_base (all 9T buses are 300 kV).
             base_current = 100.0e6 / (PSY.get_base_voltage(bus_from) * 1e3),
-            input_basis = CU,
+            input_basis = u"CU",
         )
         push!(dclines, dcline)
     end
@@ -1995,7 +1995,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
                 PSY.QuadraticCurve(c_pu[ix], b_pu[ix], a_pu[ix]),
                 PSY.NaturalUnit(),
             ),
-            input_basis = CU,
+            input_basis = u"CU",
         )
         PSY.add_component!(sys, ipc)
     end
@@ -2016,7 +2016,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
                 PSY.QuadraticCurve(c_pu_9T, b_pu_9T, a_pu_9T),
                 PSY.NaturalUnit(),
             ),
-            input_basis = CU,
+            input_basis = u"CU",
         )
         PSY.add_component!(sys, ipc)
     end
