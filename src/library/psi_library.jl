@@ -1995,12 +1995,22 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
                 PSY.QuadraticCurve(c_pu[ix], b_pu[ix], a_pu[ix]),
                 PSY.NaturalUnit(),
             ),
+            # The first converter is the grid's DC-voltage slack; the rest hold DC power.
+            dc_control = if ix == 1
+                PSY.VSCDCControlModes.DC_VOLTAGE
+            else
+                PSY.VSCDCControlModes.DC_POWER
+            end,
+            ac_control = PSY.VSCACControlModes.AC_REACTIVE_POWER,
+            dc_voltage_setpoint = ix == 1 ? 1.0 : nothing,
+            dc_power_setpoint = ix == 1 ? nothing : 0.0,
+            power_factor_setpoint = 1.0,
             input_basis = CU,
         )
         PSY.add_component!(sys, ipc)
     end
 
-    for bus_tuple in bus_arcs_9T
+    for (ix, bus_tuple) in enumerate(bus_arcs_9T)
         dcbus = get_bus_by_number(sys, bus_tuple[1])
         acbus = get_bus_by_number(sys, bus_tuple[2])
         ipc = PSY.InterconnectingConverter(;
@@ -2016,6 +2026,15 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
                 PSY.QuadraticCurve(c_pu_9T, b_pu_9T, a_pu_9T),
                 PSY.NaturalUnit(),
             ),
+            dc_control = if ix == 1
+                PSY.VSCDCControlModes.DC_VOLTAGE
+            else
+                PSY.VSCDCControlModes.DC_POWER
+            end,
+            ac_control = PSY.VSCACControlModes.AC_REACTIVE_POWER,
+            dc_voltage_setpoint = ix == 1 ? 1.0 : nothing,
+            dc_power_setpoint = ix == 1 ? nothing : 0.0,
+            power_factor_setpoint = 1.0,
             input_basis = CU,
         )
         PSY.add_component!(sys, ipc)

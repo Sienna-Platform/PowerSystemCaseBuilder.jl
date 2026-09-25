@@ -172,18 +172,20 @@ function build_c_sys14_hvdc_vsc(;
         active_power_limits_from = (min = -2.0, max = 2.0),
         active_power_limits_to = (min = -2.0, max = 2.0),
         g = 50.0,
-        # DC voltage base for the g/dc_setpoint per-unit values; export requires one whenever g != 0
+        # DC voltage base for the g/dc_voltage_setpoint per-unit values; export requires one whenever g != 0
         rated_dc_voltage = 100.0,
         # from converter: DC-voltage control (DC slack), reactive-power setpoint
         dc_control_from = PSY.VSCDCControlModes.DC_VOLTAGE,
         ac_control_from = PSY.VSCACControlModes.AC_REACTIVE_POWER,
-        dc_setpoint_from = 1.05,
+        dc_voltage_setpoint_from = 1.05,
         reactive_power_from = 0.05,
+        power_factor_setpoint_from = 0.4 / hypot(0.4, 0.05),  # matches the P/Q flows above
         # to converter: DC-power control, reactive-power setpoint
         dc_control_to = PSY.VSCDCControlModes.DC_POWER,
         ac_control_to = PSY.VSCACControlModes.AC_REACTIVE_POWER,
-        dc_setpoint_to = 0.4,
+        dc_power_setpoint_to = 0.4,
         reactive_power_to = 0.1,
+        power_factor_setpoint_to = 0.4 / hypot(0.4, 0.1),
         input_basis = CU,
     )
     _replace_2_3_line_with_hvdc!(c_sys14_hvdc_vsc, vsc)
@@ -246,7 +248,8 @@ function build_c_sys14_hvdc_lcc(;
         arc = PSY.Arc(nodes[2], nodes[3]),
         active_power_flow = 0.0,
         r = 0.05,
-        transfer_setpoint = 0.5,  # 50 MW on the 100 MVA system base
+        control_mode = PSY.LCCControlMode.POWER,
+        power_transfer_setpoint = 0.5,  # 50 MW on the 100 MVA system base
         scheduled_dc_voltage = 230.0,
         rectifier_bridges = 1,
         rectifier_delay_angle_limits = (min = 0.0, max = pi / 2),
@@ -259,7 +262,6 @@ function build_c_sys14_hvdc_lcc(;
         inverter_rc = 0.0,
         inverter_xc = 0.08,
         inverter_base_voltage = 69.0,
-        power_mode = true,
         switch_mode_voltage = 0.0,
         compounding_resistance = 0.0,
         min_compounding_voltage = 0.0,
