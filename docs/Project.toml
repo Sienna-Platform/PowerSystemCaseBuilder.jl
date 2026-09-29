@@ -7,8 +7,7 @@ PowerSystems = "bcd98974-b02a-5e2f-9ee0-a103f5c450dd"
 
 [sources]
 PowerSystemCaseBuilder = {path = ".."}
-# TODO: revert to rev = "psy6" once PowerSystems.jl#1823 merges.
-PowerSystems = {url = "https://github.com/Sienna-Platform/PowerSystems.jl.git", rev = "lk/voltage-units-1821"}
+PowerSystems = {url = "https://github.com/Sienna-Platform/PowerSystems.jl.git", rev = "psy6"}
 
 [compat]
 Documenter = "^1.8"
