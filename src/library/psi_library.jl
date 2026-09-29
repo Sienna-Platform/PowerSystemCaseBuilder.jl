@@ -1765,6 +1765,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
     T7_numbers_300kV = [704, 705, 706, 707]
     for number in T7_numbers_150kV
         dcbus = DCBus(;
+            input_basis = CU,
             number = number,
             name = string(number),
             available = true,
@@ -1776,6 +1777,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
     end
     for number in T7_numbers_300kV
         dcbus = DCBus(;
+            input_basis = CU,
             number = number,
             name = string(number),
             available = true,
@@ -1789,6 +1791,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
     T9_numbers_300kV = 901:1:909
     for number in T9_numbers_300kV
         dcbus = DCBus(;
+            input_basis = CU,
             number = number,
             name = string(number),
             available = true,
