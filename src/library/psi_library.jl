@@ -1515,13 +1515,14 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
                 end
             end
         end
-        # change scale
+        # Change scale: moving base_power directly (bypassing set_base_power!, which
+        # throws) keeps the per-unit values, so the device's MW scale with its base.
         if typeof(b) <: RenewableGen
-            PSY.set_base_power!(b, 1.2 * PSY.get_base_power(b, IS.NU))
-            PSY.set_base_power!(main_comp, 0.9 * PSY.get_base_power(b, IS.NU))
+            b.base_power = 1.2 * PSY.get_base_power(b, IS.NU)
+            main_comp.base_power = 0.9 * PSY.get_base_power(b, IS.NU)
         end
         if typeof(b) <: PowerLoad
-            PSY.set_base_power!(main_comp, 1.2 * PSY.get_base_power(b, IS.NU))
+            main_comp.base_power = 1.2 * PSY.get_base_power(b, IS.NU)
         end
     end
 
@@ -1575,7 +1576,8 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
     end
 
     for bat in get_components(EnergyReservoirStorage, main_sys)
-        set_base_power!(bat, get_base_power(bat, IS.NU) * 10)
+        # 10x the battery: moving base_power directly keeps its per-unit values.
+        bat.base_power = get_base_power(bat, IS.NU) * 10
     end
 
     for r in get_components(
