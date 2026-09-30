@@ -202,23 +202,34 @@ _fold_requirement(r::PSY.AbstractReserve) =
 function _fold_requirement_into_time_series!(sys::PSY.System, r::PSY.AbstractReserve)
     requirement = PSY.get_requirement(r, PSY.SU)
     for md in IS.list_time_series_metadata(r)
-        T = typeof(md).parameters[1]
-        T <: PSY.DeterministicSingleTimeSeries && continue
-        T <: PSY.SingleTimeSeries ||
-            error("cannot fold the requirement of $(PSY.get_name(r)) into a $T")
+        typeof(md).parameters[1] <: PSY.DeterministicSingleTimeSeries && continue
         ts = PSY.get_time_series(r, IS.get_time_series_key(md))
+        scaled = _scaled(ts, requirement)
         features = isempty(IS.get_features(md)) ? nothing : IS.get_features(md)
-        scaled = PSY.SingleTimeSeries(
-            IS.get_name(ts), ts.initial_timestamp, ts.resolution,
-            ts.data .* requirement;
-            units = IS.get_units(ts),
-            quantity_kind = IS.get_quantity_kind(ts),
-            unit_system = IS.get_unit_system(ts),
-        )
         PSY.remove_time_series!(
-            sys, PSY.SingleTimeSeries, r, IS.get_name(md); features = features)
+            sys, Base.typename(typeof(ts)).wrapper, r, IS.get_name(md);
+            features = features,
+            resolution = IS.get_resolution(md),
+            interval = IS.get_interval(md),
+        )
         PSY.add_time_series!(sys, r, scaled; features = features)
     end
     PSY.set_requirement!(r, 1.0 * PSY.SU)
     return
 end
+
+_labels(ts) = (
+    units = IS.get_units(ts),
+    quantity_kind = IS.get_quantity_kind(ts),
+    unit_system = IS.get_unit_system(ts),
+)
+_scaled(ts::PSY.SingleTimeSeries, factor) = PSY.SingleTimeSeries(
+    IS.get_name(ts), ts.initial_timestamp, ts.resolution, ts.data .* factor;
+    _labels(ts)...,
+)
+_scaled(ts::PSY.Deterministic, factor) = PSY.Deterministic(
+    IS.get_name(ts), SortedDict(k => v .* factor for (k, v) in ts.data),
+    ts.resolution, ts.interval;
+    _labels(ts)...,
+)
+_scaled(ts, _) = error("cannot fold a reserve requirement into a $(typeof(ts))")
