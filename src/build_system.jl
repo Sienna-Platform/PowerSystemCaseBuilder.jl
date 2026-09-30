@@ -111,6 +111,7 @@ function _build_system(
             case_args...,
             sys_args...,
         )
+        normalize_time_series_bases!(sys)
         #construct_time = time() - start
         start = time()
         if !skip_serialization && isempty(sys_args) &&
@@ -135,4 +136,89 @@ function _build_system(
     end
     print_stat ? print_stats(sys_descriptor) : nothing
     return sys
+end
+
+"""
+Make every component-base (`CU`) time series in `sys` mean "per unit of its owner's
+`base_power`", without changing what an operations model computes from it.
+
+The fixtures' profiles are fractions of a rating that operations models multiply back in:
+`max_active_power` for devices, `requirement` for reserves. Rebasing each device so
+`max_active_power` is 1.0 in component base makes the `CU` label true without touching the
+arrays. Reserves have no base of their own, so each `requirement` is folded into its series
+and set to 1.0 instead.
+"""
+function normalize_time_series_bases!(sys::PSY.System)
+    for c in PSY.get_components(_rebase_to_max_active_power, PSY.StaticInjection, sys)
+        max_active_power = PSY.get_max_active_power(c, PSY.NU)
+        PSY.rebase_component!(c, max_active_power; keep_time_series = true)
+    end
+    reserves = collect(PSY.get_components(_fold_requirement, PSY.AbstractReserve, sys))
+    isempty(reserves) && return sys
+    # The store won't replace a series that still backs a forecast view, so drop the views
+    # and derive them again, with the same windows, once the series are replaced.
+    views = unique(
+        (IS.get_horizon(md), IS.get_interval(md), IS.get_resolution(md)) for
+        c in PSY.get_components(PSY.has_time_series, PSY.Component, sys)
+        for md in IS.list_time_series_metadata(
+            c;
+            time_series_type = PSY.DeterministicSingleTimeSeries,
+        )
+    )
+    isempty(views) || PSY.remove_time_series!(sys, PSY.DeterministicSingleTimeSeries)
+    foreach(r -> _fold_requirement_into_time_series!(sys, r), reserves)
+    for (horizon, interval, resolution) in views
+        PSY.transform_single_time_series!(
+            sys, horizon, interval; resolution = resolution, delete_existing = false)
+    end
+    return sys
+end
+
+# Devices with their own base whose profiles scale by `max_active_power`. Hybrid systems
+# scale by a subunit's rating and storage by its capacity, so neither fits.
+function _rebase_to_max_active_power(c::PSY.StaticInjection)
+    c isa Union{PSY.HybridSystem, PSY.Storage} && return false
+    PSY.base_power_kind(c) isa PSY.ComponentBasePower && PSY.has_time_series(c) ||
+        return false
+    max_active_power = _max_active_power(c, PSY.CU)
+    return !isnothing(max_active_power) && !iszero(max_active_power) &&
+           !isapprox(max_active_power, 1.0)
+end
+
+# `get_max_active_power` falls back to throwing for devices without a rating.
+function _max_active_power(c::PSY.StaticInjection, units)
+    try
+        return PSY.get_max_active_power(c, units)
+    catch e
+        e isa ArgumentError || rethrow()
+        return nothing
+    end
+end
+
+_fold_requirement(r::PSY.AbstractReserve) =
+    PSY.has_time_series(r) && !iszero(PSY.get_requirement(r, PSY.SU)) &&
+    !isapprox(PSY.get_requirement(r, PSY.SU), 1.0)
+
+function _fold_requirement_into_time_series!(sys::PSY.System, r::PSY.AbstractReserve)
+    requirement = PSY.get_requirement(r, PSY.SU)
+    for md in IS.list_time_series_metadata(r)
+        T = typeof(md).parameters[1]
+        T <: PSY.DeterministicSingleTimeSeries && continue
+        T <: PSY.SingleTimeSeries ||
+            error("cannot fold the requirement of $(PSY.get_name(r)) into a $T")
+        ts = PSY.get_time_series(r, IS.get_time_series_key(md))
+        features = isempty(IS.get_features(md)) ? nothing : IS.get_features(md)
+        scaled = PSY.SingleTimeSeries(
+            IS.get_name(ts), ts.initial_timestamp, ts.resolution,
+            ts.data .* requirement;
+            units = IS.get_units(ts),
+            quantity_kind = IS.get_quantity_kind(ts),
+            unit_system = IS.get_unit_system(ts),
+        )
+        PSY.remove_time_series!(
+            sys, PSY.SingleTimeSeries, r, IS.get_name(md); features = features)
+        PSY.add_time_series!(sys, r, scaled; features = features)
+    end
+    PSY.set_requirement!(r, 1.0 * PSY.SU)
+    return
 end
