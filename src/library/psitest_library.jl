@@ -7218,6 +7218,7 @@ function build_c_sys5_radial(; raw_data, kwargs...)
     busC = get_component(ACBus, new_sys, "nodeC")
 
     busC_ext1 = ACBus(;
+        input_basis = CU,
         number = 301,
         name = "nodeC_ext1",
         available = true,
@@ -7231,6 +7232,7 @@ function build_c_sys5_radial(; raw_data, kwargs...)
     )
 
     busC_ext2 = ACBus(;
+        input_basis = CU,
         number = 302,
         name = "nodeC_ext2",
         available = true,
