@@ -10,6 +10,8 @@ const PSY = PowerSystems
 using PowerSystemCaseBuilder
 const PSB = PowerSystemCaseBuilder
 
+include("test_timeseries_utils.jl")
+
 LOG_FILE = "power-systems-case_builder.log"
 LOG_LEVELS = Dict(
     "Debug" => Logging.Debug,
@@ -51,6 +53,7 @@ macro includetests(testarg...)
         else
             tests = map(f -> string(f, ".jl"), tests)
         end
+        filter!(f -> f != "test_timeseries_utils.jl", tests)
         println()
         for test in tests
             print(splitext(test)[1], ": ")
