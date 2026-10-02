@@ -174,4 +174,3 @@ function _max_active_power(c::PSY.StaticInjection, units)
         return nothing
     end
 end
-
