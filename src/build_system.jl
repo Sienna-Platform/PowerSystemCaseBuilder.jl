@@ -111,6 +111,7 @@ function _build_system(
             case_args...,
             sys_args...,
         )
+        normalize_time_series_bases!(sys)
         #construct_time = time() - start
         start = time()
         if !skip_serialization && isempty(sys_args) &&
@@ -135,4 +136,41 @@ function _build_system(
     end
     print_stat ? print_stats(sys_descriptor) : nothing
     return sys
+end
+
+"""
+Make every device's component-base (`CU`) time series mean "per unit of its `base_power`",
+without changing what an operations model computes from it.
+
+The fixtures' device profiles are fractions of `max_active_power`, which operations models
+multiply back in. Rebasing each device so `max_active_power` is 1.0 in component base makes
+the `CU` label true without touching the arrays.
+"""
+function normalize_time_series_bases!(sys::PSY.System)
+    for c in PSY.get_components(_rebase_to_max_active_power, PSY.StaticInjection, sys)
+        max_active_power = PSY.get_max_active_power(c, PSY.NU)
+        PSY.rebase_component!(c, max_active_power; keep_time_series = true)
+    end
+    return sys
+end
+
+# Devices with their own base whose profiles scale by `max_active_power`. Hybrid systems
+# scale by a subunit's rating and storage by its capacity, so neither fits.
+function _rebase_to_max_active_power(c::PSY.StaticInjection)
+    c isa Union{PSY.HybridSystem, PSY.Storage} && return false
+    PSY.base_power_kind(c) isa PSY.ComponentBasePower && PSY.has_time_series(c) ||
+        return false
+    max_active_power = _max_active_power(c, PSY.CU)
+    return !isnothing(max_active_power) && !iszero(max_active_power) &&
+           !isapprox(max_active_power, 1.0)
+end
+
+# `get_max_active_power` falls back to throwing for devices without a rating.
+function _max_active_power(c::PSY.StaticInjection, units)
+    try
+        return PSY.get_max_active_power(c, units)
+    catch e
+        e isa ArgumentError || rethrow()
+        return nothing
+    end
 end
