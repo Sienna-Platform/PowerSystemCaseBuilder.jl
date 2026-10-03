@@ -44,7 +44,9 @@
     @test PSY.get_control_objective(w_pst) == TransformerControlObjective.FIXED  # COD1 = 0
     @test PSY.get_regulated_bus_number(w_pst) == 0                     # CONT1 = 0
     @test PSY.get_number_of_tap_positions(w_pst) == 33                 # NTP1 = 33
-    @test PSY.get_control_limits(w_pst) == (min = 0.9, max = 1.1)      # RMI1 / RMA1
+    @test PSY.get_tap_ratio_limits(w_pst) == (min = 0.9, max = 1.1)         # RMI1 / RMA1
+    @test PSY.get_controlled_voltage_limits(w_pst) == (min = 0.9, max = 1.1)  # VMI1 / VMA1
+    @test isnothing(PSY.get_phase_angle_limits(w_pst))  # FIXED does not move the angle
 
     # The 3W magnetizing shunt is transformer-level and typed with the 3W enum.
     @test PSY.get_shunt_location(first(t3ws)) ==
@@ -122,11 +124,11 @@ end
     )
 
     sys =
-        @test_logs (:warn, r"inverted controlled-quantity limits") match_mode = :any build(
+        @test_logs (:warn, r"inverted VMI1 = ") match_mode = :any build(
             raw,
         )
-    @test get_controlled_quantity_limits(t1(sys)) == (min = 0.984, max = 0.985)
-    @test get_control_limits(t1(sys)) == (min = 0.5, max = 1.5)
+    @test get_controlled_voltage_limits(t1(sys)) == (min = 0.984, max = 0.985)
+    @test get_tap_ratio_limits(t1(sys)) == (min = 0.5, max = 1.5)
 
     # Inverted RMI/RMA warns too: T1's RMA1/RMI1 swapped, VMA1/VMI1 set to a valid band.
     inverted = joinpath(mktempdir(), "frankenstein_70.raw")
@@ -137,9 +139,9 @@ end
             "1.500000,0.500000,0.984000,0.985000" => "0.500000,1.500000,1.100000,0.900000",
         ),
     )
-    sys2 = @test_logs (:warn, r"inverted control limits") match_mode = :any build(inverted)
-    @test get_control_limits(t1(sys2)) == (min = 0.5, max = 1.5)
-    @test get_controlled_quantity_limits(t1(sys2)) == (min = 0.9, max = 1.1)
+    sys2 = @test_logs (:warn, r"inverted RMI1 = ") match_mode = :any build(inverted)
+    @test get_tap_ratio_limits(t1(sys2)) == (min = 0.5, max = 1.5)
+    @test get_controlled_voltage_limits(t1(sys2)) == (min = 0.9, max = 1.1)
 end
 
 @testset "3W zero-impedance and mag fixtures build" begin
