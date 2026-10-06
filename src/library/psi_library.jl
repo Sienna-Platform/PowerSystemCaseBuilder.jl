@@ -939,16 +939,16 @@ function build_two_zone_5_bus(; kwargs...)
             3.29, # min for 230kV
             (min = -0.7, max = 0.7),
         ),
-        TwoTerminalGenericHVDCLine(
-            "nodeC-nodeC2",
-            true,
-            0.0,
-            Arc(; from = nodes10[3], to = nodes10[8]),
-            (min = -2.0, max = 2.0),
-            (min = -2.0, max = 2.0),
-            (min = -2.0, max = 2.0),
-            (min = -2.0, max = 2.0),
-            LossCurve(LinearCurve(0.0), NaturalUnit()),
+        TwoTerminalGenericHVDCLine(;
+            name = "nodeC-nodeC2",
+            available = true,
+            active_power_flow = 0.0,
+            arc = Arc(; from = nodes10[3], to = nodes10[8]),
+            rating = 2.0,
+            reactive_power_limits_from = (min = -2.0, max = 2.0),
+            reactive_power_limits_to = (min = -2.0, max = 2.0),
+            loss = LossCurve(LinearCurve(0.0), NaturalUnit()),
+            input_basis = u"CU",
         ),
     ]
 
@@ -1543,8 +1543,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
             available = true,
             active_power_flow = 0.0,
             arc = get_component(Arc, main_sys, "Alder -> Alder_twin"),
-            active_power_limits_from = (min = -1000.0, max = 1000.0),
-            active_power_limits_to = (min = -1000.0, max = 1000.0),
+            rating = 1000.0,
             reactive_power_limits_from = (min = -1000.0, max = 1000.0),
             reactive_power_limits_to = (min = -1000.0, max = 1000.0),
             loss = PSY.LossCurve(PSY.LinearCurve(0.1), PSY.NaturalUnit()),
@@ -1554,7 +1553,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         )
         PSY.add_component!(main_sys, new_HVDCLine)
     else
-        new_ACLine = PSY.MonitoredLine(;
+        new_ACLine = PSY.Line(;
             name = "AC_interconnection",
             available = true,
             active_power_flow = 0.0,
@@ -1565,7 +1564,10 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
             b = (from = 0.022, to = 0.022),
             rating = 1.75,
             # For now, not binding
-            flow_limits = (from_to = 2.0, to_from = 2.0),
+            operational_flow_limit = (
+                from_to = (min = 0.0, max = 2.0),
+                to_from = (min = 0.0, max = 2.0),
+            ),
             angle_limits = (min = -1.57079, max = 1.57079),
             services = Vector{Service}[],
             ext = Dict{String, Any}(),
@@ -1754,7 +1756,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
     sys_rts = build_RTS_GMLC_DA_sys_noForecast(; kwargs...)
     sys = _duplicate_system(sys_rts, deepcopy(sys_rts), false)
     # Remove AC connection
-    ac_interconnection = first(PSY.get_components(PSY.MonitoredLine, sys))
+    ac_interconnection = PSY.get_component(PSY.Line, sys, "AC_interconnection")
     PSY.remove_component!(sys, ac_interconnection)
 
     ### Add DC Buses ###
@@ -1765,7 +1767,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
     T7_numbers_300kV = [704, 705, 706, 707]
     for number in T7_numbers_150kV
         dcbus = DCBus(;
-            input_basis = CU,
+            input_basis = u"CU",
             number = number,
             name = string(number),
             available = true,
@@ -1777,7 +1779,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
     end
     for number in T7_numbers_300kV
         dcbus = DCBus(;
-            input_basis = CU,
+            input_basis = u"CU",
             number = number,
             name = string(number),
             available = true,
@@ -1791,7 +1793,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
     T9_numbers_300kV = 901:1:909
     for number in T9_numbers_300kV
         dcbus = DCBus(;
-            input_basis = CU,
+            input_basis = u"CU",
             number = number,
             name = string(number),
             available = true,
@@ -1831,8 +1833,10 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             r = T7_r[ix],
             l = 0.0,
             c = 0.0,
-            active_power_limits_from = (min = 0.0, max = limit),
-            active_power_limits_to = (min = 0.0, max = limit),
+            operational_flow_limit = (
+                from_to = (min = 0.0, max = limit),
+                to_from = (min = 0.0, max = limit),
+            ),
             # base_current (A) = S_base / V_base
             base_current = 100.0e6 / (PSY.get_base_voltage(bus_from) * 1e3),
             input_basis = u"CU",
@@ -1884,8 +1888,10 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             r = T9_r[ix],
             l = 0.0,
             c = 0.0,
-            active_power_limits_from = (min = 0.0, max = limit),
-            active_power_limits_to = (min = 0.0, max = limit),
+            operational_flow_limit = (
+                from_to = (min = 0.0, max = limit),
+                to_from = (min = 0.0, max = limit),
+            ),
             # base_current (A) = S_base / V_base (all 9T buses are 300 kV).
             base_current = 100.0e6 / (PSY.get_base_voltage(bus_from) * 1e3),
             input_basis = u"CU",
@@ -2005,7 +2011,11 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
                 PSY.VSCDCControlModes.DC_POWER
             end,
             ac_control = PSY.VSCACControlModes.AC_REACTIVE_POWER,
-            dc_voltage_setpoint = ix == 1 ? 1.0 : nothing,
+            dc_voltage_setpoint = if ix == 1
+                PSY.get_base_voltage(dcbus)
+            else
+                nothing
+            end,
             dc_power_setpoint = ix == 1 ? nothing : 0.0,
             power_factor_setpoint = 1.0,
             input_basis = u"CU",
@@ -2035,7 +2045,11 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
                 PSY.VSCDCControlModes.DC_POWER
             end,
             ac_control = PSY.VSCACControlModes.AC_REACTIVE_POWER,
-            dc_voltage_setpoint = ix == 1 ? 1.0 : nothing,
+            dc_voltage_setpoint = if ix == 1
+                PSY.get_base_voltage(dcbus)
+            else
+                nothing
+            end,
             dc_power_setpoint = ix == 1 ? nothing : 0.0,
             power_factor_setpoint = 1.0,
             input_basis = u"CU",

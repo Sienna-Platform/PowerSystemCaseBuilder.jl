@@ -169,8 +169,6 @@ function build_c_sys14_hvdc_vsc(;
         arc = PSY.Arc(nodes[2], nodes[3]),
         active_power_flow = 0.4,
         rating = 2.0,
-        active_power_limits_from = (min = -2.0, max = 2.0),
-        active_power_limits_to = (min = -2.0, max = 2.0),
         g = 50.0,
         # DC voltage base for the g/dc_voltage_setpoint per-unit values; export requires one whenever g != 0
         rated_dc_voltage = 100.0,
@@ -277,8 +275,7 @@ function build_c_sys14_hvdc_lcc(;
         inverter_tap_step = 0.05,
         inverter_extinction_angle = deg2rad(17),
         inverter_capacitor_reactance = 0.0,
-        active_power_limits_from = (min = 0.0, max = 0.0),
-        active_power_limits_to = (min = 0.0, max = 0.0),
+        rating = 1.0,
         reactive_power_limits_from = (min = 0.0, max = 0.0),
         reactive_power_limits_to = (min = 0.0, max = 0.0),
         input_basis = u"CU",
@@ -409,7 +406,14 @@ function build_c_sys5_ml(; add_forecasts, add_single_time_series, raw_data, kwar
         end
     end
     line = PSY.get_component(Line, c_sys5_ml, "1")
-    PSY.convert_component!(c_sys5_ml, line, MonitoredLine)
+    rating = PSY.get_rating(line, u"CU")
+    PSY.set_operational_flow_limit!(
+        line,
+        (
+            from_to = (min = 0.0u"CU", max = rating * u"CU"),
+            to_from = (min = 0.0u"CU", max = rating * u"CU"),
+        ),
+    )
     return c_sys5_ml
 end
 
@@ -7220,7 +7224,7 @@ function build_c_sys5_radial(; raw_data, kwargs...)
     busC = get_component(ACBus, new_sys, "nodeC")
 
     busC_ext1 = ACBus(;
-        input_basis = CU,
+        input_basis = u"CU",
         number = 301,
         name = "nodeC_ext1",
         available = true,
@@ -7234,7 +7238,7 @@ function build_c_sys5_radial(; raw_data, kwargs...)
     )
 
     busC_ext2 = ACBus(;
-        input_basis = CU,
+        input_basis = u"CU",
         number = 302,
         name = "nodeC_ext2",
         available = true,
@@ -7400,7 +7404,7 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
 
     PSY.add_component!(sys, exchange_1_2)
 
-    inter_area_line = MonitoredLine(;
+    inter_area_line = Line(;
         name = "inter_area_line",
         available = true,
         active_power_flow = 0.0,
@@ -7410,7 +7414,10 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
         r = 0.003,
         x = 0.03,
         b = (from = 0.00337, to = 0.00337),
-        flow_limits = (from_to = 7.0, to_from = 7.0),
+        operational_flow_limit = (
+            from_to = (min = 0.0, max = 7.0),
+            to_from = (min = 0.0, max = 7.0),
+        ),
         arc = PSY.Arc(; from = nodes_area1[3], to = nodes_area2[3]),
         input_basis = u"CU",
     )
