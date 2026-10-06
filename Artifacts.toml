@@ -4,7 +4,7 @@ lazy = true
 
     [[CaseData.download]]
     url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/refs/tags/5.0-dev12.tar.gz"
-    sha256 = "30c6e1b95dc21fe7a370575cd80631b033bfa4cc91a25aa86a8e62e0938125f8"
+    sha256 = "303278412ec2f7cedd700c0385c8f254ac17e686e2e5daf2fa0ab931f0a74e8b"
 
 [rts]
 git-tree-sha1 = "c257b2c37b981f261fdc328b0fb9b96436a96537"
