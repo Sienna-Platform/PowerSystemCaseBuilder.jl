@@ -115,6 +115,20 @@ end
                       TimeSeries.values(PSB.load_single_timeseries_DA[ix])
             end
         end
+
+        missing_load = build_system(
+            PSITestSystems,
+            "c_sys5";
+            force_build = true,
+            skip_serialization = true,
+        )
+        PSY.remove_component!(
+            missing_load,
+            PSY.get_component(PSY.PowerLoad, missing_load, "Bus4"),
+        )
+        @test_throws "Expected exactly 3 PowerLoad components named Bus2, Bus3, Bus4; found 2: Bus2, Bus3" collect(
+            PSB._five_bus_power_loads(missing_load),
+        )
     end
 
     """

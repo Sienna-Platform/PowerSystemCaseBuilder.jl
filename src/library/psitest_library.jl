@@ -298,10 +298,23 @@ end
 
 const _FIVE_BUS_LOAD_INDEX = Dict("Bus2" => 1, "Bus3" => 2, "Bus4" => 3)
 
-function _five_bus_power_loads(sys)
+# Julia 1.13 changed the Dict iteration order. 
+# PSB build_c_sys5 assigns load_timeseries_DA[ix] with enumerate(get_components(PowerLoad, sys))
+# This function avoids the loads getting the wrong profiles.
+function _five_bus_power_loads(sys; expected_names = ("Bus2", "Bus3", "Bus4"))
+    loads = collect(PSY.get_components(PSY.PowerLoad, sys))
+    load_names = PSY.get_name.(loads)
+    if length(load_names) != length(expected_names) || Set(load_names) != Set(expected_names)
+        throw(
+            ArgumentError(
+                "Expected exactly $(length(expected_names)) PowerLoad components named $(join(expected_names, ", ")); found $(length(load_names)): $(join(sort(load_names), ", "))",
+            ),
+        )
+    end
+    # Forecast arrays are ordered Bus2, Bus3, Bus4, but component iteration order is not guaranteed.
     return (
         (_FIVE_BUS_LOAD_INDEX[PSY.get_name(load)], load) for
-        load in PSY.get_components(PSY.PowerLoad, sys)
+        load in loads
     )
 end
 
@@ -5080,7 +5093,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
     end
 
     if add_forecasts
-        for (ix, l) in _five_bus_power_loads(c_sys5_hybrid)
+        for (ix, l) in _five_bus_power_loads(c_sys5_hybrid; expected_names = ("Bus2",))
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
