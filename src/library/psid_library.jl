@@ -200,6 +200,7 @@ function _ieee9_pcm_update_operation_cost!(sys, rts_sys)
     prime_movers = [PrimeMovers.ST, PrimeMovers.CT, PrimeMovers.CC]
     for (ix, gen_name) in enumerate(gen_names)
         gen = get_component(ThermalStandard, sys, gen_name)
+        isnothing(gen) && continue
         rts_gen = get_component(ThermalStandard, rts_sys, rts_gen_names[ix])
         mid_slope = rts_gen.operation_cost.variable.value_curve.function_data.y_coords[2]
         fuel_cost = rts_gen.operation_cost.variable.fuel_cost
@@ -216,6 +217,25 @@ function _ieee9_pcm_update_operation_cost!(sys, rts_sys)
         set_operation_cost!(gen, new_op_cost)
         set_prime_mover_type!(gen, prime_movers[ix])
         set_fuel!(gen, fuel_types[ix])
+    end
+    # RTS CT cold-start is cheaper than CC; raise Bus-2 start/shutdown to at least
+    # Bus-3's so energy+commitment ranking keeps the expensive CT last.
+    g2 = get_component(ThermalStandard, sys, "generator-2-1")
+    g3 = get_component(ThermalStandard, sys, "generator-3-1")
+    if !isnothing(g2) && !isnothing(g3)
+        c2 = get_operation_cost(g2)
+        c3 = get_operation_cost(g3)
+        if c2.start_up < c3.start_up
+            set_operation_cost!(
+                g2,
+                ThermalGenerationCost(
+                    variable = c2.variable,
+                    fixed = c2.fixed,
+                    start_up = c3.start_up,
+                    shut_down = c3.shut_down,
+                ),
+            )
+        end
     end
     return nothing
 end
@@ -245,62 +265,110 @@ function _ieee9_pcm_add_load_time_series!(sys, rts_sys)
     return nothing
 end
 
-function _ieee9_pcm_add_renewable_generators!(sys, rts_sys)
-    coal_gen = get_component(ThermalStandard, sys, "generator-1-1")
-    solar = RenewableDispatch(;
-        name = "PV_Bus_1",
-        available = false,
-        bus = get_bus(coal_gen),
-        active_power = 0.0,
-        reactive_power = 0.0,
-        rating = 1.25,
-        prime_mover_type = PrimeMovers.PVe,
-        reactive_power_limits = (min = -0.5, max = 0.5),
-        power_factor = 1.0,
-        operation_cost = RenewableGenerationCost(nothing),
-        base_power = 100.0,
+# VSM GFM stack (inv_case78 / PSID case14 patterns from psidtest_library; inlined here).
+function _ieee9_pcm_vsm_inverter(static_device)
+    bus_kv = PSY.get_base_voltage(PSY.get_bus(static_device))
+    return DynamicInverter(;
+        name = PSY.get_name(static_device),
+        ω_ref = 1.0,
+        converter = AverageConverter(; rated_voltage = bus_kv, rated_current = 100.0),
+        outer_control = OuterControl(
+            VirtualInertia(; Ta = 2.0, kd = 400.0, kω = 20.0),
+            ReactivePowerDroop(; kq = 0.2, ωf = 1000.0),
+        ),
+        inner_control = VoltageModeControl(;
+            kpv = 0.59,
+            kiv = 736.0,
+            kffv = 0.0,
+            rv = 0.0,
+            lv = 0.2,
+            kpc = 1.27,
+            kic = 14.3,
+            kffi = 0.0,
+            ωad = 50.0,
+            kad = 0.2,
+        ),
+        dc_source = FixedDCSource(; voltage = 600.0),
+        freq_estimator = KauraPLL(; ω_lp = 500.0, kp_pll = 0.084, ki_pll = 4.69),
+        filter = LCLFilter(; lf = 0.08, rf = 0.003, cf = 0.074, lg = 0.2, rg = 0.01),
+        base_power = PSY.get_base_power(static_device),
     )
-    wind = RenewableDispatch(;
-        name = "Wind_Bus_1",
-        available = false,
-        bus = get_bus(coal_gen),
-        active_power = 0.0,
-        reactive_power = 0.0,
-        rating = 1.25,
-        prime_mover_type = PrimeMovers.WT,
-        reactive_power_limits = (min = -0.5, max = 0.5),
-        power_factor = 1.0,
-        operation_cost = RenewableGenerationCost(nothing),
-        base_power = 100.0,
-    )
-    add_component!(sys, solar)
-    add_component!(sys, wind)
+end
 
-    gen_names = ["PV_Bus_1", "Wind_Bus_1"]
-    rts_gen_names = ["101_PV_1", "122_WIND_1"]
-    for (ix, gen_name) in enumerate(gen_names)
-        gen = get_component(RenewableDispatch, sys, gen_name)
-        rts_gen = get_component(RenewableDispatch, rts_sys, rts_gen_names[ix])
-        ts_array = get_time_series_array(
-            SingleTimeSeries,
-            rts_gen,
-            "max_active_power";
-            ignore_scaling_factors = true,
-        )
-        add_time_series!(
-            sys,
-            gen,
-            SingleTimeSeries(;
-                name = "max_active_power",
-                data = ts_array,
-                scaling_factor_multiplier = get_max_active_power,
-            ),
-        )
+# Single A/B knob vs base: remove idle gen-2; add capped VSM GFM solar on bus 2 (coal REF stays).
+const _IEEE9_PCM_GFM_RATING_MW = 100.0
+
+function _ieee9_pcm_replace_gen2_with_gfm!(sys)
+    gen2 = get_component(ThermalStandard, sys, "generator-2-1")
+    isnothing(gen2) &&
+        error("Expected ThermalStandard generator-2-1 in IEEE9 base RAW")
+    # RAW parse is SYSTEM_BASE; NATURAL so getters return MW for P/Q limits.
+    set_units_base_system!(sys, "NATURAL_UNITS")
+    gen2_bus = get_bus(gen2)
+    gen2_qlim = get_reactive_power_limits(gen2)
+    gen2_p = min(get_active_power(gen2), _IEEE9_PCM_GFM_RATING_MW)
+    gen2_dyn = get_dynamic_injector(gen2)
+    !isnothing(gen2_dyn) && remove_component!(sys, gen2_dyn)
+    remove_component!(sys, gen2)
+
+    # Constructors store power fields in device base; use 100 MVA base so rating=1 → 100 MW.
+    gfm_base = _IEEE9_PCM_GFM_RATING_MW
+    gfm = RenewableDispatch(;
+        name = "GFM_Bus_2",
+        available = true,
+        bus = gen2_bus,
+        active_power = gen2_p / gfm_base,
+        reactive_power = 0.0,
+        rating = 1.0,
+        prime_mover_type = PrimeMovers.PVe,
+        reactive_power_limits = (
+            min = gen2_qlim.min / gfm_base,
+            max = gen2_qlim.max / gfm_base,
+        ),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(nothing),
+        base_power = gfm_base,
+    )
+    add_component!(sys, gfm)
+    add_component!(sys, _ieee9_pcm_vsm_inverter(gfm), gfm)
+    return nothing
+end
+
+function _ieee9_pcm_add_gfm_time_series!(sys, rts_sys)
+    gen = get_component(RenewableDispatch, sys, "GFM_Bus_2")
+    isnothing(gen) && error("Expected RenewableDispatch GFM_Bus_2 after gen-2→GFM")
+    rts_gen = get_component(RenewableDispatch, rts_sys, "101_PV_1")
+    ts_array = get_time_series_array(
+        SingleTimeSeries,
+        rts_gen,
+        "max_active_power";
+        ignore_scaling_factors = true,
+    )
+    add_time_series!(
+        sys,
+        gen,
+        SingleTimeSeries(;
+            name = "max_active_power",
+            data = ts_array,
+            scaling_factor_multiplier = get_max_active_power,
+        ),
+    )
+    return nothing
+end
+
+# PSS/E AREA ISW marks non-REF PV buses as ACBusTypes.SLACK. PSID/PowerFlows init maps
+# only REF/PV/PQ into the PF bus-type priority dict, so convert orphan SLACK → PV.
+function _ieee9_pcm_normalize_slack_buses!(sys)
+    for bus in get_components(ACBus, sys)
+        if get_bustype(bus) == ACBusTypes.SLACK
+            set_bustype!(bus, ACBusTypes.PV)
+        end
     end
     return nothing
 end
 
 function _ieee9_pcm_finalize_dynamics!(sys)
+    _ieee9_pcm_normalize_slack_buses!(sys)
     for l in get_components(StandardLoad, sys)
         transform_load_to_constant_impedance(l)
     end
@@ -322,19 +390,15 @@ end
 
 function build_ieee9_bus_pcm_time_series_and_re(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    raw_file = joinpath(raw_data, "RTS_Esc487MW_RE.raw")
-    dyr_file = joinpath(raw_data, "RTS_CtrlsModified_RE.dyr")
+    # Same parse path as base; GFM overlay is the only fleet difference.
+    raw_file = joinpath(raw_data, "RTS_Esc487MW.raw")
+    dyr_file = joinpath(raw_data, "RTS_CtrlsModified_STAB1.dyr")
     sys = System(raw_file, dyr_file; sys_kwargs...)
+    _ieee9_pcm_replace_gen2_with_gfm!(sys)
     rts_sys = build_system(PSISystems, "modified_RTS_GMLC_DA_sys_noForecast"; force_build = true)
     _ieee9_pcm_update_operation_cost!(sys, rts_sys)
     _ieee9_pcm_add_load_time_series!(sys, rts_sys)
-    _ieee9_pcm_add_renewable_generators!(sys, rts_sys)
-    coal_gen = get_component(ThermalStandard, sys, "generator-1-1")
-    pv_gen = get_component(RenewableDispatch, sys, "PV_Bus_1")
-    wind_gen = get_component(RenewableDispatch, sys, "Wind_Bus_1")
-    set_available!(coal_gen, false)
-    set_available!(pv_gen, true)
-    set_available!(wind_gen, true)
+    _ieee9_pcm_add_gfm_time_series!(sys, rts_sys)
     set_units_base_system!(sys, "NATURAL_UNITS")
     _ieee9_pcm_finalize_dynamics!(sys)
     return sys

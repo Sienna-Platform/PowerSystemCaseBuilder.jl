@@ -2277,7 +2277,7 @@ const SYSTEM_CATALOG = [
     ),
     SystemDescriptor(;
         name = "IEEE 9 Bus with PCM Time Series and RE",
-        description = "IEEE 9-bus PCM TS with renewable replacement",
+        description = "IEEE 9-bus PCM TS with GFM solar at bus 2",
         category = PSIDSystems,
         raw_data = joinpath(DATA_DIR, "ieee9_bus_pcm_time_series"),
         build_function = build_ieee9_bus_pcm_time_series_and_re,
