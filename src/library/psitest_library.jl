@@ -296,6 +296,29 @@ function build_c_sys14_hvdc_lcc(;
     return c_sys14_hvdc_lcc
 end
 
+const _FIVE_BUS_LOAD_INDEX = Dict("Bus2" => 1, "Bus3" => 2, "Bus4" => 3)
+
+# Julia 1.13 changed the Dict iteration order. 
+# PSB build_c_sys5 assigns load_timeseries_DA[ix] with enumerate(get_components(PowerLoad, sys))
+# This function avoids the loads getting the wrong profiles.
+function _five_bus_power_loads(sys; expected_names = ("Bus2", "Bus3", "Bus4"))
+    loads = collect(PSY.get_components(PSY.PowerLoad, sys))
+    load_names = PSY.get_name.(loads)
+    if length(load_names) != length(expected_names) ||
+       Set(load_names) != Set(expected_names)
+        throw(
+            ArgumentError(
+                "Expected exactly $(length(expected_names)) PowerLoad components named $(join(expected_names, ", ")); found $(length(load_names)): $(join(sort(load_names), ", "))",
+            ),
+        )
+    end
+    # Forecast arrays are ordered Bus2, Bus3, Bus4, but component iteration order is not guaranteed.
+    return (
+        (_FIVE_BUS_LOAD_INDEX[PSY.get_name(load)], load) for
+        load in loads
+    )
+end
+
 function build_c_sys5(; add_forecasts, add_single_time_series, raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
     nodes = nodes5()
@@ -308,7 +331,7 @@ function build_c_sys5(; add_forecasts, add_single_time_series, raw_data, kwargs.
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PowerLoad, c_sys5))
+    for (ix, l) in _five_bus_power_loads(c_sys5)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -351,7 +374,7 @@ function build_c_sys5_ml(; add_forecasts, add_single_time_series, raw_data, kwar
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PowerLoad, c_sys5_ml))
+    for (ix, l) in _five_bus_power_loads(c_sys5_ml)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -401,7 +424,7 @@ function build_c_sys5_re(;
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_re))
+    for (ix, l) in _five_bus_power_loads(c_sys5_re)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -525,7 +548,7 @@ function build_c_sys5_re_fuel_cost(;
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_re))
+    for (ix, l) in _five_bus_power_loads(c_sys5_re)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -679,7 +702,7 @@ function build_c_sys5_re_only(; add_forecasts, add_single_time_series, raw_data,
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_re_only))
+    for (ix, l) in _five_bus_power_loads(c_sys5_re_only)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -755,7 +778,7 @@ function build_c_sys5_hy(;
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hy))
+    for (ix, l) in _five_bus_power_loads(c_sys5_hy)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -872,7 +895,7 @@ function build_c_sys5_hy_turbine_energy(;
     PSY.add_component!(c_sys5_hyd, res)
     set_downstream_turbines!(res, [turb])
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hyd))
+    for (ix, l) in _five_bus_power_loads(c_sys5_hyd)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -1041,7 +1064,7 @@ function build_c_sys5_hy_turbine_head(;
     PSY.add_component!(c_sys5_hyd, res)
     set_downstream_turbines!(res, [turb])
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hyd))
+    for (ix, l) in _five_bus_power_loads(c_sys5_hyd)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -1172,7 +1195,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
     set_downstream_turbines!(res_tail, [turb_down])
     set_upstream_reservoirs!(res_tail, [res_head])
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hyd))
+    for (ix, l) in _five_bus_power_loads(c_sys5_hyd)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -1346,7 +1369,7 @@ function build_c_sys5_hy_cascading_turbine_head(;
     set_downstream_turbines!(res_tail, [turb_down])
     set_upstream_reservoirs!(res_tail, [res_head])
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hyd))
+    for (ix, l) in _five_bus_power_loads(c_sys5_hyd)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -1469,7 +1492,7 @@ function build_c_sys5_hyd(;
     add_component!(c_sys5_hyd, reservoir[1])
     set_downstream_turbines!(reservoir[1], [hydros[2]])
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hyd))
+    for (ix, l) in _five_bus_power_loads(c_sys5_hyd)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -1638,7 +1661,7 @@ function build_c_sys5_hyd_ems(;
     add_component!(c_sys5_hyd, reservoir[1])
     set_downstream_turbines!(reservoir[1], [hydros[2]])
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hyd))
+    for (ix, l) in _five_bus_power_loads(c_sys5_hyd)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -1805,7 +1828,7 @@ function build_c_sys5_bat(;
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_bat))
+    for (ix, l) in _five_bus_power_loads(c_sys5_bat)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -1927,7 +1950,7 @@ function build_c_sys5_hydro_pump_energy(;
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_bat))
+    for (ix, l) in _five_bus_power_loads(c_sys5_bat)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -2094,7 +2117,7 @@ function build_c_sys5_il(;
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_il))
+    for (ix, l) in _five_bus_power_loads(c_sys5_il)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -2207,7 +2230,7 @@ function build_c_sys5_dc(; add_forecasts, add_single_time_series, raw_data, kwar
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_dc))
+    for (ix, l) in _five_bus_power_loads(c_sys5_dc)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -2353,7 +2376,7 @@ function build_c_sys5_events(; add_forecasts, raw_data, sys_kwargs...)
     bus_dist_fact = Dict("Bus2" => 0.33, "Bus3" => 0.33, "Bus4" => 0.34)
     peak_load = maximum(da_load_time_series_val)
     if add_forecasts
-        for (ix, l) in enumerate(PSY.get_components(PowerLoad, c_sys5))
+        for (ix, l) in _five_bus_power_loads(c_sys5)
             set_max_active_power!(l, bus_dist_fact[PSY.get_name(l)] * peak_load / 100)
             add_time_series!(
                 c_sys5,
@@ -2492,7 +2515,7 @@ function build_c_sys5_events_rt(; add_forecasts, raw_data, sys_kwargs...)
     bus_dist_fact = Dict("Bus2" => 0.33, "Bus3" => 0.33, "Bus4" => 0.34)
     peak_load = maximum(rt_load_time_series_val)
     if add_forecasts
-        for (ix, l) in enumerate(PSY.get_components(PowerLoad, c_sys5))
+        for (ix, l) in _five_bus_power_loads(c_sys5)
             set_max_active_power!(l, bus_dist_fact[PSY.get_name(l)] * peak_load / 100)
             rt_timearray =
                 TimeArray(rt_load_time_series, rt_load_time_series_val ./ peak_load)
@@ -2560,7 +2583,7 @@ function build_c_sys5_reg(; add_forecasts, raw_data, kwargs...)
     )
     #add_component!(c_sys5_reg, AGC_service)
     if add_forecasts
-        for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_reg))
+        for (ix, l) in _five_bus_power_loads(c_sys5_reg)
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -2767,7 +2790,7 @@ function build_c_sys5_uc(;
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_uc))
+    for (ix, l) in _five_bus_power_loads(c_sys5_uc)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = timestamp(load_timeseries_DA[t][ix])[1]
@@ -2868,7 +2891,7 @@ function build_c_sys5_uc_non_spin(;
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_uc))
+    for (ix, l) in _five_bus_power_loads(c_sys5_uc)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = timestamp(load_timeseries_DA[t][ix])[1]
@@ -3001,7 +3024,7 @@ function build_c_sys5_uc_re(;
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_uc))
+    for (ix, l) in _five_bus_power_loads(c_sys5_uc)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = timestamp(load_timeseries_DA[t][ix])[1]
@@ -3157,7 +3180,7 @@ function build_c_sys5_ed(; add_forecasts, add_single_time_series, add_reserves, 
         sys_kwargs...,
     )
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_ed))
+    for (ix, l) in _five_bus_power_loads(c_sys5_ed)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2 # loop over days
             ta = load_timeseries_DA[t][ix]
@@ -3345,7 +3368,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
     add_component!(c_sys5_hy_uc, reservoir[1])
     set_downstream_turbines!(reservoir[1], [hydros[2]])
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hy_uc))
+    for (ix, l) in _five_bus_power_loads(c_sys5_hy_uc)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = timestamp(load_timeseries_DA[t][ix])[1]
@@ -3548,7 +3571,7 @@ function build_c_sys5_hy_ems_uc(;
     add_component!(c_sys5_hy_uc, reservoir[1])
     set_downstream_turbines!(reservoir[1], [hydros[2]])
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hy_uc))
+    for (ix, l) in _five_bus_power_loads(c_sys5_hy_uc)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time = timestamp(load_timeseries_DA[t][ix])[1]
@@ -3747,7 +3770,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
     add_component!(c_sys5_hy_ed, reservoir[1])
     set_downstream_turbines!(reservoir[1], [hydros[2]])
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hy_ed))
+    for (ix, l) in _five_bus_power_loads(c_sys5_hy_ed)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2 # loop over days
             ta = load_timeseries_DA[t][ix]
@@ -3997,7 +4020,7 @@ function build_c_sys5_hy_ems_ed(;
     add_component!(c_sys5_hy_ed, reservoir[1])
     set_downstream_turbines!(reservoir[1], [hydros[2]])
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hy_ed))
+    for (ix, l) in _five_bus_power_loads(c_sys5_hy_ed)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2 # loop over days
             ta = load_timeseries_DA[t][ix]
@@ -4249,7 +4272,7 @@ function build_c_sys5_phes_ed(;
     set_downstream_turbines!(head_reservoir, [hydro_pump])
     set_upstream_turbines!(tail_reservoir, [hydro_pump])
 
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_phes_ed))
+    for (ix, l) in _five_bus_power_loads(c_sys5_phes_ed)
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2 # loop over days
             ta = load_timeseries_DA[t][ix]
@@ -4520,7 +4543,7 @@ function build_c_sys5_pglib(;
     )
 
     forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
-    for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_uc))
+    for (ix, l) in _five_bus_power_loads(c_sys5_uc)
         for t in 1:2
             ini_time = timestamp(load_timeseries_DA[t][ix])[1]
             forecast_data[ini_time] = load_timeseries_DA[t][ix]
@@ -4809,7 +4832,7 @@ function build_c_sys5_bat_ems(;
     )
 
     if add_forecasts
-        for (ix, l) in enumerate(get_components(PowerLoad, c_sys5_bat))
+        for (ix, l) in _five_bus_power_loads(c_sys5_bat)
             forecast_data = SortedDict{Dates.DateTime, TimeArray}()
             for t in 1:2
                 ini_time = timestamp(load_timeseries_DA[t][ix])[1]
@@ -4922,7 +4945,7 @@ function build_c_sys5_pglib_sim(; add_forecasts, add_reserves, raw_data, kwargs.
     )
 
     if add_forecasts
-        for (ix, l) in enumerate(get_components(PowerLoad, c_sys5_uc))
+        for (ix, l) in _five_bus_power_loads(c_sys5_uc)
             data = vcat(load_timeseries_DA[1][ix] .* 0.3, load_timeseries_DA[2][ix] .* 0.3)
             add_time_series!(c_sys5_uc, l, SingleTimeSeries("max_active_power", data))
         end
@@ -5071,7 +5094,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
     end
 
     if add_forecasts
-        for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hybrid))
+        for (ix, l) in _five_bus_power_loads(c_sys5_hybrid; expected_names = ("Bus2",))
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -5096,7 +5119,9 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
             x -> !isnothing(PSY.get_electric_load(x)),
             collect(PSY.get_components(PSY.HybridSystem, c_sys5_hybrid)),
         )
-        for (ix, hy) in enumerate(_load_devices)
+        for hy in _load_devices
+            load = PSY.get_electric_load(hy)
+            ix = _FIVE_BUS_LOAD_INDEX[PSY.get_name(load)]
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -5104,12 +5129,12 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
             end
             add_time_series!(
                 c_sys5_hybrid,
-                PSY.get_electric_load(hy),
+                load,
                 PSY.Deterministic("max_active_power", forecast_data),
             )
             PSY.add_time_series!(
                 c_sys5_hybrid,
-                PSY.get_electric_load(hy),
+                load,
                 PSY.SingleTimeSeries("max_active_power", load_single_timeseries_DA[ix]),
             )
             PSY.copy_subcomponent_time_series!(hy, PSY.get_electric_load(hy))
@@ -5231,7 +5256,7 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
     end
 
     if add_forecasts
-        for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hybrid))
+        for (ix, l) in _five_bus_power_loads(c_sys5_hybrid)
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = TimeSeries.timestamp(load_timeseries_DA[t][ix])[1]
@@ -5386,7 +5411,7 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
     end
 
     if add_forecasts
-        for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_hybrid))
+        for (ix, l) in _five_bus_power_loads(c_sys5_hybrid)
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2 # loop over days
                 ta = load_timeseries_DA[t][ix]
@@ -6207,7 +6232,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
 
     # TODO refactor as per https://github.com/Sienna-Platform/PowerSystemCaseBuilder.jl/issues/66
     if add_forecasts
-        for (ix, l) in enumerate(PSY.get_components(PSY.PowerLoad, c_sys5_all_components))
+        for (ix, l) in _five_bus_power_loads(c_sys5_all_components)
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
                 ini_time = timestamp(load_timeseries_DA[t][ix])[1]
