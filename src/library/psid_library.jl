@@ -204,8 +204,8 @@ function _ieee9_pcm_update_operation_cost!(sys, rts_sys)
         rts_gen = get_component(ThermalStandard, rts_sys, rts_gen_names[ix])
         mid_slope = rts_gen.operation_cost.variable.value_curve.function_data.y_coords[2]
         fuel_cost = rts_gen.operation_cost.variable.fuel_cost
-        new_op_cost = ThermalGenerationCost(
-            variable = CostCurve(
+        new_op_cost = ThermalGenerationCost(;
+            variable = CostCurve(;
                 value_curve = LinearCurve(mid_slope * fuel_cost),
                 power_units = rts_gen.operation_cost.variable.power_units,
                 vom_cost = rts_gen.operation_cost.variable.vom_cost,
@@ -228,7 +228,7 @@ function _ieee9_pcm_update_operation_cost!(sys, rts_sys)
         if c2.start_up < c3.start_up
             set_operation_cost!(
                 g2,
-                ThermalGenerationCost(
+                ThermalGenerationCost(;
                     variable = c2.variable,
                     fixed = c2.fixed,
                     start_up = c3.start_up,
@@ -380,7 +380,8 @@ function build_ieee9_bus_pcm_time_series(; raw_data, kwargs...)
     raw_file = joinpath(raw_data, "RTS_Esc487MW.raw")
     dyr_file = joinpath(raw_data, "RTS_CtrlsModified_STAB1.dyr")
     sys = System(raw_file, dyr_file; sys_kwargs...)
-    rts_sys = build_system(PSISystems, "modified_RTS_GMLC_DA_sys_noForecast"; force_build = true)
+    rts_sys =
+        build_system(PSISystems, "modified_RTS_GMLC_DA_sys_noForecast"; force_build = true)
     _ieee9_pcm_update_operation_cost!(sys, rts_sys)
     _ieee9_pcm_add_load_time_series!(sys, rts_sys)
     set_units_base_system!(sys, "NATURAL_UNITS")
@@ -395,7 +396,8 @@ function build_ieee9_bus_pcm_time_series_and_re(; raw_data, kwargs...)
     dyr_file = joinpath(raw_data, "RTS_CtrlsModified_STAB1.dyr")
     sys = System(raw_file, dyr_file; sys_kwargs...)
     _ieee9_pcm_replace_gen2_with_gfm!(sys)
-    rts_sys = build_system(PSISystems, "modified_RTS_GMLC_DA_sys_noForecast"; force_build = true)
+    rts_sys =
+        build_system(PSISystems, "modified_RTS_GMLC_DA_sys_noForecast"; force_build = true)
     _ieee9_pcm_update_operation_cost!(sys, rts_sys)
     _ieee9_pcm_add_load_time_series!(sys, rts_sys)
     _ieee9_pcm_add_gfm_time_series!(sys, rts_sys)
