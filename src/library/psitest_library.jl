@@ -304,7 +304,8 @@ const _FIVE_BUS_LOAD_INDEX = Dict("Bus2" => 1, "Bus3" => 2, "Bus4" => 3)
 function _five_bus_power_loads(sys; expected_names = ("Bus2", "Bus3", "Bus4"))
     loads = collect(PSY.get_components(PSY.PowerLoad, sys))
     load_names = PSY.get_name.(loads)
-    if length(load_names) != length(expected_names) || Set(load_names) != Set(expected_names)
+    if length(load_names) != length(expected_names) ||
+       Set(load_names) != Set(expected_names)
         throw(
             ArgumentError(
                 "Expected exactly $(length(expected_names)) PowerLoad components named $(join(expected_names, ", ")); found $(length(load_names)): $(join(sort(load_names), ", "))",
