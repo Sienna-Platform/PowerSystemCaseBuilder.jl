@@ -2338,19 +2338,18 @@ const SYSTEM_CATALOG = [
         raw_data = RTS_DIR,
         build_function = build_rts_gmlc_rt_with_timeseries_outage_data,
     ),
-    # uncomment once PR #65 in PowerSystemsTestData is merged
-    #=SystemDescriptor(;
-    name = "118_bus_DA",
-    description = "118_bus_DA",
-    category = PSISystems,
-    raw_data = joinpath(DATA_DIR, "118-Bus", "data_118bus.jl"),
-    build_function = build_118_bus_DA,
+    SystemDescriptor(;
+        name = "118_bus_DA",
+        description = "118_bus_DA",
+        category = PSISystems,
+        raw_data = joinpath(DATA_DIR, "118-Bus", "data_118bus.jl"),
+        build_function = build_118_bus_DA,
     ),
     SystemDescriptor(;
-    name = "118_bus_RT",
-    description = "118_bus_RT",
-    category = PSISystems,
-    raw_data = joinpath(DATA_DIR, "118-Bus", "data_118bus.jl"),
-    build_function = build_118_bus_RT,
-    )=#
+        name = "118_bus_RT",
+        description = "118_bus_RT",
+        category = PSISystems,
+        raw_data = joinpath(DATA_DIR, "118-Bus", "data_118bus.jl"),
+        build_function = build_118_bus_RT,
+    ),
 ]

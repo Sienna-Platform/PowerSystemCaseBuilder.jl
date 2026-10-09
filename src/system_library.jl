@@ -4,8 +4,7 @@ include(joinpath(DATA_DIR, "psy_data", "data_10bus_ac_dc_pu.jl"))
 include(joinpath(DATA_DIR, "psy_data", "data_14bus_pu.jl"))
 include(joinpath(DATA_DIR, "psid_tests", "data_tests", "dynamic_test_data.jl"))
 include(joinpath(DATA_DIR, "psid_tests", "data_examples", "load_tutorial_functions.jl"))
-# uncomment once PR #65 in PowerSystemsTestData is merged
-# include(joinpath(DATA_DIR, "118-Bus", "data_118bus.jl"))
+include(joinpath(DATA_DIR, "118-Bus", "data_118bus.jl"))
 
 # These library cases are used for testing purposes the data might not yield functional results
 include("library/matpowertest_library.jl")
