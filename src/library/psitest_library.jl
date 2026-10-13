@@ -2139,6 +2139,11 @@ function build_c_sys5_bat(;
             reserve_bat[2],
             PSY.get_components(PSY.EnergyReservoirStorage, c_sys5_bat),
         )
+        # The shared reserve set holds 100 and 50, which PSY reads as SU. The battery alone
+        # provides these reserves (2.0 SU each way), so use 100 MW and 50 MW. Set them after
+        # add_service!, because the unit conversion needs the system base.
+        PSY.set_requirement!(reserve_bat[1], 1.0 * u"SU")
+        PSY.set_requirement!(reserve_bat[2], 0.5 * u"SU")
         # ORDC
         PSY.add_service!(
             c_sys5_bat,
