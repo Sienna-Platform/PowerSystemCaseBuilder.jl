@@ -2139,6 +2139,11 @@ function build_c_sys5_bat(;
             reserve_bat[2],
             PSY.get_components(PSY.EnergyReservoirStorage, c_sys5_bat),
         )
+        # The shared reserve set holds 100 and 50, which PSY reads as SU. The battery alone
+        # provides these reserves (2.0 SU each way), so use 100 MW and 50 MW. Set them after
+        # add_service!, because the unit conversion needs the system base.
+        PSY.set_requirement!(reserve_bat[1], 1.0 * u"SU")
+        PSY.set_requirement!(reserve_bat[2], 0.5 * u"SU")
         # ORDC
         PSY.add_service!(
             c_sys5_bat,
@@ -5263,7 +5268,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
             active_power_limits = (min = 0.3, max = 0.9),
             reactive_power_limits = nothing,
             ramp_limits = nothing,
-            time_limits = (up = 4, down = 2),
+            time_limits = (up = 240.0, down = 120.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 14.0, 0.0)),
                 0.0,
@@ -5271,7 +5276,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
                 2.0,
             ),
             base_power = 100.0,
-            time_at_status = 2.0,
+            time_at_status = 120.0,
             input_basis = u"CU",
         ),
         PSY.ThermalStandard(;
@@ -5287,7 +5292,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
             active_power_limits = (min = 0.7, max = 2.2),
             reactive_power_limits = nothing,
             ramp_limits = nothing,
-            time_limits = (up = 6, down = 4),
+            time_limits = (up = 360.0, down = 240.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 15.0, 0.0)),
                 0.0,
@@ -5295,7 +5300,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
                 0.75,
             ),
             base_power = 100.0,
-            time_at_status = 3.0,
+            time_at_status = 180.0,
             input_basis = u"CU",
         ),
     ]
@@ -7647,7 +7652,7 @@ function _build_cost_base_test_sys(; kwargs...)
         active_power_limits = (min = 0.0, max = 1.70),
         reactive_power_limits = (min = -1.275, max = 1.275),
         ramp_limits = (up = 0.02 * 2.2125, down = 0.02 * 2.2125),
-        time_limits = (up = 2.0, down = 1.0),
+        time_limits = (up = 120.0, down = 60.0),
         operation_cost = ThermalGenerationCost(CostCurve(LinearCurve(0.23)),
             0.0,
             1.5,

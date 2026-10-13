@@ -584,7 +584,7 @@ function make_modified_RTS_GMLC_sys(
         if PSY.get_fuel(d) == PSY.ThermalFuels.NUCLEAR
             no_ramp = 0.0 * u"CU" / PSY.u"minute"
             PSY.set_ramp_limits!(d, (up = no_ramp, down = no_ramp))
-            PSY.set_time_limits!(d, (up = 4380.0, down = 4380.0))
+            PSY.set_time_limits!(d, (up = 262800.0, down = 262800.0))
         end
     end
     for d in PSY.get_components(PSY.RenewableDispatch, sys)
@@ -991,7 +991,7 @@ function build_two_zone_5_bus(; kwargs...)
             active_power_limits = (min = 0.0, max = 1.70),
             reactive_power_limits = (min = -1.275, max = 1.275),
             ramp_limits = (up = 0.02 * 2.2125, down = 0.02 * 2.2125),
-            time_limits = (up = 2.0, down = 1.0),
+            time_limits = (up = 120.0, down = 60.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 15.0, 0.0)),
                 0.0,
@@ -1014,7 +1014,7 @@ function build_two_zone_5_bus(; kwargs...)
             active_power_limits = (min = 0.0, max = 5.20),
             reactive_power_limits = (min = -3.90, max = 3.90),
             ramp_limits = (up = 0.012 * 5.2, down = 0.012 * 5.2),
-            time_limits = (up = 3.0, down = 2.0),
+            time_limits = (up = 180.0, down = 120.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 30.0, 0.0)),
                 0.0,
@@ -1037,7 +1037,7 @@ function build_two_zone_5_bus(; kwargs...)
             active_power_limits = (min = 0.0, max = 2.0),
             reactive_power_limits = (min = -1.5, max = 1.5),
             ramp_limits = (up = 0.015 * 2.5, down = 0.015 * 2.5),
-            time_limits = (up = 2.0, down = 1.0),
+            time_limits = (up = 120.0, down = 60.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 40.0, 0.0)),
                 0.0,
@@ -1060,7 +1060,7 @@ function build_two_zone_5_bus(; kwargs...)
             active_power_limits = (min = 0.0, max = 6.0),
             reactive_power_limits = (min = -4.50, max = 4.50),
             ramp_limits = (up = 0.015 * 7.5, down = 0.015 * 7.5),
-            time_limits = (up = 5.0, down = 3.0),
+            time_limits = (up = 300.0, down = 180.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 10.0, 0.0)),
                 0.0,
@@ -1106,7 +1106,7 @@ function build_two_zone_5_bus(; kwargs...)
             active_power_limits = (min = 0.0, max = 1.70),
             reactive_power_limits = (min = -1.275, max = 1.275),
             ramp_limits = (up = 0.02 * 2.2125, down = 0.02 * 2.2125),
-            time_limits = (up = 2.0, down = 1.0),
+            time_limits = (up = 120.0, down = 60.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 15.0, 0.0)),
                 0.0,
@@ -1129,7 +1129,7 @@ function build_two_zone_5_bus(; kwargs...)
             active_power_limits = (min = 0.0, max = 5.20),
             reactive_power_limits = (min = -3.90, max = 3.90),
             ramp_limits = (up = 0.012 * 5.2, down = 0.012 * 5.2),
-            time_limits = (up = 3.0, down = 2.0),
+            time_limits = (up = 180.0, down = 120.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 30.0, 0.0)),
                 0.0,
@@ -1152,7 +1152,7 @@ function build_two_zone_5_bus(; kwargs...)
             active_power_limits = (min = 0.0, max = 2.0),
             reactive_power_limits = (min = -1.5, max = 1.5),
             ramp_limits = (up = 0.015 * 2.5, down = 0.015 * 2.5),
-            time_limits = (up = 2.0, down = 1.0),
+            time_limits = (up = 120.0, down = 60.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 40.0, 0.0)),
                 0.0,
@@ -1175,7 +1175,7 @@ function build_two_zone_5_bus(; kwargs...)
             active_power_limits = (min = 0.0, max = 6.0),
             reactive_power_limits = (min = -4.50, max = 4.50),
             ramp_limits = (up = 0.015 * 7.5, down = 0.015 * 7.5),
-            time_limits = (up = 5.0, down = 3.0),
+            time_limits = (up = 300.0, down = 180.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 10.0, 0.0)),
                 0.0,
