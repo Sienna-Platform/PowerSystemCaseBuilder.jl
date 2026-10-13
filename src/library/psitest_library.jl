@@ -5263,7 +5263,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
             active_power_limits = (min = 0.3, max = 0.9),
             reactive_power_limits = nothing,
             ramp_limits = nothing,
-            time_limits = (up = 4, down = 2),
+            time_limits = (up = 240.0, down = 120.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 14.0, 0.0)),
                 0.0,
@@ -5271,7 +5271,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
                 2.0,
             ),
             base_power = 100.0,
-            time_at_status = 2.0,
+            time_at_status = 120.0,
             input_basis = u"CU",
         ),
         PSY.ThermalStandard(;
@@ -5287,7 +5287,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
             active_power_limits = (min = 0.7, max = 2.2),
             reactive_power_limits = nothing,
             ramp_limits = nothing,
-            time_limits = (up = 6, down = 4),
+            time_limits = (up = 360.0, down = 240.0),
             operation_cost = ThermalGenerationCost(
                 CostCurve(QuadraticCurve(0.0, 15.0, 0.0)),
                 0.0,
@@ -5295,7 +5295,7 @@ function build_duration_test_sys(; raw_data, kwargs...)
                 0.75,
             ),
             base_power = 100.0,
-            time_at_status = 3.0,
+            time_at_status = 180.0,
             input_basis = u"CU",
         ),
     ]
@@ -7647,7 +7647,7 @@ function _build_cost_base_test_sys(; kwargs...)
         active_power_limits = (min = 0.0, max = 1.70),
         reactive_power_limits = (min = -1.275, max = 1.275),
         ramp_limits = (up = 0.02 * 2.2125, down = 0.02 * 2.2125),
-        time_limits = (up = 2.0, down = 1.0),
+        time_limits = (up = 120.0, down = 60.0),
         operation_cost = ThermalGenerationCost(CostCurve(LinearCurve(0.23)),
             0.0,
             1.5,
