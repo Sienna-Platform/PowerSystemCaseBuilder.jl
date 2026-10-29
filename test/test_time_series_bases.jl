@@ -18,15 +18,15 @@
 
         for c in get_components(PSB._rebase_to_max_active_power, StaticInjection, raw)
             normalized = get_component(typeof(c), sys, get_name(c))
-            @test get_max_active_power(normalized, CU) ≈ 1.0
-            @test get_max_active_power(normalized, SU) ≈ get_max_active_power(c, SU)
+            @test get_max_active_power(normalized, u"CU") ≈ 1.0
+            @test get_max_active_power(normalized, u"SU") ≈ get_max_active_power(c, u"SU")
         end
 
         # Reserves still scale their series by `requirement`, so they're left alone.
         for r in get_components(has_time_series, PSY.AbstractReserve, raw)
             n_reserves += 1
             normalized = get_component(typeof(r), sys, get_name(r))
-            @test get_requirement(normalized, SU) == get_requirement(r, SU)
+            @test get_requirement(normalized, u"SU") == get_requirement(r, u"SU")
             for md in PSY.IS.list_time_series_metadata(r)
                 @test series_values(normalized, md) == series_values(r, md)
             end
