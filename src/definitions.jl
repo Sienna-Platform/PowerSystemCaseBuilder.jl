@@ -67,6 +67,24 @@ name for the reader to resolve, and leaves the scaling to the consumer.
 per_unit_of(quantity_kind::AbstractString) =
     (unit_system = IS.CU, units = nothing, quantity_kind = quantity_kind)
 
+"""Keyword arguments declaring a time series stored in the natural `units` of its quantity."""
+natural_units(quantity_kind::AbstractString, units::AbstractString) =
+    (unit_system = IS.NU, units = units, quantity_kind = quantity_kind)
+
+"""A water reservoir's inflow and outflow: volume flow in m³/s."""
+const WATER_FLOW = natural_units("volume_flow_rate", "m^3/s")
+
+"""An `ENERGY` reservoir's inflow, outflow and water budget: power in MW."""
+const ENERGY_FLOW = natural_units("active_power", "MW")
+
+"""
+Fixture flows of an `ENERGY` reservoir, in MW for [`ENERGY_FLOW`](@ref). The fixture data
+states them per unit of the system base (`data_5bus_pu.jl`: "per-unit (100MW base)").
+"""
+in_mw(sys::PSY.System, ta::TimeSeries.TimeArray) = ta .* PSY.get_base_power(sys)
+in_mw(sys::PSY.System, data::AbstractDict) =
+    SortedDict{Dates.DateTime, TimeSeries.TimeArray}(k => in_mw(sys, v) for (k, v) in data)
+
 """
 The quantity a profile normalized against a reservoir's storage capacity scales to.
 
@@ -86,3 +104,10 @@ is canonically MWh, with `conversion_factor` scaling a non-MWh medium into it. S
 are energy however the medium is measured.
 """
 reservoir_level_quantity(::PSY.EnergyReservoirStorage) = "energy"
+
+"""
+The field a profile normalized by [`reservoir_level_quantity`](@ref) is a fraction of, passed
+to `add_time_series!` as `base_field`.
+"""
+reservoir_base_field(::PSY.HydroReservoir) = :storage_level_limits
+reservoir_base_field(::PSY.EnergyReservoirStorage) = :storage_capacity
