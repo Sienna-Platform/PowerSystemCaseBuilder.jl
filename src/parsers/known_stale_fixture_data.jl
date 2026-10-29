@@ -35,6 +35,22 @@ const KNOWN_STALE_TIME_SERIES_ROWS = Set([
 ])
 
 """
+Reservoir series filed under a generator that has no reservoir, as (category, component,
+series name). PowerTableDataParser moves a reservoir-normalized series off a turbine onto the
+reservoir feeding it; a `HydroDispatch` has none, so the parser rejects the row. Unlike
+[`KNOWN_STALE_TIME_SERIES_ROWS`](@ref), the component's other series are kept.
+
+PowerSystemsTestData-5.0-dev13: `201_HYDRO_4` (RTS_GMLC/timeseries_pointers.json, the
+run-of-river unit above) and `HydroDispatch2` (5-Bus 5bus_ts/7day/
+timeseries_pointers_da_7day.json).
+"""
+const KNOWN_RESERVOIR_SERIES_WITHOUT_RESERVOIR = Set([
+    ("Generator", "201_HYDRO_4", "inflow"),
+    ("Generator", "201_HYDRO_4", "storage_capacity"),
+    ("Generator", "HydroDispatch2", "inflow"),
+])
+
+"""
 Confirmed stale `scaling_factor_multiplier` names: a getter that exists in PSY but not on
 the component type the pointer row applies it to.
 
@@ -50,7 +66,8 @@ const KNOWN_STALE_SCALING_FACTOR_MULTIPLIERS = Dict(
 
 """
 Return `rawsys` unchanged if it carries no time-series pointer file, or its
-`timeseries_metadata_file` matches nothing in [`KNOWN_STALE_TIME_SERIES_ROWS`](@ref) or
+`timeseries_metadata_file` matches nothing in [`KNOWN_STALE_TIME_SERIES_ROWS`](@ref),
+[`KNOWN_RESERVOIR_SERIES_WITHOUT_RESERVOIR`](@ref) or
 [`KNOWN_STALE_SCALING_FACTOR_MULTIPLIERS`](@ref). Otherwise return a copy pointing at a
 fixed temp copy of the pointer file: known-dangling rows dropped, known-stale multiplier
 names remapped.
@@ -65,7 +82,9 @@ function fix_known_stale_time_series_data(
     rows = JSON.parsefile(path)
     kept = [
         row for row in rows if
-        (row["category"], row["component_name"]) ∉ KNOWN_STALE_TIME_SERIES_ROWS
+        (row["category"], row["component_name"]) ∉ KNOWN_STALE_TIME_SERIES_ROWS &&
+        (row["category"], row["component_name"], row["name"]) ∉
+        KNOWN_RESERVOIR_SERIES_WITHOUT_RESERVOIR
     ]
     fixed = [
         if haskey(row, "scaling_factor_multiplier") &&
