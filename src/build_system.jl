@@ -148,7 +148,7 @@ the `CU` label true without touching the arrays.
 """
 function normalize_time_series_bases!(sys::PSY.System)
     for c in PSY.get_components(_rebase_to_max_active_power, PSY.StaticInjection, sys)
-        max_active_power = PSY.get_max_active_power(c, PSY.NU)
+        max_active_power = PSY.get_max_active_power(c, u"NU")
         PSY.rebase_component!(c, max_active_power; keep_time_series = true)
     end
     return sys
@@ -160,7 +160,7 @@ function _rebase_to_max_active_power(c::PSY.StaticInjection)
     c isa Union{PSY.HybridSystem, PSY.Storage} && return false
     PSY.base_power_kind(c) isa PSY.ComponentBasePower && PSY.has_time_series(c) ||
         return false
-    max_active_power = _max_active_power(c, PSY.CU)
+    max_active_power = _max_active_power(c, u"CU")
     return !isnothing(max_active_power) && !iszero(max_active_power) &&
            !isapprox(max_active_power, 1.0)
 end
