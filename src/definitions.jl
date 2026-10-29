@@ -78,8 +78,9 @@ const WATER_FLOW = natural_units("volume_flow_rate", "m^3/s")
 const ENERGY_FLOW = natural_units("active_power", "MW")
 
 """
-Fixture flows of an `ENERGY` reservoir, in MW for [`ENERGY_FLOW`](@ref). The fixture data
-states them per unit of the system base (`data_5bus_pu.jl`: "per-unit (100MW base)").
+Flows of an `ENERGY` reservoir in the test system data, in MW for [`ENERGY_FLOW`](@ref).
+The test system data states them per unit of the system base (`data_5bus_pu.jl`: "per-unit
+(100MW base)").
 """
 in_mw(sys::PSY.System, ta::TimeSeries.TimeArray) = ta .* PSY.get_base_power(sys)
 in_mw(sys::PSY.System, data::AbstractDict) =
