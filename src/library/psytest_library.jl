@@ -80,7 +80,7 @@ function build_tamu_ACTIVSg2000_sys(; raw_data, kwargs...)
                 normalization_factor = Float64(maximum(loads[!, lname])),
                 per_unit_of("active_power")...,
             )
-            PSY.add_time_series!(sys, component, ts)
+            PSY.add_time_series!(sys, component, ts; base_field = :base_power)
         end
     end
 
