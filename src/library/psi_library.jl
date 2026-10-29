@@ -226,7 +226,8 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
                     "max_active_power",
                     rt_timearray;
                     per_unit_of("active_power")...,
-                ),
+                );
+                base_field = :base_power,
             )
         end
         for (ix, g) in enumerate(sorted_components(RenewableDispatch, c_sys5))
@@ -1302,7 +1303,8 @@ function build_two_zone_5_bus(; kwargs...)
                     data,
                     resolution;
                     per_unit_of("active_power")...,
-                ),
+                );
+                base_field = :base_power,
             )
         elseif occursin("nodeC", PSY.get_name(l))
             data = Dict(DateTime("2020-01-01T00:00:00") => loadbusC_ts_DA)
@@ -1314,7 +1316,8 @@ function build_two_zone_5_bus(; kwargs...)
                     data,
                     resolution;
                     per_unit_of("active_power")...,
-                ),
+                );
+                base_field = :base_power,
             )
         else
             data = Dict(DateTime("2020-01-01T00:00:00") => loadbusD_ts_DA)
@@ -1326,7 +1329,8 @@ function build_two_zone_5_bus(; kwargs...)
                     data,
                     resolution;
                     per_unit_of("active_power")...,
-                ),
+                );
+                base_field = :base_power,
             )
         end
     end
@@ -2146,7 +2150,7 @@ function build_118_bus_DA(; kwargs...)
         ),
     )
     for i in 1:length(wind_generators)
-        add_time_series!(sys, wind_generators[i], wind_DA_TS[i])
+        add_time_series!(sys, wind_generators[i], wind_DA_TS[i]; base_field = :base_power)
     end
     solar_generators = PSY.collect(
         get_components(
@@ -2156,14 +2160,14 @@ function build_118_bus_DA(; kwargs...)
         ),
     )
     for i in 1:length(solar_generators)
-        add_time_series!(sys, solar_generators[i], solar_DA_TS[i])
+        add_time_series!(sys, solar_generators[i], solar_DA_TS[i]; base_field = :base_power)
     end
     loads = power_load118(nodes118())
     for i in 1:3
         region = get_component(Area, sys, "R$i")
         begin_time_series_update(sys) do
             for component in get_components_in_aggregation_topology(PowerLoad, sys, region)
-                add_time_series!(sys, component, load_TS[i])
+                add_time_series!(sys, component, load_TS[i]; base_field = :base_power)
             end
         end
     end
@@ -2273,7 +2277,7 @@ function build_118_bus_RT(; kwargs...)
         region = get_component(Area, sys, "R$i")
         begin_time_series_update(sys) do
             for component in get_components_in_aggregation_topology(PowerLoad, sys, region)
-                add_time_series!(sys, component, load_TS[i])
+                add_time_series!(sys, component, load_TS[i]; base_field = :base_power)
             end
         end
     end
