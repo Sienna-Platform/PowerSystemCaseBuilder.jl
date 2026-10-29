@@ -28,6 +28,8 @@ PowerOperationsOpenAPIModels = "a372b6d7-45a2-44c2-8199-6a724b72e8ff"
 PowerSystemCaseBuilder = {path = ".."}
 InfrastructureSystems = {url = "https://github.com/Sienna-Platform/InfrastructureSystems.jl.git", rev = "IS4"}
 PowerFlowFileParser = {url = "https://github.com/Sienna-Platform/PowerFlowFileParser.jl.git", rev = "psy6"}
-PowerSystems = {url = "https://github.com/Sienna-Platform/PowerSystems.jl.git", rev = "psy6"}
-PowerTableDataParser = {url = "https://github.com/NLR-Sienna/PowerTableDataParser.jl.git", rev = "psy6"}
+# TODO: revert to rev = "psy6" once the PowerSystems time series units PR merges.
+PowerSystems = {url = "https://github.com/Sienna-Platform/PowerSystems.jl.git", rev = "lk/ts-units-prototype"}
+# TODO: revert to NLR-Sienna rev = "psy6" once PowerTableDataParser.jl#18 merges.
+PowerTableDataParser = {url = "https://github.com/luke-kiernan/PowerTableDataParser.jl.git", rev = "lk/ts-translate-multipliers"}
 
