@@ -82,9 +82,14 @@ Flows of an `ENERGY` reservoir in the test system data, in MW for [`ENERGY_FLOW`
 The test system data states them per unit of the system base (`data_5bus_pu.jl`: "per-unit
 (100MW base)").
 """
-in_mw(sys::PSY.System, ta::TimeSeries.TimeArray) = ta .* PSY.get_base_power(sys)
-in_mw(sys::PSY.System, data::AbstractDict) =
-    SortedDict{Dates.DateTime, TimeSeries.TimeArray}(k => in_mw(sys, v) for (k, v) in data)
+in_mw(sys::PSY.System, data) = scaled(data, PSY.get_base_power(sys))
+
+"""Time series data, a `TimeArray` or a forecast's windows, times `factor`."""
+scaled(ta::TimeSeries.TimeArray, factor) = ta .* factor
+scaled(data::AbstractDict, factor) =
+    SortedDict{Dates.DateTime, TimeSeries.TimeArray}(
+        k => scaled(v, factor) for (k, v) in data
+    )
 
 """
 The quantity a profile normalized against a reservoir's storage capacity scales to.
@@ -107,8 +112,26 @@ are energy however the medium is measured.
 reservoir_level_quantity(::PSY.EnergyReservoirStorage) = "energy"
 
 """
-The field a profile normalized by [`reservoir_level_quantity`](@ref) is a fraction of, passed
-to `add_time_series!` as `base_field`.
+How a level profile normalized against its owner's capacity is stored, as the keyword
+arguments [`reservoir_level_labels`](@ref), the values [`reservoir_level_values`](@ref), and
+the `base_field` [`reservoir_base_field`](@ref) passed to `add_time_series!`.
+
+A battery's stays per unit of its `storage_capacity`. PowerSystems takes a reservoir's levels
+in natural units only, so its profile is scaled by `storage_level_limits.max` into the natural
+unit of its level quantity.
 """
-reservoir_base_field(::PSY.HydroReservoir) = :storage_level_limits
+reservoir_level_labels(storage::PSY.EnergyReservoirStorage) =
+    per_unit_of(reservoir_level_quantity(storage))
+function reservoir_level_labels(reservoir::PSY.HydroReservoir)
+    quantity = reservoir_level_quantity(reservoir)
+    return natural_units(quantity, PowerTableDataParser.RESERVOIR_LEVEL_UNITS[quantity])
+end
+
+"""See [`reservoir_level_labels`](@ref)."""
+reservoir_level_values(::PSY.EnergyReservoirStorage, data) = data
+reservoir_level_values(reservoir::PSY.HydroReservoir, data) =
+    scaled(data, PSY.get_storage_level_limits(reservoir).max)
+
+"""See [`reservoir_level_labels`](@ref)."""
 reservoir_base_field(::PSY.EnergyReservoirStorage) = :storage_capacity
+reservoir_base_field(::PSY.HydroReservoir) = nothing

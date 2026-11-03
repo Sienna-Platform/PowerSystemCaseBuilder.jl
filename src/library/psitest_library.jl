@@ -1096,8 +1096,8 @@ function build_c_sys5_hy_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
@@ -1117,8 +1117,8 @@ function build_c_sys5_hy_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "storage_target",
-                        forecast_data_target;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        reservoir_level_values(h, forecast_data_target);
+                        reservoir_level_labels(h)...,
                     );
                     base_field = reservoir_base_field(h),
                 )
@@ -1456,8 +1456,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
@@ -1477,8 +1477,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "storage_target",
-                        forecast_data_target;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        reservoir_level_values(h, forecast_data_target);
+                        reservoir_level_labels(h)...,
                     );
                     base_field = reservoir_base_field(h),
                 )
@@ -1807,8 +1807,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
@@ -1827,8 +1827,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.Deterministic(
                     "storage_target",
-                    forecast_data_target;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, forecast_data_target);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
@@ -2022,8 +2022,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
@@ -2042,8 +2042,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.Deterministic(
                     "storage_target",
-                    forecast_data_target;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, forecast_data_target);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
@@ -3927,8 +3927,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
@@ -3938,8 +3938,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.Deterministic(
                     "storage_target",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, forecast_data);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
@@ -4194,8 +4194,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
@@ -4205,8 +4205,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.Deterministic(
                     "storage_target",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, forecast_data);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
@@ -4507,8 +4507,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 l,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_RT;
-                    per_unit_of(reservoir_level_quantity(l))...,
+                    reservoir_level_values(l, storage_target_single_ts_RT);
+                    reservoir_level_labels(l)...,
                 );
                 base_field = reservoir_base_field(l),
             )
@@ -4519,8 +4519,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     l,
                     PSY.Deterministic(
                         "storage_target",
-                        forecast_data;
-                        per_unit_of(reservoir_level_quantity(l))...,
+                        reservoir_level_values(l, forecast_data);
+                        reservoir_level_labels(l)...,
                     );
                     base_field = reservoir_base_field(l),
                 )
@@ -4821,8 +4821,8 @@ function build_c_sys5_hy_ems_ed(;
                 l,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_RT;
-                    per_unit_of(reservoir_level_quantity(l))...,
+                    reservoir_level_values(l, storage_target_single_ts_RT);
+                    reservoir_level_labels(l)...,
                 );
                 base_field = reservoir_base_field(l),
             )
@@ -4833,8 +4833,8 @@ function build_c_sys5_hy_ems_ed(;
                     l,
                     PSY.Deterministic(
                         "storage_target",
-                        forecast_data;
-                        per_unit_of(reservoir_level_quantity(l))...,
+                        reservoir_level_values(l, forecast_data);
+                        reservoir_level_labels(l)...,
                     );
                     base_field = reservoir_base_field(l),
                 )
@@ -5660,8 +5660,8 @@ function build_c_sys5_bat_ems(;
                 r,
                 Deterministic(
                     "storage_target",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(r))...,
+                    reservoir_level_values(r, forecast_data);
+                    reservoir_level_labels(r)...,
                 );
                 base_field = reservoir_base_field(r),
             )
@@ -5670,8 +5670,8 @@ function build_c_sys5_bat_ems(;
                 r,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(r))...,
+                    reservoir_level_values(r, storage_target_single_ts_DA);
+                    reservoir_level_labels(r)...,
                 );
                 base_field = reservoir_base_field(r),
             )
@@ -6435,8 +6435,8 @@ function build_hydro_test_case_b_sys(; raw_data, kwargs...)
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast_dur = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
+        reservoir_level_values(reservoir, energy_target_data);
+        reservoir_level_labels(reservoir)...,
     )
 
     hydro_test_case_b_sys = PSY.System(100.0; sys_kwargs...)
@@ -6506,8 +6506,8 @@ function build_hydro_test_case_c_sys(; raw_data, kwargs...)
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast_dur = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
+        reservoir_level_values(reservoir, energy_target_data);
+        reservoir_level_labels(reservoir)...,
     )
 
     hydro_test_case_c_sys = PSY.System(100.0; sys_kwargs...)
@@ -6575,8 +6575,8 @@ function build_hydro_test_case_d_sys(; raw_data, kwargs...)
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast_dur = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
+        reservoir_level_values(reservoir, energy_target_data);
+        reservoir_level_labels(reservoir)...,
     )
 
     hydro_test_case_d_sys = PSY.System(100.0; sys_kwargs...)
@@ -6644,8 +6644,8 @@ function build_hydro_test_case_e_sys(; raw_data, kwargs...)
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast_dur = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
+        reservoir_level_values(reservoir, energy_target_data);
+        reservoir_level_labels(reservoir)...,
     )
 
     hydro_test_case_e_sys = PSY.System(100.0; sys_kwargs...)
@@ -6713,8 +6713,8 @@ function build_hydro_test_case_f_sys(; raw_data, kwargs...)
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast_dur = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
+        reservoir_level_values(reservoir, energy_target_data);
+        reservoir_level_labels(reservoir)...,
     )
 
     hydro_test_case_f_sys = PSY.System(100.0; sys_kwargs...)
@@ -6823,8 +6823,8 @@ function build_batt_test_case_b_sys(; raw_data, kwargs...)
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(batt))...,
+        reservoir_level_values(batt, energy_target_data);
+        reservoir_level_labels(batt)...,
     )
 
     batt_test_case_b_sys = PSY.System(100.0; sys_kwargs...)
@@ -6929,8 +6929,8 @@ function build_batt_test_case_c_sys(; raw_data, kwargs...)
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(batt))...,
+        reservoir_level_values(batt, energy_target_data);
+        reservoir_level_labels(batt)...,
     )
 
     batt_test_case_c_sys = PSY.System(100.0; sys_kwargs...)
@@ -7035,8 +7035,8 @@ function build_batt_test_case_d_sys(; raw_data, kwargs...)
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(batt))...,
+        reservoir_level_values(batt, energy_target_data);
+        reservoir_level_labels(batt)...,
     )
 
     batt_test_case_d_sys = PSY.System(100.0; sys_kwargs...)
@@ -7141,8 +7141,8 @@ function build_batt_test_case_e_sys(; raw_data, kwargs...)
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(batt))...,
+        reservoir_level_values(batt, energy_target_data);
+        reservoir_level_labels(batt)...,
     )
 
     batt_test_case_e_sys = PSY.System(100.0; sys_kwargs...)
@@ -7247,8 +7247,8 @@ function build_batt_test_case_f_sys(; raw_data, kwargs...)
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(batt))...,
+        reservoir_level_values(batt, energy_target_data);
+        reservoir_level_labels(batt)...,
     )
 
     batt_test_case_f_sys = PSY.System(100.0; sys_kwargs...)
@@ -7362,8 +7362,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.Deterministic(
                     "storage_target",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, forecast_data);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
@@ -7372,8 +7372,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 );
                 base_field = reservoir_base_field(h),
             )
