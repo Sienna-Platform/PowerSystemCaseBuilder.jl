@@ -225,9 +225,8 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     rt_timearray;
-                    per_unit_of("active_power")...,
-                );
-                base_field = :base_power,
+                    component_base("active_power")...,
+                ),
             )
         end
         for (ix, g) in enumerate(sorted_components(RenewableDispatch, c_sys5))
@@ -1302,9 +1301,8 @@ function build_two_zone_5_bus(; kwargs...)
                     "max_active_power",
                     data,
                     resolution;
-                    per_unit_of("active_power")...,
-                );
-                base_field = :base_power,
+                    component_base("active_power")...,
+                ),
             )
         elseif occursin("nodeC", PSY.get_name(l))
             data = Dict(DateTime("2020-01-01T00:00:00") => loadbusC_ts_DA)
@@ -1315,9 +1313,8 @@ function build_two_zone_5_bus(; kwargs...)
                     "max_active_power",
                     data,
                     resolution;
-                    per_unit_of("active_power")...,
-                );
-                base_field = :base_power,
+                    component_base("active_power")...,
+                ),
             )
         else
             data = Dict(DateTime("2020-01-01T00:00:00") => loadbusD_ts_DA)
@@ -1328,9 +1325,8 @@ function build_two_zone_5_bus(; kwargs...)
                     "max_active_power",
                     data,
                     resolution;
-                    per_unit_of("active_power")...,
-                );
-                base_field = :base_power,
+                    component_base("active_power")...,
+                ),
             )
         end
     end
@@ -2095,7 +2091,7 @@ function build_118_bus_DA(; kwargs...)
         local solar_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = solar_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(solar_DA_TS, solar_TS)
     end
@@ -2108,7 +2104,7 @@ function build_118_bus_DA(; kwargs...)
         local wind_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = wind_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(wind_DA_TS, wind_TS)
     end
@@ -2120,7 +2116,7 @@ function build_118_bus_DA(; kwargs...)
         local load_time_series = SingleTimeSeries(;
             name = "max_active_power",
             data = load_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(load_TS, load_time_series)
     end
@@ -2154,7 +2150,7 @@ function build_118_bus_DA(; kwargs...)
         ),
     )
     for i in 1:length(wind_generators)
-        add_time_series!(sys, wind_generators[i], wind_DA_TS[i]; base_field = :base_power)
+        add_time_series!(sys, wind_generators[i], wind_DA_TS[i])
     end
     solar_generators = PSY.collect(
         get_components(
@@ -2164,14 +2160,14 @@ function build_118_bus_DA(; kwargs...)
         ),
     )
     for i in 1:length(solar_generators)
-        add_time_series!(sys, solar_generators[i], solar_DA_TS[i]; base_field = :base_power)
+        add_time_series!(sys, solar_generators[i], solar_DA_TS[i])
     end
     loads = power_load118(nodes118())
     for i in 1:3
         region = get_component(Area, sys, "R$i")
         begin_time_series_update(sys) do
             for component in get_components_in_aggregation_topology(PowerLoad, sys, region)
-                add_time_series!(sys, component, load_TS[i]; base_field = :base_power)
+                add_time_series!(sys, component, load_TS[i])
             end
         end
     end
@@ -2204,7 +2200,7 @@ function build_118_bus_RT(; kwargs...)
         local solar_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = solar_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(solar_RT_TS, solar_TS)
     end
@@ -2217,7 +2213,7 @@ function build_118_bus_RT(; kwargs...)
         local wind_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = wind_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(wind_RT_TS, wind_TS)
     end
@@ -2229,7 +2225,7 @@ function build_118_bus_RT(; kwargs...)
         local load_time_series = SingleTimeSeries(;
             name = "max_active_power",
             data = load_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(load_TS, load_time_series)
     end
@@ -2281,7 +2277,7 @@ function build_118_bus_RT(; kwargs...)
         region = get_component(Area, sys, "R$i")
         begin_time_series_update(sys) do
             for component in get_components_in_aggregation_topology(PowerLoad, sys, region)
-                add_time_series!(sys, component, load_TS[i]; base_field = :base_power)
+                add_time_series!(sys, component, load_TS[i])
             end
         end
     end

@@ -58,14 +58,21 @@ Replaces `scaling_factor_multiplier`, which InfrastructureSystems removed. A nor
 profile used to be stored bare next to the name of an accessor, and every read multiplied it
 by that accessor's value on the owner. The profile is still stored the same way — one shared
 array many components can point at — but the storage now *declares* what it is:
-`unit_system` says the values are per unit on the component's own base, and `quantity_kind`
-names the physical quantity they scale to. That carries the same meaning without a function
-name for the reader to resolve, and leaves the scaling to the consumer.
+`unit_system` says the values are per unit on the component's own base, `quantity_kind`
+names the physical quantity they scale to, and `per_unit_of` names the component field they
+are a fraction of: `base_power` for power, `storage_capacity` for a battery's energy. That
+carries the same meaning without a function name for the reader to resolve, and leaves the
+scaling to the consumer.
 
 `units` stays `nothing`: a per-unit basis is not a units label.
 """
-per_unit_of(quantity_kind::AbstractString) =
-    (unit_system = IS.CU, units = nothing, quantity_kind = quantity_kind)
+component_base(quantity_kind::AbstractString, per_unit_of::AbstractString = "base_power") =
+    (
+        unit_system = IS.CU,
+        units = nothing,
+        quantity_kind = quantity_kind,
+        per_unit_of = per_unit_of,
+    )
 
 """Keyword arguments declaring a time series stored in the natural `units` of its quantity."""
 natural_units(quantity_kind::AbstractString, units::AbstractString) =
@@ -113,15 +120,14 @@ reservoir_level_quantity(::PSY.EnergyReservoirStorage) = "energy"
 
 """
 How a level profile normalized against its owner's capacity is stored, as the keyword
-arguments [`reservoir_level_labels`](@ref), the values [`reservoir_level_values`](@ref), and
-the `base_field` [`reservoir_base_field`](@ref) passed to `add_time_series!`.
+arguments [`reservoir_level_labels`](@ref) and the values [`reservoir_level_values`](@ref).
 
 A battery's stays per unit of its `storage_capacity`. PowerSystems takes a reservoir's levels
 in natural units only, so its profile is scaled by `storage_level_limits.max` into the natural
 unit of its level quantity.
 """
 reservoir_level_labels(storage::PSY.EnergyReservoirStorage) =
-    per_unit_of(reservoir_level_quantity(storage))
+    component_base(reservoir_level_quantity(storage), "storage_capacity")
 function reservoir_level_labels(reservoir::PSY.HydroReservoir)
     quantity = reservoir_level_quantity(reservoir)
     return natural_units(quantity, PowerTableDataParser.RESERVOIR_LEVEL_UNITS[quantity])
@@ -131,7 +137,3 @@ end
 reservoir_level_values(::PSY.EnergyReservoirStorage, data) = data
 reservoir_level_values(reservoir::PSY.HydroReservoir, data) =
     scaled(data, PSY.get_storage_level_limits(reservoir).max)
-
-"""See [`reservoir_level_labels`](@ref)."""
-reservoir_base_field(::PSY.EnergyReservoirStorage) = :storage_capacity
-reservoir_base_field(::PSY.HydroReservoir) = nothing
