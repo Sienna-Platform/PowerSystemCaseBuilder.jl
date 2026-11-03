@@ -1,4 +1,5 @@
 [deps]
+InfraStore = "6aee0376-896a-4a59-96ff-12f221c99746"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
@@ -26,7 +27,11 @@ PowerOperationsOpenAPIModels = "a372b6d7-45a2-44c2-8199-6a724b72e8ff"
 
 [sources]
 PowerSystemCaseBuilder = {path = ".."}
-InfrastructureSystems = {url = "https://github.com/Sienna-Platform/InfrastructureSystems.jl.git", rev = "IS4"}
+# TODO: back to IS4, and drop the InfraStore and time series model pins, once those
+# release `per_unit_of`.
+InfrastructureSystems = {url = "https://github.com/Sienna-Platform/InfrastructureSystems.jl.git", rev = "lk/per-unit-of"}
+InfraStore = {url = "https://github.com/NatLabRockies/infrastore.git", rev = "lk/per-unit-of", subdir = "julia/InfraStore.jl"}
+InfrastructureTimeSeriesOpenAPIModels = {url = "https://github.com/Sienna-Platform/PowerOpenAPIModels.git", rev = "lk/per-unit-of", subdir = "InfrastructureTimeSeriesOpenAPIModels.jl"}
 PowerFlowFileParser = {url = "https://github.com/Sienna-Platform/PowerFlowFileParser.jl.git", rev = "psy6"}
 # TODO: revert to rev = "psy6" once the PowerSystems time series units PR merges.
 PowerSystems = {url = "https://github.com/Sienna-Platform/PowerSystems.jl.git", rev = "lk/ts-units-prototype"}
