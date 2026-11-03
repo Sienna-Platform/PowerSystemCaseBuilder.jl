@@ -24,7 +24,7 @@ SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 TimeSeries = "9e3dc215-6440-5c97-bce1-76c03772f85e"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
-# PowerSystems depends on these packages. They sit in [deps] only to require the 0.2 release.
+# PowerSystems depends on these packages. They sit in [deps] only to require the 0.4 release.
 InfrastructureCoreOpenAPIModels = "1f5e1c8d-e0cc-4dbf-8c6d-f2a3d2ae70a8"
 InfrastructureTimeSeriesOpenAPIModels = "37a216c8-a490-47cf-89d7-db2cb9618199"
 PowerCoreOpenAPIModels = "b7b40286-e793-417d-a9a0-b1583e4da1cb"
@@ -34,10 +34,10 @@ PowerOpenAPIModels = "0730f07c-cff6-4c3b-a9df-c546153be50a"
 PowerOperationsOpenAPIModels = "a372b6d7-45a2-44c2-8199-6a724b72e8ff"
 
 [sources]
-InfrastructureSystems = {url = "https://github.com/Sienna-Platform/InfrastructureSystems.jl.git", rev = "jd/sdk-0.3"}
-PowerFlowFileParser = {url = "https://github.com/Sienna-Platform/PowerFlowFileParser.jl.git", rev = "jd/sdk-0.3"}
-PowerSystems = {url = "https://github.com/Sienna-Platform/PowerSystems.jl.git", rev = "jd/sdk-0.3"}
-PowerTableDataParser = {url = "https://github.com/NLR-Sienna/PowerTableDataParser.jl.git", rev = "jd/sdk-0.3"}
+InfrastructureSystems = {url = "https://github.com/Sienna-Platform/InfrastructureSystems.jl.git", rev = "IS4"}
+PowerFlowFileParser = {url = "https://github.com/Sienna-Platform/PowerFlowFileParser.jl.git", rev = "psy6"}
+PowerSystems = {url = "https://github.com/Sienna-Platform/PowerSystems.jl.git", rev = "psy6"}
+PowerTableDataParser = {url = "https://github.com/NLR-Sienna/PowerTableDataParser.jl.git", rev = "psy6"}
 
 [compat]
 CSV = "~0.10"
