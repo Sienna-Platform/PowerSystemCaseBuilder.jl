@@ -2007,6 +2007,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             loss_function = PSY.LossCurve(
                 PSY.QuadraticCurve(c_pu[ix], b_pu[ix], a_pu[ix]),
                 PSY.NaturalUnit(),
+                u"kA",
             ),
             # The first converter is the grid's DC-voltage slack; the rest hold DC power.
             dc_control = if ix == 1
@@ -2042,6 +2043,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             loss_function = PSY.LossCurve(
                 PSY.QuadraticCurve(c_pu_9T, b_pu_9T, a_pu_9T),
                 PSY.NaturalUnit(),
+                u"kA",
             ),
             dc_control = if ix == 1
                 PSY.VSCDCControlModes.DC_VOLTAGE
