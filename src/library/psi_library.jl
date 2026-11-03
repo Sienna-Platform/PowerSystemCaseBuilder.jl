@@ -1334,6 +1334,8 @@ function build_two_zone_5_bus(; kwargs...)
 end
 
 const COST_PERTURBATION_NOISE_SEED = 1357
+# Upper bound of the heat-rate noise, in MMBtu/MWh: about 1% of an RTS heat rate.
+const HEAT_RATE_NOISE = 0.1
 
 """
 Clear a detached component's id so the system it is added to next mints a fresh one.
@@ -1624,7 +1626,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         old_slopes = get_slopes(old_value_curve)
         new_slopes = zeros(size(old_slopes))
         noise_val, rand_ix = iterate(noise_values, rand_ix)
-        cost_noise = round(100.0 * noise_val; digits = 2)
+        cost_noise = round(HEAT_RATE_NOISE * noise_val; digits = 5)
         get_initial_input(old_value_curve)
         old_y =
             get_initial_input(old_value_curve) /
@@ -1637,7 +1639,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
         for ix in 2:length(old_slopes)
             while new_slopes[ix - 1] > new_slopes[ix]
                 noise_val, rand_ix = iterate(noise_values, rand_ix)
-                cost_noise = round(100.0 * noise_val; digits = 2)
+                cost_noise = round(HEAT_RATE_NOISE * noise_val; digits = 5)
                 new_slopes[ix] = old_slopes[ix] + cost_noise
             end
         end
@@ -2005,6 +2007,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             loss_function = PSY.LossCurve(
                 PSY.QuadraticCurve(c_pu[ix], b_pu[ix], a_pu[ix]),
                 PSY.NaturalUnit(),
+                u"kA",
             ),
             # The first converter is the grid's DC-voltage slack; the rest hold DC power.
             dc_control = if ix == 1
@@ -2040,6 +2043,7 @@ function build_MTHVDC_two_RTS_DA_sys_noForecast(; kwargs...)
             loss_function = PSY.LossCurve(
                 PSY.QuadraticCurve(c_pu_9T, b_pu_9T, a_pu_9T),
                 PSY.NaturalUnit(),
+                u"kA",
             ),
             dc_control = if ix == 1
                 PSY.VSCDCControlModes.DC_VOLTAGE
