@@ -2,6 +2,7 @@
     catalog = SystemCatalog(SYSTEM_CATALOG)
     series_values(c, md) =
         get_time_series_values(c, get_time_series(c, PSY.IS.get_time_series_key(md)))
+    n_devices = 0
     n_reserves = 0
     for (category, name, kwargs) in (
         (PSITestSystems, "c_sys5_uc", (add_reserves = true,)),
@@ -20,6 +21,11 @@
             normalized = get_component(typeof(c), sys, get_name(c))
             @test get_max_active_power(normalized, u"CU") ≈ 1.0
             @test get_max_active_power(normalized, u"SU") ≈ get_max_active_power(c, u"SU")
+            # The arrays are kept as they are: an operations model reads the same inputs.
+            n_devices += 1
+            for md in PSY.IS.list_time_series_metadata(c)
+                @test series_values(normalized, md) == series_values(c, md)
+            end
         end
 
         # Reserves still scale their series by `requirement`, so they're left alone.
@@ -32,5 +38,6 @@
             end
         end
     end
+    @test n_devices > 0
     @test n_reserves > 0
 end

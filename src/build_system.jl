@@ -131,6 +131,9 @@ function _build_system(
         end
         sys =
             PSY.from_file(get_serialized_filepath(name, case_args); sys_args...)
+        # A cache written before normalization existed still needs it; a normalized one is
+        # left as is.
+        normalize_time_series_bases!(sys)
         PSY.get_runchecks(sys)
         # update_stats!(sys_descriptor, time() - start)
     end
