@@ -62,7 +62,7 @@ function build_c_sys14(; add_forecasts, add_single_time_series, raw_data, kwargs
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     single_timeseries_DA14[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -73,7 +73,7 @@ function build_c_sys14(; add_forecasts, add_single_time_series, raw_data, kwargs
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -109,7 +109,7 @@ function build_c_sys14_dc(; add_forecasts, add_single_time_series, raw_data, kwa
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     single_timeseries_DA14[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -120,7 +120,7 @@ function build_c_sys14_dc(; add_forecasts, add_single_time_series, raw_data, kwa
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -201,7 +201,7 @@ function build_c_sys14_hvdc_vsc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     single_timeseries_DA14[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -212,7 +212,7 @@ function build_c_sys14_hvdc_vsc(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -295,7 +295,7 @@ function build_c_sys14_hvdc_lcc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     single_timeseries_DA14[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -306,7 +306,7 @@ function build_c_sys14_hvdc_lcc(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -341,7 +341,7 @@ function build_c_sys5(; add_forecasts, add_single_time_series, raw_data, kwargs.
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -352,7 +352,7 @@ function build_c_sys5(; add_forecasts, add_single_time_series, raw_data, kwargs.
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -388,7 +388,7 @@ function build_c_sys5_ml(; add_forecasts, add_single_time_series, raw_data, kwar
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -399,7 +399,7 @@ function build_c_sys5_ml(; add_forecasts, add_single_time_series, raw_data, kwar
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -449,7 +449,7 @@ function build_c_sys5_re(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -460,7 +460,7 @@ function build_c_sys5_re(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -479,7 +479,7 @@ function build_c_sys5_re(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -490,7 +490,7 @@ function build_c_sys5_re(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -585,7 +585,7 @@ function build_c_sys5_re_fuel_cost(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -596,7 +596,7 @@ function build_c_sys5_re_fuel_cost(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -615,7 +615,7 @@ function build_c_sys5_re_fuel_cost(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -626,7 +626,7 @@ function build_c_sys5_re_fuel_cost(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -753,7 +753,7 @@ function build_c_sys5_re_only(; add_forecasts, add_single_time_series, raw_data,
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -764,7 +764,7 @@ function build_c_sys5_re_only(; add_forecasts, add_single_time_series, raw_data,
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -783,7 +783,7 @@ function build_c_sys5_re_only(; add_forecasts, add_single_time_series, raw_data,
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -794,7 +794,7 @@ function build_c_sys5_re_only(; add_forecasts, add_single_time_series, raw_data,
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -837,7 +837,7 @@ function build_c_sys5_hy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -848,7 +848,7 @@ function build_c_sys5_hy(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -867,7 +867,7 @@ function build_c_sys5_hy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -878,7 +878,7 @@ function build_c_sys5_hy(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -964,7 +964,7 @@ function build_c_sys5_hy_turbine_energy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -975,7 +975,7 @@ function build_c_sys5_hy_turbine_energy(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -994,7 +994,7 @@ function build_c_sys5_hy_turbine_energy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -1005,7 +1005,7 @@ function build_c_sys5_hy_turbine_energy(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -1022,9 +1022,9 @@ function build_c_sys5_hy_turbine_energy(;
                 c_sys5_hyd,
                 h,
                 PSY.SingleTimeSeries(
-                    "max_active_power",
-                    hydro_budget_single_ts_DA;
-                    per_unit_of("active_power")...,
+                    "hydro_budget",
+                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
+                    ENERGY_FLOW...,
                 ),
             )
         else
@@ -1034,8 +1034,8 @@ function build_c_sys5_hy_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        forecast_data;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        in_mw(c_sys5_hyd, forecast_data);
+                        ENERGY_FLOW...,
                     ),
                 )
             end
@@ -1055,8 +1055,8 @@ function build_c_sys5_hy_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    hydro_single_timeseries_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    ENERGY_FLOW...,
                 ),
             )
             PSY.add_time_series!(
@@ -1064,8 +1064,8 @@ function build_c_sys5_hy_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         else
@@ -1075,8 +1075,8 @@ function build_c_sys5_hy_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "inflow",
-                        forecast_data_inflow;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        in_mw(c_sys5_hyd, forecast_data_inflow);
+                        ENERGY_FLOW...,
                     ),
                 )
                 PSY.add_time_series!(
@@ -1084,8 +1084,8 @@ function build_c_sys5_hy_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "storage_target",
-                        forecast_data_target;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        reservoir_level_values(h, forecast_data_target);
+                        reservoir_level_labels(h)...,
                     ),
                 )
             end
@@ -1171,7 +1171,7 @@ function build_c_sys5_hy_turbine_head(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -1182,7 +1182,7 @@ function build_c_sys5_hy_turbine_head(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -1203,13 +1203,13 @@ function build_c_sys5_hy_turbine_head(;
                 PSY.SingleTimeSeries(
                     "inflow",
                     inflow_single_ts_DA_water;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    WATER_FLOW...,
                 ),
             )
             PSY.add_time_series!(
                 c_sys5_hyd,
                 h,
-                PSY.SingleTimeSeries("outflow", outflow_single_ts_DA_water),
+                PSY.SingleTimeSeries("outflow", outflow_single_ts_DA_water; WATER_FLOW...),
             )
         else
             if add_forecasts
@@ -1219,13 +1219,13 @@ function build_c_sys5_hy_turbine_head(;
                     PSY.Deterministic(
                         "inflow",
                         forecast_data_inflow;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        WATER_FLOW...,
                     ),
                 )
                 PSY.add_time_series!(
                     c_sys5_hyd,
                     h,
-                    PSY.Deterministic("outflow", forecast_data_outflow),
+                    PSY.Deterministic("outflow", forecast_data_outflow; WATER_FLOW...),
                 )
             end
         end
@@ -1316,7 +1316,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -1327,7 +1327,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -1346,7 +1346,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -1357,7 +1357,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -1375,8 +1375,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    hydro_budget_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
+                    ENERGY_FLOW...,
                 ),
             )
         else
@@ -1386,8 +1386,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        forecast_data;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        in_mw(c_sys5_hyd, forecast_data);
+                        ENERGY_FLOW...,
                     ),
                 )
             end
@@ -1407,8 +1407,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    hydro_single_timeseries_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    ENERGY_FLOW...,
                 ),
             )
             PSY.add_time_series!(
@@ -1416,8 +1416,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         else
@@ -1427,8 +1427,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "inflow",
-                        forecast_data_inflow;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        in_mw(c_sys5_hyd, forecast_data_inflow);
+                        ENERGY_FLOW...,
                     ),
                 )
                 PSY.add_time_series!(
@@ -1436,8 +1436,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "storage_target",
-                        forecast_data_target;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        reservoir_level_values(h, forecast_data_target);
+                        reservoir_level_labels(h)...,
                     ),
                 )
             end
@@ -1528,7 +1528,7 @@ function build_c_sys5_hy_cascading_turbine_head(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -1539,7 +1539,7 @@ function build_c_sys5_hy_cascading_turbine_head(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -1560,13 +1560,13 @@ function build_c_sys5_hy_cascading_turbine_head(;
                 PSY.SingleTimeSeries(
                     "inflow",
                     inflow_single_ts_DA_water;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    WATER_FLOW...,
                 ),
             )
             PSY.add_time_series!(
                 c_sys5_hyd,
                 h,
-                PSY.SingleTimeSeries("outflow", outflow_single_ts_DA_water),
+                PSY.SingleTimeSeries("outflow", outflow_single_ts_DA_water; WATER_FLOW...),
             )
         else
             if add_forecasts
@@ -1576,13 +1576,13 @@ function build_c_sys5_hy_cascading_turbine_head(;
                     PSY.Deterministic(
                         "inflow",
                         forecast_data_inflow;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        WATER_FLOW...,
                     ),
                 )
                 PSY.add_time_series!(
                     c_sys5_hyd,
                     h,
-                    PSY.Deterministic("outflow", forecast_data_outflow),
+                    PSY.Deterministic("outflow", forecast_data_outflow; WATER_FLOW...),
                 )
             end
         end
@@ -1665,7 +1665,7 @@ function build_c_sys5_hyd(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -1675,7 +1675,7 @@ function build_c_sys5_hyd(;
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -1693,7 +1693,7 @@ function build_c_sys5_hyd(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -1703,7 +1703,7 @@ function build_c_sys5_hyd(;
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -1720,8 +1720,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    hydro_budget_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
+                    ENERGY_FLOW...,
                 ),
             )
         elseif add_forecasts
@@ -1730,8 +1730,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hyd, forecast_data);
+                    ENERGY_FLOW...,
                 ),
             )
         end
@@ -1750,8 +1750,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    hydro_single_timeseries_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    ENERGY_FLOW...,
                 ),
             )
             PSY.add_time_series!(
@@ -1759,8 +1759,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         elseif add_forecasts
@@ -1769,8 +1769,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    forecast_data_inflow;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hyd, forecast_data_inflow);
+                    ENERGY_FLOW...,
                 ),
             )
             PSY.add_time_series!(
@@ -1778,8 +1778,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.Deterministic(
                     "storage_target",
-                    forecast_data_target;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, forecast_data_target);
+                    reservoir_level_labels(h)...,
                 ),
             )
         end
@@ -1874,7 +1874,7 @@ function build_c_sys5_hyd_ems(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -1884,7 +1884,7 @@ function build_c_sys5_hyd_ems(;
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -1902,7 +1902,7 @@ function build_c_sys5_hyd_ems(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -1912,7 +1912,7 @@ function build_c_sys5_hyd_ems(;
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -1929,8 +1929,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    hydro_budget_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
+                    ENERGY_FLOW...,
                 ),
             )
         elseif add_forecasts
@@ -1939,8 +1939,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hyd, forecast_data);
+                    ENERGY_FLOW...,
                 ),
             )
         end
@@ -1959,8 +1959,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    hydro_single_timeseries_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    ENERGY_FLOW...,
                 ),
             )
             PSY.add_time_series!(
@@ -1968,8 +1968,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         elseif add_forecasts
@@ -1978,8 +1978,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    forecast_data_inflow;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hyd, forecast_data_inflow);
+                    ENERGY_FLOW...,
                 ),
             )
             PSY.add_time_series!(
@@ -1987,8 +1987,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.Deterministic(
                     "storage_target",
-                    forecast_data_target;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, forecast_data_target);
+                    reservoir_level_labels(h)...,
                 ),
             )
         end
@@ -2081,7 +2081,7 @@ function build_c_sys5_bat(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -2092,7 +2092,7 @@ function build_c_sys5_bat(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -2111,7 +2111,7 @@ function build_c_sys5_bat(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -2122,7 +2122,7 @@ function build_c_sys5_bat(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -2224,7 +2224,7 @@ function build_c_sys5_hydro_pump_energy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -2235,7 +2235,7 @@ function build_c_sys5_hydro_pump_energy(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -2254,7 +2254,7 @@ function build_c_sys5_hydro_pump_energy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -2265,7 +2265,7 @@ function build_c_sys5_hydro_pump_energy(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -2368,7 +2368,7 @@ function build_c_sys5_hydro_pump_energy(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data_power;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
                 PSY.add_time_series!(
@@ -2416,7 +2416,7 @@ function build_c_sys5_il(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -2426,7 +2426,7 @@ function build_c_sys5_il(;
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -2444,7 +2444,7 @@ function build_c_sys5_il(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -2454,7 +2454,7 @@ function build_c_sys5_il(;
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -2541,7 +2541,7 @@ function build_c_sys5_dc(; add_forecasts, add_single_time_series, raw_data, kwar
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -2552,7 +2552,7 @@ function build_c_sys5_dc(; add_forecasts, add_single_time_series, raw_data, kwar
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -2571,7 +2571,7 @@ function build_c_sys5_dc(; add_forecasts, add_single_time_series, raw_data, kwar
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -2582,7 +2582,7 @@ function build_c_sys5_dc(; add_forecasts, add_single_time_series, raw_data, kwar
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -2707,7 +2707,7 @@ function build_c_sys5_events(; add_forecasts, raw_data, sys_kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -2842,7 +2842,7 @@ function build_c_sys5_events_rt(; add_forecasts, raw_data, sys_kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     rt_timearray;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -2856,7 +2856,7 @@ function build_c_sys5_events_rt(; add_forecasts, raw_data, sys_kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_RT;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -2912,7 +2912,7 @@ function build_c_sys5_reg(; add_forecasts, raw_data, kwargs...)
             PSY.add_time_series!(
                 c_sys5_reg,
                 l,
-                PSY.Deterministic("max_active_power", forecast_data; per_unit_of("active_power")...),
+                PSY.Deterministic("max_active_power", forecast_data; component_base("active_power")...),
             )
         end
         for (_, l) in enumerate(sorted_components(PSY.ThermalStandard, c_sys5_reg))
@@ -2924,7 +2924,7 @@ function build_c_sys5_reg(; add_forecasts, raw_data, kwargs...)
             PSY.add_time_series!(
                 c_sys5_reg,
                 l,
-                PSY.Deterministic("max_active_power", forecast_data; per_unit_of("active_power")...),
+                PSY.Deterministic("max_active_power", forecast_data; component_base("active_power")...),
             )
         end
     end
@@ -3023,7 +3023,7 @@ function build_sys_ramp_testing(; raw_data, kwargs...)
         "max_active_power",
         ts_dict,
         Hour(1);
-        per_unit_of("active_power")...,
+        component_base("active_power")...,
     )
     ramp_test_sys = PSY.System(100.0, sys_kwargs...)
     PSY.add_component!(ramp_test_sys, node)
@@ -3081,7 +3081,7 @@ function build_sys_10bus_ac_dc(; raw_data, kwargs...)
                     "max_active_power",
                     data,
                     resolution;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif occursin("nodeC", PSY.get_name(l))
@@ -3093,7 +3093,7 @@ function build_sys_10bus_ac_dc(; raw_data, kwargs...)
                     "max_active_power",
                     data,
                     resolution;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -3105,7 +3105,7 @@ function build_sys_10bus_ac_dc(; raw_data, kwargs...)
                     "max_active_power",
                     data,
                     resolution;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -3145,7 +3145,7 @@ function build_c_sys5_uc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -3156,7 +3156,7 @@ function build_c_sys5_uc(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -3252,7 +3252,7 @@ function build_c_sys5_uc_non_spin(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -3263,7 +3263,7 @@ function build_c_sys5_uc_non_spin(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -3391,7 +3391,7 @@ function build_c_sys5_uc_re(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -3402,7 +3402,7 @@ function build_c_sys5_uc_re(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -3421,7 +3421,7 @@ function build_c_sys5_uc_re(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -3432,7 +3432,7 @@ function build_c_sys5_uc_re(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -3451,7 +3451,7 @@ function build_c_sys5_uc_re(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -3462,7 +3462,7 @@ function build_c_sys5_uc_re(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -3569,7 +3569,7 @@ function build_c_sys5_ed(; add_forecasts, add_single_time_series, add_reserves, 
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_RT[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -3580,7 +3580,7 @@ function build_c_sys5_ed(; add_forecasts, add_single_time_series, add_reserves, 
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -3603,7 +3603,7 @@ function build_c_sys5_ed(; add_forecasts, add_single_time_series, add_reserves, 
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -3614,7 +3614,7 @@ function build_c_sys5_ed(; add_forecasts, add_single_time_series, add_reserves, 
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -3637,7 +3637,7 @@ function build_c_sys5_ed(; add_forecasts, add_single_time_series, add_reserves, 
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_RT;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -3648,7 +3648,7 @@ function build_c_sys5_ed(; add_forecasts, add_single_time_series, add_reserves, 
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -3769,7 +3769,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -3780,7 +3780,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -3799,7 +3799,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -3809,7 +3809,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -3826,8 +3826,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         elseif add_forecasts
@@ -3836,8 +3836,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.Deterministic(
                     "storage_target",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, forecast_data);
+                    reservoir_level_labels(h)...,
                 ),
             )
         end
@@ -3854,8 +3854,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    hydro_single_timeseries_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hy_uc, hydro_single_timeseries_DA);
+                    ENERGY_FLOW...,
                 ),
             )
         elseif add_forecasts
@@ -3864,8 +3864,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hy_uc, forecast_data);
+                    ENERGY_FLOW...,
                 ),
             )
         end
@@ -3882,8 +3882,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    hydro_budget_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hy_uc, hydro_budget_single_ts_DA);
+                    ENERGY_FLOW...,
                 ),
             )
         elseif add_forecasts
@@ -3892,8 +3892,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hy_uc, forecast_data);
+                    ENERGY_FLOW...,
                 ),
             )
         end
@@ -3911,7 +3911,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -3921,7 +3921,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -3939,7 +3939,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -3949,7 +3949,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -3968,7 +3968,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -3978,7 +3978,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -4024,7 +4024,7 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4035,7 +4035,7 @@ function build_c_sys5_hy_ems_uc(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4054,7 +4054,7 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -4064,7 +4064,7 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -4081,8 +4081,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         elseif add_forecasts
@@ -4091,8 +4091,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.Deterministic(
                     "storage_target",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, forecast_data);
+                    reservoir_level_labels(h)...,
                 ),
             )
         end
@@ -4109,8 +4109,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    hydro_single_timeseries_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hy_uc, hydro_single_timeseries_DA);
+                    ENERGY_FLOW...,
                 ),
             )
         elseif add_forecasts
@@ -4119,8 +4119,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hy_uc, forecast_data);
+                    ENERGY_FLOW...,
                 ),
             )
         end
@@ -4137,8 +4137,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    hydro_budget_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hy_uc, hydro_budget_single_ts_DA);
+                    ENERGY_FLOW...,
                 ),
             )
         elseif add_forecasts
@@ -4147,8 +4147,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hy_uc, forecast_data);
+                    ENERGY_FLOW...,
                 ),
             )
         end
@@ -4166,7 +4166,7 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -4176,7 +4176,7 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -4194,7 +4194,7 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -4204,7 +4204,7 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -4223,7 +4223,7 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif add_forecasts
@@ -4233,7 +4233,7 @@ function build_c_sys5_hy_ems_uc(;
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -4279,7 +4279,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_RT[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4290,7 +4290,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4313,7 +4313,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_RT;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4324,7 +4324,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4347,7 +4347,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4358,7 +4358,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4380,8 +4380,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 l,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_RT;
-                    per_unit_of(reservoir_level_quantity(l))...,
+                    reservoir_level_values(l, storage_target_single_ts_RT);
+                    reservoir_level_labels(l)...,
                 ),
             )
         else
@@ -4391,8 +4391,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     l,
                     PSY.Deterministic(
                         "storage_target",
-                        forecast_data;
-                        per_unit_of(reservoir_level_quantity(l))...,
+                        reservoir_level_values(l, forecast_data);
+                        reservoir_level_labels(l)...,
                     ),
                 )
             end
@@ -4414,8 +4414,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 l,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    hydro_single_timeseries_RT;
-                    per_unit_of(reservoir_level_quantity(l))...,
+                    in_mw(c_sys5_hy_ed, hydro_single_timeseries_RT);
+                    ENERGY_FLOW...,
                 ),
             )
         else
@@ -4425,8 +4425,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     l,
                     PSY.Deterministic(
                         "inflow",
-                        forecast_data;
-                        per_unit_of(reservoir_level_quantity(l))...,
+                        in_mw(c_sys5_hy_ed, forecast_data);
+                        ENERGY_FLOW...,
                     ),
                 )
             end
@@ -4448,8 +4448,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    hydro_budget_single_ts_RT;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hy_ed, hydro_budget_single_ts_RT);
+                    ENERGY_FLOW...,
                 ),
             )
         else
@@ -4459,8 +4459,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        forecast_data;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        in_mw(c_sys5_hy_ed, forecast_data);
+                        ENERGY_FLOW...,
                     ),
                 )
             end
@@ -4484,7 +4484,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_RT;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4495,7 +4495,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4518,7 +4518,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_RT;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4529,7 +4529,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4581,7 +4581,7 @@ function build_c_sys5_hy_ems_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_RT[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4592,7 +4592,7 @@ function build_c_sys5_hy_ems_ed(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4615,7 +4615,7 @@ function build_c_sys5_hy_ems_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_RT;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4626,7 +4626,7 @@ function build_c_sys5_hy_ems_ed(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4649,7 +4649,7 @@ function build_c_sys5_hy_ems_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4660,7 +4660,7 @@ function build_c_sys5_hy_ems_ed(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4682,8 +4682,8 @@ function build_c_sys5_hy_ems_ed(;
                 l,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_RT;
-                    per_unit_of(reservoir_level_quantity(l))...,
+                    reservoir_level_values(l, storage_target_single_ts_RT);
+                    reservoir_level_labels(l)...,
                 ),
             )
         else
@@ -4693,8 +4693,8 @@ function build_c_sys5_hy_ems_ed(;
                     l,
                     PSY.Deterministic(
                         "storage_target",
-                        forecast_data;
-                        per_unit_of(reservoir_level_quantity(l))...,
+                        reservoir_level_values(l, forecast_data);
+                        reservoir_level_labels(l)...,
                     ),
                 )
             end
@@ -4716,8 +4716,8 @@ function build_c_sys5_hy_ems_ed(;
                 l,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    hydro_single_timeseries_RT;
-                    per_unit_of(reservoir_level_quantity(l))...,
+                    in_mw(c_sys5_hy_ed, hydro_single_timeseries_RT);
+                    ENERGY_FLOW...,
                 ),
             )
         else
@@ -4727,8 +4727,8 @@ function build_c_sys5_hy_ems_ed(;
                     l,
                     PSY.Deterministic(
                         "inflow",
-                        forecast_data;
-                        per_unit_of(reservoir_level_quantity(l))...,
+                        in_mw(c_sys5_hy_ed, forecast_data);
+                        ENERGY_FLOW...,
                     ),
                 )
             end
@@ -4750,8 +4750,8 @@ function build_c_sys5_hy_ems_ed(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    hydro_budget_single_ts_RT;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_hy_ed, hydro_budget_single_ts_RT);
+                    ENERGY_FLOW...,
                 ),
             )
         else
@@ -4761,8 +4761,8 @@ function build_c_sys5_hy_ems_ed(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        forecast_data;
-                        per_unit_of(reservoir_level_quantity(h))...,
+                        in_mw(c_sys5_hy_ed, forecast_data);
+                        ENERGY_FLOW...,
                     ),
                 )
             end
@@ -4786,7 +4786,7 @@ function build_c_sys5_hy_ems_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_RT;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4797,7 +4797,7 @@ function build_c_sys5_hy_ems_ed(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4820,7 +4820,7 @@ function build_c_sys5_hy_ems_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_RT;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4831,7 +4831,7 @@ function build_c_sys5_hy_ems_ed(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4885,7 +4885,7 @@ function build_c_sys5_phes_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_RT[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4896,7 +4896,7 @@ function build_c_sys5_phes_ed(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4919,7 +4919,7 @@ function build_c_sys5_phes_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_RT;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4930,7 +4930,7 @@ function build_c_sys5_phes_ed(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -4953,7 +4953,7 @@ function build_c_sys5_phes_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -4964,44 +4964,8 @@ function build_c_sys5_phes_ed(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
-                )
-            end
-        end
-    end
-    for (ix, l) in enumerate(sorted_components(PSY.HydroPumpTurbine, c_sys5_phes_ed))
-        forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
-        for t in 1:2
-            ta = hydro_timeseries_DA[t][ix]
-            for i in 1:length(ta)
-                ini_time = timestamp(ta[i])
-                data = when(hydro_timeseries_RT[t][ix], hour, hour(ini_time[1]))
-                forecast_data[ini_time[1]] = data
-            end
-        end
-        if add_single_time_series
-            PSY.add_time_series!(
-                c_sys5_phes_ed,
-                head_reservoir,
-                PSY.SingleTimeSeries("initial_level", hydro_single_timeseries_RT),
-            )
-            PSY.add_time_series!(
-                c_sys5_phes_ed,
-                tail_reservoir,
-                PSY.SingleTimeSeries("initial_level", hydro_single_timeseries_RT),
-            )
-        else
-            if add_forecasts
-                PSY.add_time_series!(
-                    c_sys5_phes_ed,
-                    head_reservoir,
-                    PSY.Deterministic("initial_level", forecast_data),
-                )
-                PSY.add_time_series!(
-                    c_sys5_phes_ed,
-                    tail_reservoir,
-                    PSY.Deterministic("initial_level", forecast_data),
                 )
             end
         end
@@ -5025,7 +4989,8 @@ function build_c_sys5_phes_ed(;
                     TimeSeries.TimeArray(
                         timestamp(hydro_single_timeseries_RT),
                         values(hydro_single_timeseries_RT) .* 0.8,
-                    ),
+                    );
+                    WATER_FLOW...,
                 ),
             )
             PSY.add_time_series!(
@@ -5036,7 +5001,8 @@ function build_c_sys5_phes_ed(;
                     TimeSeries.TimeArray(
                         timestamp(hydro_single_timeseries_RT),
                         values(hydro_single_timeseries_RT) .* 0.8,
-                    ),
+                    );
+                    WATER_FLOW...,
                 ),
             )
         else
@@ -5047,13 +5013,13 @@ function build_c_sys5_phes_ed(;
                     PSY.Deterministic(
                         "inflow",
                         forecast_data;
-                        per_unit_of(reservoir_level_quantity(head_reservoir))...,
+                        WATER_FLOW...,
                     ),
                 )
                 PSY.add_time_series!(
                     c_sys5_phes_ed,
                     tail_reservoir,
-                    PSY.Deterministic("outflow", forecast_data),
+                    PSY.Deterministic("outflow", forecast_data; WATER_FLOW...),
                 )
             end
         end
@@ -5076,7 +5042,7 @@ function build_c_sys5_phes_ed(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     Iload_single_timeseries_RT;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -5087,7 +5053,7 @@ function build_c_sys5_phes_ed(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -5176,7 +5142,7 @@ function build_c_sys5_pglib(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -5187,7 +5153,7 @@ function build_c_sys5_pglib(;
                     PSY.Deterministic(
                         "max_active_power",
                         forecast_data;
-                        per_unit_of("active_power")...,
+                        component_base("active_power")...,
                     ),
                 )
             end
@@ -5315,13 +5281,17 @@ function build_duration_test_sys(; raw_data, kwargs...)
     duration_load = [0.3, 0.6, 0.8, 0.7, 1.7, 0.9, 0.7]
     load_data = SortedDict(DA_dur[1] => TimeSeries.TimeArray(DA_dur, duration_load))
     load_forecast_dur =
-        PSY.Deterministic("max_active_power", load_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", load_data; component_base("active_power")...)
     duration_test_sys = PSY.System(100.0; sys_kwargs...)
     PSY.add_component!(duration_test_sys, node)
     PSY.add_component!(duration_test_sys, load)
     PSY.add_component!(duration_test_sys, gens_dur[1])
     PSY.add_component!(duration_test_sys, gens_dur[2])
-    PSY.add_time_series!(duration_test_sys, load, load_forecast_dur)
+    PSY.add_time_series!(
+        duration_test_sys,
+        load,
+        load_forecast_dur,
+    )
 
     return duration_test_sys
 end
@@ -5481,7 +5451,7 @@ function build_c_sys5_bat_ems(;
                 Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -5490,7 +5460,7 @@ function build_c_sys5_bat_ems(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -5506,7 +5476,7 @@ function build_c_sys5_bat_ems(;
                 Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -5515,7 +5485,7 @@ function build_c_sys5_bat_ems(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -5530,8 +5500,8 @@ function build_c_sys5_bat_ems(;
                 r,
                 Deterministic(
                     "storage_target",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(r))...,
+                    reservoir_level_values(r, forecast_data);
+                    reservoir_level_labels(r)...,
                 ),
             )
             PSY.add_time_series!(
@@ -5539,8 +5509,8 @@ function build_c_sys5_bat_ems(;
                 r,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(r))...,
+                    reservoir_level_values(r, storage_target_single_ts_DA);
+                    reservoir_level_labels(r)...,
                 ),
             )
         end
@@ -5614,7 +5584,11 @@ function build_c_sys5_pglib_sim(; add_forecasts, add_reserves, raw_data, kwargs.
             add_time_series!(
                 c_sys5_uc,
                 l,
-                SingleTimeSeries("max_active_power", data; per_unit_of("active_power")...),
+                SingleTimeSeries(
+                    "max_active_power",
+                    data;
+                    component_base("active_power")...,
+                ),
             )
         end
         for (ix, r) in enumerate(sorted_components(RenewableGen, c_sys5_uc))
@@ -5622,7 +5596,11 @@ function build_c_sys5_pglib_sim(; add_forecasts, add_reserves, raw_data, kwargs.
             add_time_series!(
                 c_sys5_uc,
                 r,
-                SingleTimeSeries("max_active_power", data; per_unit_of("active_power")...),
+                SingleTimeSeries(
+                    "max_active_power",
+                    data;
+                    component_base("active_power")...,
+                ),
             )
         end
     end
@@ -5783,7 +5761,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -5792,7 +5770,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -5812,7 +5790,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -5821,7 +5799,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.copy_subcomponent_time_series!(hy, PSY.get_electric_load(hy))
@@ -5842,7 +5820,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -5851,7 +5829,7 @@ function build_c_sys5_hybrid(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
@@ -5965,7 +5943,7 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -5974,7 +5952,7 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -5990,7 +5968,7 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -5999,7 +5977,7 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -6019,7 +5997,7 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -6028,7 +6006,7 @@ function build_c_sys5_hybrid_uc(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
@@ -6146,7 +6124,7 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -6155,7 +6133,7 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_RT[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -6175,7 +6153,7 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -6184,7 +6162,7 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -6209,7 +6187,7 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -6218,7 +6196,7 @@ function build_c_sys5_hybrid_ed(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_RT[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.copy_subcomponent_time_series!(hy, PSY.get_renewable_unit(hy))
@@ -6272,23 +6250,19 @@ function build_hydro_test_case_b_sys(; raw_data, kwargs...)
     load_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, duration_load))
     load_forecast_dur =
-        PSY.Deterministic("max_active_power", load_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", load_data; component_base("active_power")...)
 
     inflow = [0.5, 0.5, 0.5]
     inflow_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, inflow))
-    inflow_forecast_dur = PSY.Deterministic(
-        "inflow",
-        inflow_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
-    )
+    inflow_forecast_dur = PSY.Deterministic("inflow", inflow_data; WATER_FLOW...)
 
     energy_target = [0.0, 0.0, 0.1]
     energy_target_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast_dur = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
+        reservoir_level_values(reservoir, energy_target_data);
+        reservoir_level_labels(reservoir)...,
     )
 
     hydro_test_case_b_sys = PSY.System(100.0; sys_kwargs...)
@@ -6297,9 +6271,21 @@ function build_hydro_test_case_b_sys(; raw_data, kwargs...)
     PSY.add_component!(hydro_test_case_b_sys, hydro)
     PSY.add_component!(hydro_test_case_b_sys, reservoir)
     PSY.set_downstream_turbines!(reservoir, [hydro])
-    PSY.add_time_series!(hydro_test_case_b_sys, load, load_forecast_dur)
-    PSY.add_time_series!(hydro_test_case_b_sys, reservoir, inflow_forecast_dur)
-    PSY.add_time_series!(hydro_test_case_b_sys, reservoir, energy_target_forecast_dur)
+    PSY.add_time_series!(
+        hydro_test_case_b_sys,
+        load,
+        load_forecast_dur,
+    )
+    PSY.add_time_series!(
+        hydro_test_case_b_sys,
+        reservoir,
+        inflow_forecast_dur,
+    )
+    PSY.add_time_series!(
+        hydro_test_case_b_sys,
+        reservoir,
+        energy_target_forecast_dur,
+    )
 
     return hydro_test_case_b_sys
 end
@@ -6333,23 +6319,19 @@ function build_hydro_test_case_c_sys(; raw_data, kwargs...)
     load_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, duration_load))
     load_forecast_dur =
-        PSY.Deterministic("max_active_power", load_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", load_data; component_base("active_power")...)
 
     inflow = [0.5, 0.5, 0.5]
     inflow_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, inflow))
-    inflow_forecast_dur = PSY.Deterministic(
-        "inflow",
-        inflow_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
-    )
+    inflow_forecast_dur = PSY.Deterministic("inflow", inflow_data; WATER_FLOW...)
 
     energy_target = [0.0, 0.0, 0.1]
     energy_target_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast_dur = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
+        reservoir_level_values(reservoir, energy_target_data);
+        reservoir_level_labels(reservoir)...,
     )
 
     hydro_test_case_c_sys = PSY.System(100.0; sys_kwargs...)
@@ -6357,9 +6339,21 @@ function build_hydro_test_case_c_sys(; raw_data, kwargs...)
     PSY.add_component!(hydro_test_case_c_sys, load)
     PSY.add_component!(hydro_test_case_c_sys, turbine)
     PSY.add_component!(hydro_test_case_c_sys, reservoir)
-    PSY.add_time_series!(hydro_test_case_c_sys, load, load_forecast_dur)
-    PSY.add_time_series!(hydro_test_case_c_sys, reservoir, inflow_forecast_dur)
-    PSY.add_time_series!(hydro_test_case_c_sys, reservoir, energy_target_forecast_dur)
+    PSY.add_time_series!(
+        hydro_test_case_c_sys,
+        load,
+        load_forecast_dur,
+    )
+    PSY.add_time_series!(
+        hydro_test_case_c_sys,
+        reservoir,
+        inflow_forecast_dur,
+    )
+    PSY.add_time_series!(
+        hydro_test_case_c_sys,
+        reservoir,
+        energy_target_forecast_dur,
+    )
 
     return hydro_test_case_c_sys
 end
@@ -6392,23 +6386,19 @@ function build_hydro_test_case_d_sys(; raw_data, kwargs...)
     load_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, duration_load))
     load_forecast_dur =
-        PSY.Deterministic("max_active_power", load_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", load_data; component_base("active_power")...)
 
     inflow = [0.5, 0.5, 0.5]
     inflow_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, inflow))
-    inflow_forecast_dur = PSY.Deterministic(
-        "inflow",
-        inflow_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
-    )
+    inflow_forecast_dur = PSY.Deterministic("inflow", inflow_data; WATER_FLOW...)
 
     energy_target = [0.0, 0.0, 0.0]
     energy_target_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast_dur = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
+        reservoir_level_values(reservoir, energy_target_data);
+        reservoir_level_labels(reservoir)...,
     )
 
     hydro_test_case_d_sys = PSY.System(100.0; sys_kwargs...)
@@ -6416,9 +6406,21 @@ function build_hydro_test_case_d_sys(; raw_data, kwargs...)
     PSY.add_component!(hydro_test_case_d_sys, load)
     PSY.add_component!(hydro_test_case_d_sys, turbine)
     PSY.add_component!(hydro_test_case_d_sys, reservoir)
-    PSY.add_time_series!(hydro_test_case_d_sys, load, load_forecast_dur)
-    PSY.add_time_series!(hydro_test_case_d_sys, reservoir, inflow_forecast_dur)
-    PSY.add_time_series!(hydro_test_case_d_sys, reservoir, energy_target_forecast_dur)
+    PSY.add_time_series!(
+        hydro_test_case_d_sys,
+        load,
+        load_forecast_dur,
+    )
+    PSY.add_time_series!(
+        hydro_test_case_d_sys,
+        reservoir,
+        inflow_forecast_dur,
+    )
+    PSY.add_time_series!(
+        hydro_test_case_d_sys,
+        reservoir,
+        energy_target_forecast_dur,
+    )
 
     return hydro_test_case_d_sys
 end
@@ -6451,23 +6453,19 @@ function build_hydro_test_case_e_sys(; raw_data, kwargs...)
     load_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, duration_load))
     load_forecast_dur =
-        PSY.Deterministic("max_active_power", load_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", load_data; component_base("active_power")...)
 
     inflow = [0.5, 0.5, 0.5]
     inflow_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, inflow))
-    inflow_forecast_dur = PSY.Deterministic(
-        "inflow",
-        inflow_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
-    )
+    inflow_forecast_dur = PSY.Deterministic("inflow", inflow_data; WATER_FLOW...)
 
     energy_target = [0.2, 0.2, 0.0]
     energy_target_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast_dur = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
+        reservoir_level_values(reservoir, energy_target_data);
+        reservoir_level_labels(reservoir)...,
     )
 
     hydro_test_case_e_sys = PSY.System(100.0; sys_kwargs...)
@@ -6475,9 +6473,21 @@ function build_hydro_test_case_e_sys(; raw_data, kwargs...)
     PSY.add_component!(hydro_test_case_e_sys, load)
     PSY.add_component!(hydro_test_case_e_sys, turbine)
     PSY.add_component!(hydro_test_case_e_sys, reservoir)
-    PSY.add_time_series!(hydro_test_case_e_sys, load, load_forecast_dur)
-    PSY.add_time_series!(hydro_test_case_e_sys, reservoir, inflow_forecast_dur)
-    PSY.add_time_series!(hydro_test_case_e_sys, reservoir, energy_target_forecast_dur)
+    PSY.add_time_series!(
+        hydro_test_case_e_sys,
+        load,
+        load_forecast_dur,
+    )
+    PSY.add_time_series!(
+        hydro_test_case_e_sys,
+        reservoir,
+        inflow_forecast_dur,
+    )
+    PSY.add_time_series!(
+        hydro_test_case_e_sys,
+        reservoir,
+        energy_target_forecast_dur,
+    )
 
     return hydro_test_case_e_sys
 end
@@ -6510,23 +6520,19 @@ function build_hydro_test_case_f_sys(; raw_data, kwargs...)
     load_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, duration_load))
     load_forecast_dur =
-        PSY.Deterministic("max_active_power", load_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", load_data; component_base("active_power")...)
 
     inflow = [0.5, 0.5, 0.5]
     inflow_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, inflow))
-    inflow_forecast_dur = PSY.Deterministic(
-        "inflow",
-        inflow_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
-    )
+    inflow_forecast_dur = PSY.Deterministic("inflow", inflow_data; WATER_FLOW...)
 
     energy_target = [0.0, 0.0, 0.1]
     energy_target_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast_dur = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(reservoir))...,
+        reservoir_level_values(reservoir, energy_target_data);
+        reservoir_level_labels(reservoir)...,
     )
 
     hydro_test_case_f_sys = PSY.System(100.0; sys_kwargs...)
@@ -6534,9 +6540,21 @@ function build_hydro_test_case_f_sys(; raw_data, kwargs...)
     PSY.add_component!(hydro_test_case_f_sys, load)
     PSY.add_component!(hydro_test_case_f_sys, turbine)
     PSY.add_component!(hydro_test_case_f_sys, reservoir)
-    PSY.add_time_series!(hydro_test_case_f_sys, load, load_forecast_dur)
-    PSY.add_time_series!(hydro_test_case_f_sys, reservoir, inflow_forecast_dur)
-    PSY.add_time_series!(hydro_test_case_f_sys, reservoir, energy_target_forecast_dur)
+    PSY.add_time_series!(
+        hydro_test_case_f_sys,
+        load,
+        load_forecast_dur,
+    )
+    PSY.add_time_series!(
+        hydro_test_case_f_sys,
+        reservoir,
+        inflow_forecast_dur,
+    )
+    PSY.add_time_series!(
+        hydro_test_case_f_sys,
+        reservoir,
+        energy_target_forecast_dur,
+    )
 
     return hydro_test_case_f_sys
 end
@@ -6609,20 +6627,20 @@ function build_batt_test_case_b_sys(; raw_data, kwargs...)
     load_ts = [0.3, 0.6, 0.5]
     load_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, load_ts))
     load_forecast =
-        PSY.Deterministic("max_active_power", load_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", load_data; component_base("active_power")...)
 
     wind_ts = [0.5, 0.7, 0.8]
     wind_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, wind_ts))
     wind_forecast =
-        PSY.Deterministic("max_active_power", wind_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", wind_data; component_base("active_power")...)
 
     energy_target = [0.4, 0.4, 0.1]
     energy_target_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(batt))...,
+        reservoir_level_values(batt, energy_target_data);
+        reservoir_level_labels(batt)...,
     )
 
     batt_test_case_b_sys = PSY.System(100.0; sys_kwargs...)
@@ -6630,9 +6648,17 @@ function build_batt_test_case_b_sys(; raw_data, kwargs...)
     PSY.add_component!(batt_test_case_b_sys, load)
     PSY.add_component!(batt_test_case_b_sys, re)
     PSY.add_component!(batt_test_case_b_sys, batt)
-    PSY.add_time_series!(batt_test_case_b_sys, load, load_forecast)
+    PSY.add_time_series!(
+        batt_test_case_b_sys,
+        load,
+        load_forecast,
+    )
     PSY.add_time_series!(batt_test_case_b_sys, re, wind_forecast)
-    PSY.add_time_series!(batt_test_case_b_sys, batt, energy_target_forecast)
+    PSY.add_time_series!(
+        batt_test_case_b_sys,
+        batt,
+        energy_target_forecast,
+    )
 
     return batt_test_case_b_sys
 end
@@ -6705,20 +6731,20 @@ function build_batt_test_case_c_sys(; raw_data, kwargs...)
     load_ts = [0.3, 0.6, 0.5]
     load_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, load_ts))
     load_forecast =
-        PSY.Deterministic("max_active_power", load_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", load_data; component_base("active_power")...)
 
     wind_ts = [0.9, 0.7, 0.8]
     wind_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, wind_ts))
     wind_forecast =
-        PSY.Deterministic("max_active_power", wind_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", wind_data; component_base("active_power")...)
 
     energy_target = [0.0, 0.0, 0.4]
     energy_target_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(batt))...,
+        reservoir_level_values(batt, energy_target_data);
+        reservoir_level_labels(batt)...,
     )
 
     batt_test_case_c_sys = PSY.System(100.0; sys_kwargs...)
@@ -6726,9 +6752,17 @@ function build_batt_test_case_c_sys(; raw_data, kwargs...)
     PSY.add_component!(batt_test_case_c_sys, load)
     PSY.add_component!(batt_test_case_c_sys, re)
     PSY.add_component!(batt_test_case_c_sys, batt)
-    PSY.add_time_series!(batt_test_case_c_sys, load, load_forecast)
+    PSY.add_time_series!(
+        batt_test_case_c_sys,
+        load,
+        load_forecast,
+    )
     PSY.add_time_series!(batt_test_case_c_sys, re, wind_forecast)
-    PSY.add_time_series!(batt_test_case_c_sys, batt, energy_target_forecast)
+    PSY.add_time_series!(
+        batt_test_case_c_sys,
+        batt,
+        energy_target_forecast,
+    )
 
     return batt_test_case_c_sys
 end
@@ -6801,20 +6835,20 @@ function build_batt_test_case_d_sys(; raw_data, kwargs...)
     load_ts = [0.3, 0.6, 0.5, 0.8]
     load_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, load_ts))
     load_forecast =
-        PSY.Deterministic("max_active_power", load_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", load_data; component_base("active_power")...)
 
     wind_ts = [0.9, 0.7, 0.8, 0.1]
     wind_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, wind_ts))
     wind_forecast =
-        PSY.Deterministic("max_active_power", wind_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", wind_data; component_base("active_power")...)
 
     energy_target = [0.0, 0.0, 0.0, 0.0]
     energy_target_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(batt))...,
+        reservoir_level_values(batt, energy_target_data);
+        reservoir_level_labels(batt)...,
     )
 
     batt_test_case_d_sys = PSY.System(100.0; sys_kwargs...)
@@ -6822,9 +6856,17 @@ function build_batt_test_case_d_sys(; raw_data, kwargs...)
     PSY.add_component!(batt_test_case_d_sys, load)
     PSY.add_component!(batt_test_case_d_sys, re)
     PSY.add_component!(batt_test_case_d_sys, batt)
-    PSY.add_time_series!(batt_test_case_d_sys, load, load_forecast)
+    PSY.add_time_series!(
+        batt_test_case_d_sys,
+        load,
+        load_forecast,
+    )
     PSY.add_time_series!(batt_test_case_d_sys, re, wind_forecast)
-    PSY.add_time_series!(batt_test_case_d_sys, batt, energy_target_forecast)
+    PSY.add_time_series!(
+        batt_test_case_d_sys,
+        batt,
+        energy_target_forecast,
+    )
 
     return batt_test_case_d_sys
 end
@@ -6897,20 +6939,20 @@ function build_batt_test_case_e_sys(; raw_data, kwargs...)
     load_ts = [0.3, 0.6, 0.5]
     load_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, load_ts))
     load_forecast =
-        PSY.Deterministic("max_active_power", load_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", load_data; component_base("active_power")...)
 
     wind_ts = [0.9, 0.7, 0.8]
     wind_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, wind_ts))
     wind_forecast =
-        PSY.Deterministic("max_active_power", wind_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", wind_data; component_base("active_power")...)
 
     energy_target = [0.2, 0.2, 0.0]
     energy_target_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(batt))...,
+        reservoir_level_values(batt, energy_target_data);
+        reservoir_level_labels(batt)...,
     )
 
     batt_test_case_e_sys = PSY.System(100.0; sys_kwargs...)
@@ -6918,9 +6960,17 @@ function build_batt_test_case_e_sys(; raw_data, kwargs...)
     PSY.add_component!(batt_test_case_e_sys, load)
     PSY.add_component!(batt_test_case_e_sys, re)
     PSY.add_component!(batt_test_case_e_sys, batt)
-    PSY.add_time_series!(batt_test_case_e_sys, load, load_forecast)
+    PSY.add_time_series!(
+        batt_test_case_e_sys,
+        load,
+        load_forecast,
+    )
     PSY.add_time_series!(batt_test_case_e_sys, re, wind_forecast)
-    PSY.add_time_series!(batt_test_case_e_sys, batt, energy_target_forecast)
+    PSY.add_time_series!(
+        batt_test_case_e_sys,
+        batt,
+        energy_target_forecast,
+    )
 
     return batt_test_case_e_sys
 end
@@ -6993,20 +7043,20 @@ function build_batt_test_case_f_sys(; raw_data, kwargs...)
     load_ts = [0.3, 0.6, 0.5]
     load_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, load_ts))
     load_forecast =
-        PSY.Deterministic("max_active_power", load_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", load_data; component_base("active_power")...)
 
     wind_ts = [0.9, 0.7, 0.8]
     wind_data = SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, wind_ts))
     wind_forecast =
-        PSY.Deterministic("max_active_power", wind_data; per_unit_of("active_power")...)
+        PSY.Deterministic("max_active_power", wind_data; component_base("active_power")...)
 
     energy_target = [0.0, 0.0, 0.3]
     energy_target_data =
         SortedDict(time_periods[1] => TimeSeries.TimeArray(time_periods, energy_target))
     energy_target_forecast = PSY.Deterministic(
         "storage_target",
-        energy_target_data;
-        per_unit_of(reservoir_level_quantity(batt))...,
+        reservoir_level_values(batt, energy_target_data);
+        reservoir_level_labels(batt)...,
     )
 
     batt_test_case_f_sys = PSY.System(100.0; sys_kwargs...)
@@ -7014,9 +7064,17 @@ function build_batt_test_case_f_sys(; raw_data, kwargs...)
     PSY.add_component!(batt_test_case_f_sys, load)
     PSY.add_component!(batt_test_case_f_sys, re)
     PSY.add_component!(batt_test_case_f_sys, batt)
-    PSY.add_time_series!(batt_test_case_f_sys, load, load_forecast)
+    PSY.add_time_series!(
+        batt_test_case_f_sys,
+        load,
+        load_forecast,
+    )
     PSY.add_time_series!(batt_test_case_f_sys, re, wind_forecast)
-    PSY.add_time_series!(batt_test_case_f_sys, batt, energy_target_forecast)
+    PSY.add_time_series!(
+        batt_test_case_f_sys,
+        batt,
+        energy_target_forecast,
+    )
 
     return batt_test_case_f_sys
 end
@@ -7055,7 +7113,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -7064,7 +7122,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     load_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -7081,7 +7139,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -7090,7 +7148,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -7106,8 +7164,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.Deterministic(
                     "storage_target",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, forecast_data);
+                    reservoir_level_labels(h)...,
                 ),
             )
             PSY.add_time_series!(
@@ -7115,8 +7173,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "storage_target",
-                    storage_target_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    reservoir_level_values(h, storage_target_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         end
@@ -7132,8 +7190,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_all_components, forecast_data);
+                    ENERGY_FLOW...,
                 ),
             )
             PSY.add_time_series!(
@@ -7141,8 +7199,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    hydro_single_timeseries_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_all_components, hydro_single_timeseries_DA);
+                    ENERGY_FLOW...,
                 ),
             )
         end
@@ -7158,8 +7216,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    forecast_data;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_all_components, forecast_data);
+                    ENERGY_FLOW...,
                 ),
             )
             PSY.add_time_series!(
@@ -7167,8 +7225,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    hydro_budget_single_ts_DA;
-                    per_unit_of(reservoir_level_quantity(h))...,
+                    in_mw(c_sys5_all_components, hydro_budget_single_ts_DA);
+                    ENERGY_FLOW...,
                 ),
             )
         end
@@ -7185,7 +7243,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -7194,7 +7252,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_single_timeseries_DA;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -7211,7 +7269,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.Deterministic(
                     "max_active_power",
                     forecast_data;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
             PSY.add_time_series!(
@@ -7220,7 +7278,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     ren_single_timeseries_DA[ix];
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -7688,7 +7746,7 @@ function _build_cost_base_test_sys(; kwargs...)
     load_forecast = PSY.Deterministic(
         "max_active_power",
         DA_load_forecast;
-        per_unit_of("active_power")...,
+        component_base("active_power")...,
     )
     cost_test_sys = PSY.System(100.0; sys_kwargs...)
     PSY.add_component!(cost_test_sys, node)
