@@ -154,6 +154,7 @@ include("parsers/psse_metadata_reimport.jl")
 # includes
 
 include("definitions.jl")
+include("units_and_normalization.jl")
 include("system_library.jl")
 
 include("system_build_stats.jl")
