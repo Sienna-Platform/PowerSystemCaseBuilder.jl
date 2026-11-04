@@ -128,6 +128,25 @@ const SYSTEM_CATALOG = [
         ],
     ),
     SystemDescriptor(;
+        name = "two_area_pjm_DA_off_area_load",
+        description = "2 Area 5-Bus system with a StandardLoad in Area2 that Area1 owns",
+        category = PSISystems,
+        raw_data = joinpath(DATA_DIR, "psy_data", "data_5bus_pu.jl"),
+        build_function = build_two_area_pjm_DA_off_area_load,
+        supported_arguments = [
+            SystemArgument(;
+                name = :add_forecasts,
+                default = true,
+                allowed_values = Set([true, false]),
+            ),
+            SystemArgument(;
+                name = :add_reserves,
+                default = false,
+                allowed_values = Set([true, false]),
+            ),
+        ],
+    ),
+    SystemDescriptor(;
         name = "c_sys5_pjm_rt",
         description = "5-Bus system",
         category = PSISystems,

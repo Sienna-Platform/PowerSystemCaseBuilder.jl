@@ -7403,8 +7403,16 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
         sys_kwargs...,
     )
 
-    area1 = Area(; name = "Area1", input_basis = u"CU")
-    area2 = Area(; name = "Area2", input_basis = u"CU")
+    area1 = Area(;
+        name = "Area1",
+        scheduled_net_interchange = 0.0,
+        input_basis = u"CU",
+    )
+    area2 = Area(;
+        name = "Area2",
+        scheduled_net_interchange = 0.0,
+        input_basis = u"CU",
+    )
 
     add_component!(sys, area1)
     add_component!(sys, area2)
@@ -7630,6 +7638,28 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
         end
     end
 
+    return sys
+end
+
+function build_two_area_pjm_DA_off_area_load(; kwargs...)
+    sys = build_two_area_pjm_DA(; kwargs...)
+    bus = PSY.get_component(PSY.ACBus, sys, "Bus_nodeC_2")
+    load = PSY.StandardLoad(;
+        name = "OffAreaLoad",
+        available = true,
+        bus = bus,
+        base_power = 100.0,
+        constant_active_power = 0.2,
+        constant_reactive_power = 0.05,
+        current_active_power = 0.1,
+        current_reactive_power = 0.03,
+        impedance_active_power = 0.08,
+        impedance_reactive_power = 0.02,
+        input_basis = u"CU",
+    )
+    PSY.add_component!(sys, load)
+    area1 = PSY.get_component(PSY.Area, sys, "Area1")
+    PSY.set_out_of_area_loads!(area1, PSY.ElectricLoad[load])
     return sys
 end
 
