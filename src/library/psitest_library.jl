@@ -7405,12 +7405,10 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
 
     area1 = Area(;
         name = "Area1",
-        scheduled_net_interchange = 0.0,
         input_basis = u"CU",
     )
     area2 = Area(;
         name = "Area2",
-        scheduled_net_interchange = 0.0,
         input_basis = u"CU",
     )
 
@@ -7660,6 +7658,9 @@ function build_two_area_pjm_DA_off_area_load(; kwargs...)
     PSY.add_component!(sys, load)
     area1 = PSY.get_component(PSY.Area, sys, "Area1")
     PSY.set_out_of_area_loads!(area1, PSY.ElectricLoad[load])
+    area2 = PSY.get_component(PSY.Area, sys, "Area2")
+    PSY.set_scheduled_net_interchange!(area1, 0.0u"MW")
+    PSY.set_scheduled_net_interchange!(area2, 0.0u"MW")
     return sys
 end
 
