@@ -59,7 +59,7 @@ end
     sys = build_system(PSISystems, "two_area_pjm_DA"; force_build = true)
     for name in ("Area1", "Area2")
         area = PSY.get_component(PSY.Area, sys, name)
-        @test iszero(PSY.get_scheduled_net_interchange(area, u"SU"))
+        @test isnothing(PSY.get_scheduled_net_interchange(area, u"SU"))
         @test isempty(PSY.get_out_of_area_loads(area))
     end
 
