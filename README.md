@@ -1,11 +1,15 @@
 # PowerSystemCaseBuilder.jl
 
-[![Main - CI](https://github.com/Sienna-Platform/PowerSystemCaseBuilder.jl/workflows/Main%20-%20CI/badge.svg)](https://github.com/Sienna-Platform/PowerSystemCaseBuilder.jl/actions/workflows/main-tests.yml)
-[![codecov](https://codecov.io/gh/Sienna-Platform/PowerSystemCaseBuilder.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Sienna-Platform/PowerSystemCaseBuilder.jl)
-[![Documentation Build](https://github.com/Sienna-Platform/PowerSystemCaseBuilder.jl/workflows/Documentation/badge.svg?)](https://sienna-platform.github.io/PowerSystemCaseBuilder.jl/stable)
-[<img src="https://img.shields.io/badge/slack-@Sienna/PSB-sienna.svg?logo=slack">](https://join.slack.com/t/core-sienna/shared_invite/zt-glam9vdu-o8A9TwZTZqqNTKHa7q3BpQ)
-[![PowerSystemCaseBuilder.jl Downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/PowerSystemCaseBuilder)](https://pkgs.genieframework.com?packages=PowerSystemCaseBuilder)
+| **Documentation** | **Build Status** |
+|:---:|:---:|
+| [![][docs-sienna-img]][docs-sienna-url] [![][docs-stable-img]][docs-stable-url] [![][docs-dev-img]][docs-dev-url] | [![Main - CI](https://github.com/Sienna-Platform/PowerSystemCaseBuilder.jl/workflows/Main%20-%20CI/badge.svg)](https://github.com/Sienna-Platform/PowerSystemCaseBuilder.jl/actions/workflows/main-tests.yml) [![codecov](https://codecov.io/gh/Sienna-Platform/PowerSystemCaseBuilder.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Sienna-Platform/PowerSystemCaseBuilder.jl) [<img src="https://img.shields.io/badge/slack-@Sienna/PSB-sienna.svg?logo=slack">](https://join.slack.com/t/core-sienna/shared_invite/zt-glam9vdu-o8A9TwZTZqqNTKHa7q3BpQ) [![PowerSystemCaseBuilder.jl Downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/PowerSystemCaseBuilder)](https://pkgs.genieframework.com?packages=PowerSystemCaseBuilder) |
 
+[docs-sienna-img]: https://img.shields.io/badge/Central_Sienna_docs-blue.svg
+[docs-sienna-url]: https://sienna-platform.github.io/Sienna/SiennaDocs/docs/build/index/
+[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
+[docs-stable-url]: https://sienna-platform.github.io/PowerSystemCaseBuilder.jl/stable/
+[docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
+[docs-dev-url]: https://sienna-platform.github.io/PowerSystemCaseBuilder.jl/dev/
 
 The `PowerSystemCaseBuilder.jl` package provides a library
 of over 200 power systems test cases using the
