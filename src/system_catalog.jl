@@ -64,6 +64,60 @@ function list_systems(catalog::SystemCatalog, category::Type{<:SystemCategory})
     end
 end
 
+"""
+Builds each [`PowerSystems.System`](@extref) in the [`SystemCatalog`](@ref) one at a time
+and calls `f(category, name, sys)` on it, so only one `System` is held in memory at once.
+
+Each system receives only the keyword arguments it supports (plus `System` and build
+keywords); a keyword supported by no system in the catalog is an error. Systems that fail to
+build are skipped with a warning.
+
+# Example
+```julia
+sizes = Dict{Tuple{DataType, String}, Int}()
+foreach_system() do category, name, sys
+    sizes[(category, name)] = length(PSY.get_components(PSY.ACBus, sys))
+end
+```
+
+# Accepted Key Words
+- `system_catalog::SystemCatalog`: Defaults to the `PowerSystemCaseBuilder.jl` catalog of
+  `System`s
+- All other keyword arguments are forwarded to [`build_system`](@ref)
+"""
+function foreach_system(
+    f::Function;
+    system_catalog::SystemCatalog = SystemCatalog(),
+    kwargs...,
+)
+    descriptors = [d for cat in values(system_catalog.data) for d in values(cat)]
+    always =
+        union(PSY.SYSTEM_KWARGS, (:force_build, :assign_new_uuids, :skip_serialization))
+    supported = union(always, get_supported_argument_names.(descriptors)...)
+    unknown = setdiff(keys(kwargs), supported)
+    isempty(unknown) ||
+        error("No system in the catalog supports these keyword arguments: $unknown")
+    for d in descriptors
+        category, name = get_category(d), get_name(d)
+        names = union(always, get_supported_argument_names(d))
+        sys = try
+            build_system(
+                category,
+                name;
+                system_catalog,
+                filter(p -> first(p) in names, kwargs)...,
+            )
+        catch e
+            e isa InterruptException && rethrow()
+            @warn "Skipping system $(category)/$(name)" exception =
+                (e, catch_backtrace())
+            continue
+        end
+        f(category, name, sys)
+    end
+    return
+end
+
 function SystemCatalog(system_catalogue::Array{SystemDescriptor} = SYSTEM_CATALOG)
     data = Dict{DataType, Dict{String, SystemDescriptor}}()
     unique_names = Set{String}()
