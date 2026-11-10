@@ -28,12 +28,13 @@
             end
         end
 
-        # Reserves still scale their series by `requirement`, so they're left alone.
+        # Reserves' series are built in MW, so normalization leaves them alone.
         for r in get_components(has_time_series, PSY.AbstractReserve, raw)
             n_reserves += 1
             normalized = get_component(typeof(r), sys, get_name(r))
             @test get_requirement(normalized, u"SU") == get_requirement(r, u"SU")
             for md in PSY.IS.list_time_series_metadata(r)
+                @test PSY.IS.get_units(md) == "MW"
                 @test series_values(normalized, md) == series_values(r, md)
             end
         end

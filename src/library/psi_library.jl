@@ -97,7 +97,8 @@ function build_c_sys5_pjm(; add_forecasts, raw_data, sys_kwargs...)
                 l,
                 PSY.SingleTimeSeries(
                     "max_active_power",
-                    TimeArray(da_load_time_series, da_load_time_series_val ./ peak_load),
+                    TimeArray(da_load_time_series, da_load_time_series_val ./ peak_load);
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -107,7 +108,8 @@ function build_c_sys5_pjm(; add_forecasts, raw_data, sys_kwargs...)
                 g,
                 PSY.SingleTimeSeries(
                     "max_active_power",
-                    TimeArray(da_load_time_series, re_timeseries[PSY.get_name(g)]),
+                    TimeArray(da_load_time_series, re_timeseries[PSY.get_name(g)]);
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -235,7 +237,8 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
                 g,
                 PSY.SingleTimeSeries(
                     "max_active_power",
-                    TimeArray(rt_re_time_stamps, re_timeseries[PSY.get_name(g)]),
+                    TimeArray(rt_re_time_stamps, re_timeseries[PSY.get_name(g)]);
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -1720,7 +1723,12 @@ function fix_rts_RT_reserve_requirements(DA_sys::PSY.System, RT_sys::PSY.System)
         for i in eachindex(data_da)
             all(data_da[i] .== rt_data[((i - 1) * 12 + 1):(12 * i)])
         end
-        new_ts = SingleTimeSeries("requirement", TimeArray(dates_rt, rt_data))
+        # The DA series is already in MW.
+        new_ts = SingleTimeSeries(
+            "requirement",
+            TimeArray(dates_rt, rt_data);
+            RESERVE_REQUIREMENT...,
+        )
         remove_time_series!(RT_sys, SingleTimeSeries, service_rt, "requirement")
         add_time_series!(RT_sys, service_rt, new_ts)
     end

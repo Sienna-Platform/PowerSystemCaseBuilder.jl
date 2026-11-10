@@ -35,6 +35,15 @@ The test system data states them per unit of the system base (`data_5bus_pu.jl`:
 """
 in_mw(sys::PSY.System, data) = scaled(data, PSY.get_base_power(sys))
 
+"""
+A reserve's requirement profile in MW. PowerSystems takes a service's series in natural
+units only, and the test system data's profiles are fractions of the reserve's own
+`requirement`, so they are scaled by it, as PowerTableDataParser does for tabular data. The
+`requirement` field keeps its value.
+"""
+requirement_in_mw(serv::PSY.Service, data) =
+    scaled(data, PSY.get_requirement(serv, u"MW"))
+
 """Time series data, a `TimeArray` or a forecast's windows, times `factor`."""
 scaled(ta::TimeSeries.TimeArray, factor) = ta .* factor
 scaled(data::AbstractDict, factor) =

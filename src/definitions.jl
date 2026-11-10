@@ -57,3 +57,6 @@ const WATER_FLOW =
 
 """An `ENERGY` reservoir's inflow, outflow and water budget: power in MW."""
 const ENERGY_FLOW = (units = "MW", quantity_kind = "active_power")
+
+"""A reserve's requirement: power in MW, see [`requirement_in_mw`](@ref)."""
+const RESERVE_REQUIREMENT = (units = "MW", quantity_kind = "active_power")

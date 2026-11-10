@@ -527,14 +527,22 @@ function build_c_sys5_re(;
                 PSY.add_time_series!(
                     c_sys5_re,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_re,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -662,14 +670,22 @@ function build_c_sys5_re_fuel_cost(;
                 PSY.add_time_series!(
                     c_sys5_re,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_re,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -909,14 +925,22 @@ function build_c_sys5_hy(;
                 PSY.add_time_series!(
                     c_sys5_hy,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_hy,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -1116,14 +1140,22 @@ function build_c_sys5_hy_turbine_energy(;
                 PSY.add_time_series!(
                     c_sys5_hyd,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_hyd,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -1256,14 +1288,22 @@ function build_c_sys5_hy_turbine_head(;
                 PSY.add_time_series!(
                     c_sys5_hyd,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_hyd,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -1468,14 +1508,22 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 PSY.add_time_series!(
                     c_sys5_hyd,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_hyd,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -1612,14 +1660,22 @@ function build_c_sys5_hy_cascading_turbine_head(;
                 PSY.add_time_series!(
                     c_sys5_hyd,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_hyd,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -1814,13 +1870,21 @@ function build_c_sys5_hyd(;
                 PSY.add_time_series!(
                     c_sys5_hyd,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             elseif add_forecasts
                 PSY.add_time_series!(
                     c_sys5_hyd,
                     serv,
-                    PSY.Deterministic("requirement", forecast_data),
+                    PSY.Deterministic(
+                        "requirement",
+                        requirement_in_mw(serv, forecast_data);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             end
         end
@@ -2023,13 +2087,21 @@ function build_c_sys5_hyd_ems(;
                 PSY.add_time_series!(
                     c_sys5_hyd,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             elseif add_forecasts
                 PSY.add_time_series!(
                     c_sys5_hyd,
                     serv,
-                    PSY.Deterministic("requirement", forecast_data),
+                    PSY.Deterministic(
+                        "requirement",
+                        requirement_in_mw(serv, forecast_data);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             end
         end
@@ -2164,14 +2236,22 @@ function build_c_sys5_bat(;
                 PSY.add_time_series!(
                     c_sys5_bat,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_bat,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -2307,14 +2387,22 @@ function build_c_sys5_hydro_pump_energy(;
                 PSY.add_time_series!(
                     c_sys5_bat,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_bat,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -2336,12 +2424,9 @@ function build_c_sys5_hydro_pump_energy(;
 
     for (ix, l) in enumerate(sorted_components(PSY.HydroPumpTurbine, c_sys5_bat))
         forecast_data_power = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
-        forecast_data_cap = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
             ini_time_power = TimeSeries.timestamp(hydro_pump_power_timeseries_DA[t][ix])[1]
             forecast_data_power[ini_time_power] = hydro_pump_power_timeseries_DA[t][ix]
-            ini_time_cap = TimeSeries.timestamp(hydro_pump_cap_timeseries_DA[t][ix])[1]
-            forecast_data_cap[ini_time_cap] = hydro_pump_cap_timeseries_DA[t][ix]
         end
         if add_single_time_series
             PSY.add_time_series!(
@@ -2350,14 +2435,7 @@ function build_c_sys5_hydro_pump_energy(;
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     hydro_pump_power_single_timeseries_DA;
-                ),
-            )
-            PSY.add_time_series!(
-                c_sys5_bat,
-                l,
-                PSY.SingleTimeSeries(
-                    "capacity",
-                    hydro_pump_cap_single_timeseries_DA;
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -2370,11 +2448,6 @@ function build_c_sys5_hydro_pump_energy(;
                         forecast_data_power;
                         component_base("active_power")...,
                     ),
-                )
-                PSY.add_time_series!(
-                    c_sys5_bat,
-                    l,
-                    PSY.Deterministic("capacity", forecast_data_cap),
                 )
             end
         end
@@ -2490,13 +2563,21 @@ function build_c_sys5_il(;
                 PSY.add_time_series!(
                     c_sys5_il,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             elseif add_forecasts
                 PSY.add_time_series!(
                     c_sys5_il,
                     serv,
-                    PSY.Deterministic("requirement", forecast_data),
+                    PSY.Deterministic(
+                        "requirement",
+                        requirement_in_mw(serv, forecast_data);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             end
         end
@@ -2696,7 +2777,8 @@ function build_c_sys5_events(; add_forecasts, raw_data, sys_kwargs...)
                 l,
                 PSY.SingleTimeSeries(
                     "max_active_power",
-                    TimeArray(da_load_time_series, da_load_time_series_val ./ peak_load),
+                    TimeArray(da_load_time_series, da_load_time_series_val ./ peak_load);
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -2717,7 +2799,8 @@ function build_c_sys5_events(; add_forecasts, raw_data, sys_kwargs...)
                 g,
                 PSY.SingleTimeSeries(
                     "max_active_power",
-                    TimeArray(da_load_time_series, re_timeseries[PSY.get_name(g)]),
+                    TimeArray(da_load_time_series, re_timeseries[PSY.get_name(g)]);
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -2866,7 +2949,8 @@ function build_c_sys5_events_rt(; add_forecasts, raw_data, sys_kwargs...)
                 g,
                 PSY.SingleTimeSeries(
                     "max_active_power",
-                    TimeArray(rt_re_time_stamps, re_timeseries[PSY.get_name(g)]),
+                    TimeArray(rt_re_time_stamps, re_timeseries[PSY.get_name(g)]);
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -3195,14 +3279,22 @@ function build_c_sys5_uc(;
                 PSY.add_time_series!(
                     c_sys5_uc,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_uc,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -3309,14 +3401,22 @@ function build_c_sys5_uc_non_spin(;
                 PSY.add_time_series!(
                     c_sys5_uc,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_uc,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -3332,14 +3432,22 @@ function build_c_sys5_uc_non_spin(;
                 PSY.add_time_series!(
                     c_sys5_uc,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_uc,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -3501,14 +3609,22 @@ function build_c_sys5_uc_re(;
                 PSY.add_time_series!(
                     c_sys5_uc,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_uc,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -3689,14 +3805,22 @@ function build_c_sys5_ed(; add_forecasts, add_single_time_series, add_reserves, 
                 PSY.add_time_series!(
                     c_sys5_ed,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts_RT),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts_RT);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_ed,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -5093,14 +5217,22 @@ function build_c_sys5_phes_ed(;
                 PSY.add_time_series!(
                     c_sys5_phes_ed,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts_RT),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts_RT);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_phes_ed,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -5188,14 +5320,22 @@ function build_c_sys5_pglib(;
                 PSY.add_time_series!(
                     c_sys5_uc,
                     serv,
-                    PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                    PSY.SingleTimeSeries(
+                        "requirement",
+                        requirement_in_mw(serv, Reserve_single_ts);
+                        RESERVE_REQUIREMENT...,
+                    ),
                 )
             else
                 if add_forecasts
                     PSY.add_time_series!(
                         c_sys5_uc,
                         serv,
-                        PSY.Deterministic("requirement", forecast_data),
+                        PSY.Deterministic(
+                            "requirement",
+                            requirement_in_mw(serv, forecast_data);
+                            RESERVE_REQUIREMENT...,
+                        ),
                     )
                 end
             end
@@ -5545,11 +5685,23 @@ function build_c_sys5_bat_ems(;
                 ini_time = timestamp(Reserve_ts[t])[1]
                 forecast_data[ini_time] = Reserve_ts[t]
             end
-            add_time_series!(c_sys5_bat, serv, Deterministic("requirement", forecast_data))
+            add_time_series!(
+                c_sys5_bat,
+                serv,
+                Deterministic(
+                    "requirement",
+                    requirement_in_mw(serv, forecast_data);
+                    RESERVE_REQUIREMENT...,
+                ),
+            )
             PSY.add_time_series!(
                 c_sys5_bat,
                 serv,
-                PSY.SingleTimeSeries("requirement", Reserve_single_ts),
+                PSY.SingleTimeSeries(
+                    "requirement",
+                    requirement_in_mw(serv, Reserve_single_ts);
+                    RESERVE_REQUIREMENT...,
+                ),
             )
         end
         for (ix, serv) in
@@ -5615,7 +5767,15 @@ function build_c_sys5_pglib_sim(; add_forecasts, add_reserves, raw_data, kwargs.
         add_service!(c_sys5_uc, reserve_uc[3], get_components(ThermalMultiStart, c_sys5_uc))
         for serv in get_components(!has_demand_curve, OnlineReserve, c_sys5_uc)
             data = vcat(Reserve_ts[1], Reserve_ts[2])
-            add_time_series!(c_sys5_uc, serv, SingleTimeSeries("requirement", data))
+            add_time_series!(
+                c_sys5_uc,
+                serv,
+                SingleTimeSeries(
+                    "requirement",
+                    requirement_in_mw(serv, data);
+                    RESERVE_REQUIREMENT...,
+                ),
+            )
         end
     end
     PSY.transform_single_time_series!(c_sys5_uc, Hour(24), Dates.Hour(14))
@@ -7603,7 +7763,8 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
                 l,
                 PSY.SingleTimeSeries(
                     "max_active_power",
-                    TimeArray(da_load_time_series, da_load_time_series_val ./ peak_load),
+                    TimeArray(da_load_time_series, da_load_time_series_val ./ peak_load);
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -7613,7 +7774,8 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
                 g,
                 PSY.SingleTimeSeries(
                     "max_active_power",
-                    TimeArray(da_load_time_series, re_timeseries[PSY.get_name(g)]),
+                    TimeArray(da_load_time_series, re_timeseries[PSY.get_name(g)]);
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -7670,7 +7832,11 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
         for serv in PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, sys)
             reserve_time_series = PSY.SingleTimeSeries(;
                 name = "requirement",
-                data = TimeSeries.TimeArray(da_load_time_series, rand(168)),
+                data = requirement_in_mw(
+                    serv,
+                    TimeSeries.TimeArray(da_load_time_series, rand(168)),
+                ),
+                RESERVE_REQUIREMENT...,
             )
             PSY.add_time_series!(
                 sys,
