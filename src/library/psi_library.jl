@@ -97,7 +97,8 @@ function build_c_sys5_pjm(; add_forecasts, raw_data, sys_kwargs...)
                 l,
                 PSY.SingleTimeSeries(
                     "max_active_power",
-                    TimeArray(da_load_time_series, da_load_time_series_val ./ peak_load),
+                    TimeArray(da_load_time_series, da_load_time_series_val ./ peak_load);
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -107,7 +108,8 @@ function build_c_sys5_pjm(; add_forecasts, raw_data, sys_kwargs...)
                 g,
                 PSY.SingleTimeSeries(
                     "max_active_power",
-                    TimeArray(da_load_time_series, re_timeseries[PSY.get_name(g)]),
+                    TimeArray(da_load_time_series, re_timeseries[PSY.get_name(g)]);
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -225,7 +227,7 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
                 PSY.SingleTimeSeries(
                     "max_active_power",
                     rt_timearray;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -235,7 +237,8 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
                 g,
                 PSY.SingleTimeSeries(
                     "max_active_power",
-                    TimeArray(rt_re_time_stamps, re_timeseries[PSY.get_name(g)]),
+                    TimeArray(rt_re_time_stamps, re_timeseries[PSY.get_name(g)]);
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -1301,7 +1304,7 @@ function build_two_zone_5_bus(; kwargs...)
                     "max_active_power",
                     data,
                     resolution;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         elseif occursin("nodeC", PSY.get_name(l))
@@ -1313,7 +1316,7 @@ function build_two_zone_5_bus(; kwargs...)
                     "max_active_power",
                     data,
                     resolution;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         else
@@ -1325,7 +1328,7 @@ function build_two_zone_5_bus(; kwargs...)
                     "max_active_power",
                     data,
                     resolution;
-                    per_unit_of("active_power")...,
+                    component_base("active_power")...,
                 ),
             )
         end
@@ -1720,7 +1723,12 @@ function fix_rts_RT_reserve_requirements(DA_sys::PSY.System, RT_sys::PSY.System)
         for i in eachindex(data_da)
             all(data_da[i] .== rt_data[((i - 1) * 12 + 1):(12 * i)])
         end
-        new_ts = SingleTimeSeries("requirement", TimeArray(dates_rt, rt_data))
+        # The DA series is already in MW.
+        new_ts = SingleTimeSeries(
+            "requirement",
+            TimeArray(dates_rt, rt_data);
+            RESERVE_REQUIREMENT...,
+        )
         remove_time_series!(RT_sys, SingleTimeSeries, service_rt, "requirement")
         add_time_series!(RT_sys, service_rt, new_ts)
     end
@@ -2091,7 +2099,7 @@ function build_118_bus_DA(; kwargs...)
         local solar_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = solar_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(solar_DA_TS, solar_TS)
     end
@@ -2104,7 +2112,7 @@ function build_118_bus_DA(; kwargs...)
         local wind_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = wind_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(wind_DA_TS, wind_TS)
     end
@@ -2116,7 +2124,7 @@ function build_118_bus_DA(; kwargs...)
         local load_time_series = SingleTimeSeries(;
             name = "max_active_power",
             data = load_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(load_TS, load_time_series)
     end
@@ -2200,7 +2208,7 @@ function build_118_bus_RT(; kwargs...)
         local solar_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = solar_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(solar_RT_TS, solar_TS)
     end
@@ -2213,7 +2221,7 @@ function build_118_bus_RT(; kwargs...)
         local wind_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = wind_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(wind_RT_TS, wind_TS)
     end
@@ -2225,7 +2233,7 @@ function build_118_bus_RT(; kwargs...)
         local load_time_series = SingleTimeSeries(;
             name = "max_active_power",
             data = load_array,
-            per_unit_of("active_power")...,
+            component_base("active_power")...,
         )
         push!(load_TS, load_time_series)
     end
