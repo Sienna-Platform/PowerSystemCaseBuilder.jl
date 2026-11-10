@@ -53,7 +53,7 @@ const PSSE_PARSER_TAP_RATIO_LBOUND = 0.5
 
 """A water reservoir's inflow and outflow: volume flow in m³/s."""
 const WATER_FLOW =
-    (unit_system = IS.NU, units = "m^3/s", quantity_kind = "volume_flow_rate")
+    (units = "m^3/s", quantity_kind = "volume_flow_rate")
 
 """An `ENERGY` reservoir's inflow, outflow and water budget: power in MW."""
-const ENERGY_FLOW = (unit_system = IS.NU, units = "MW", quantity_kind = "active_power")
+const ENERGY_FLOW = (units = "MW", quantity_kind = "active_power")

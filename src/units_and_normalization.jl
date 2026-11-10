@@ -8,9 +8,10 @@ Replaces `scaling_factor_multiplier`, which InfrastructureSystems removed. A nor
 profile used to be stored bare next to the name of an accessor, and every read multiplied it
 by that accessor's value on the owner. The profile is still stored the same way — one shared
 array many components can point at — but the storage now *declares* what it is:
-`unit_system` says the values are per unit on the component's own base, `quantity_kind`
-names the physical quantity they scale to, and `per_unit_of` names the component field they
-are a fraction of: `base_power` for power, `storage_capacity` for a battery's energy. That
+`per_unit_of` names the component field the values are a fraction of — `base_power` for
+power, `storage_capacity` for a battery's energy — which makes them per unit on the
+component's own base (IS derives `unit_system = CU` from it), and `quantity_kind` names the
+physical quantity they scale to. That
 carries the same meaning without a function name for the reader to resolve, and leaves the
 scaling to the consumer.
 
@@ -18,7 +19,6 @@ scaling to the consumer.
 """
 component_base(quantity_kind::AbstractString, per_unit_of::AbstractString = "base_power") =
     (
-        unit_system = IS.CU,
         units = nothing,
         quantity_kind = quantity_kind,
         per_unit_of = per_unit_of,
@@ -26,7 +26,7 @@ component_base(quantity_kind::AbstractString, per_unit_of::AbstractString = "bas
 
 """Keyword arguments declaring a time series stored in the natural `units` of its quantity."""
 natural_units(quantity_kind::AbstractString, units::AbstractString) =
-    (unit_system = IS.NU, units = units, quantity_kind = quantity_kind)
+    (units = units, quantity_kind = quantity_kind)
 
 """
 Flows of an `ENERGY` reservoir in the test system data, in MW for [`ENERGY_FLOW`](@ref).
