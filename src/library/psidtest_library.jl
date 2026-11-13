@@ -79,8 +79,7 @@ function build_psid_psse_test_avr(; raw_data, kwargs...)
         )
     end
     pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
-    avr_sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(avr_sys, dyr_file)
+    avr_sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     _set_zip_load_model!(avr_sys, :impedance)
     return avr_sys
 end
@@ -109,8 +108,7 @@ function build_psid_psse_test_tg(; raw_data, kwargs...)
         )
     end
     pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
-    tg_sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(tg_sys, dyr_file)
+    tg_sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
 
     for l in get_components(PSY.StandardLoad, tg_sys)
         transform_load_to_constant_impedance(l)
@@ -158,8 +156,7 @@ function build_psid_psse_test_gen(; raw_data, kwargs...)
         )
     end
     pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
-    gen_sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(gen_sys, dyr_file)
+    gen_sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
 
     for l in get_components(PSY.StandardLoad, gen_sys)
         transform_load_to_constant_impedance(l)
@@ -192,8 +189,7 @@ function build_psid_psse_test_pss(; raw_data, kwargs...)
         )
     end
     pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
-    pss_sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(pss_sys, dyr_file)
+    pss_sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
 
     for l in get_components(PSY.StandardLoad, pss_sys)
         transform_load_to_constant_impedance(l)
@@ -211,12 +207,12 @@ function build_psid_test_omib(; raw_data, kwargs...)
     function dyn_gen_classic(generator)
         return DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_classic(),
+            frequency_ref = PSY.get_frequency(omib_sys),
+            synchronous_machine_dynamics = machine_classic(),
             shaft = shaft_damping(),
-            avr = avr_none(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_none(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -240,12 +236,12 @@ function build_psid_test_threebus_oneDoneQ(; raw_data, kwargs...)
     function dyn_gen_oneDoneQ(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_oneDoneQ(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_oneDoneQ(),
             shaft = shaft_no_damping(),
-            avr = avr_type1(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_type1(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -270,12 +266,12 @@ function build_psid_test_threebus_simple_marconato(; raw_data, kwargs...)
     function dyn_gen_simple_marconato(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_simple_marconato(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_simple_marconato(),
             shaft = shaft_no_damping(),
-            avr = avr_type1(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_type1(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -300,12 +296,12 @@ function build_psid_test_threebus_marconato(; raw_data, kwargs...)
     function dyn_gen_marconato(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_marconato(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_marconato(),
             shaft = shaft_no_damping(),
-            avr = avr_type1(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_type1(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -330,12 +326,12 @@ function build_psid_test_threebus_simple_anderson(; raw_data, kwargs...)
     function dyn_gen_simple_anderson(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_simple_anderson(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_simple_anderson(),
             shaft = shaft_no_damping(),
-            avr = avr_type1(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_type1(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -360,12 +356,12 @@ function build_psid_test_threebus_anderson(; raw_data, kwargs...)
     function dyn_gen_anderson(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_anderson(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_anderson(),
             shaft = shaft_no_damping(),
-            avr = avr_type1(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_type1(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -395,24 +391,24 @@ function build_psid_test_threebus_5shaft(; raw_data, kwargs...)
     function dyn_gen_five_mass_shaft_order(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_oneDoneQ(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_oneDoneQ(),
             shaft = shaft_fivemass(),
-            avr = avr_type1(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_type1(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
     function dyn_gen_first_order(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_oneDoneQ(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_oneDoneQ(),
             shaft = shaft_damping(),
-            avr = avr_type1(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_type1(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -442,9 +438,9 @@ function build_psid_test_vsm_inverter(; raw_data, kwargs...)
     function inv_darco(static_device)
         return PSY.DynamicInverter(
             PSY.get_name(static_device),
-            1.0,
+            PSY.get_frequency(omib_sys),
             converter_low_power(),
-            outer_control(),
+            outer_control()...,
             inner_control(),
             dc_source_lv(),
             pll(),
@@ -473,24 +469,26 @@ function build_psid_test_threebus_machine_vsm(; raw_data, kwargs...)
     function dyn_gen_second_order(generator)
         return DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_oneDoneQ(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_oneDoneQ(),
             shaft = shaft_no_damping(),
-            avr = avr_type1(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_type1(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
     function inv_case78(static_device)
+        active_power_control, reactive_power_control = outer_control()
         return DynamicInverter(;
             name = PSY.get_name(static_device),
-            ω_ref = 1.0,
+            frequency_ref = PSY.get_frequency(threebus_sys),
             converter = converter_high_power(),
-            outer_control = outer_control(),
+            active_power_control = active_power_control,
+            reactive_power_control = reactive_power_control,
             inner_control = inner_control(),
             dc_source = dc_source_lv(),
-            freq_estimator = pll(),
+            reference_frame_rotation = pll(),
             filter = filt(),
         )
     end
@@ -525,24 +523,24 @@ function build_psid_test_threebus_multimachine(; raw_data, kwargs...)
     function dyn_gen_multi(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_classic(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_classic(),
             shaft = shaft_damping(),
-            avr = avr_none(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_none(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
     function dyn_gen_multi_tg(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_classic(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_classic(),
             shaft = shaft_damping(),
-            avr = avr_none(),
-            prime_mover = tg_type2(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_none(),
+            turbine_governor_dynamics = tg_type2(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -572,24 +570,24 @@ function build_psid_test_threebus_psat_avrs(; raw_data, kwargs...)
     function dyn_gen_avr_type2(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_oneDoneQ(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_oneDoneQ(),
             shaft = shaft_no_damping(),
-            avr = avr_type2(),
-            prime_mover = tg_type1(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_type2(),
+            turbine_governor_dynamics = tg_type1(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
     function dyn_gen_simple_avr(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_oneDoneQ(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_oneDoneQ(),
             shaft = shaft_no_damping(),
-            avr = avr_propr(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_propr(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -616,14 +614,16 @@ function build_psid_test_threebus_vsm_reference(; raw_data, kwargs...)
     threebus_sys = system_from_openapi(pm_data; runchecks = false, sys_kwargs...)
 
     function inv_case78(static_device)
+        active_power_control, reactive_power_control = outer_control()
         return DynamicInverter(;
             name = PSY.get_name(static_device),
-            ω_ref = 1.0, # ω_ref,
+            frequency_ref = PSY.get_frequency(threebus_sys),
             converter = converter_high_power(),
-            outer_control = outer_control(),
+            active_power_control = active_power_control,
+            reactive_power_control = reactive_power_control,
             inner_control = inner_control(),
             dc_source = dc_source_lv(),
-            freq_estimator = pll(),
+            reference_frame_rotation = pll(),
             filter = filt(),
         )
     end
@@ -631,12 +631,12 @@ function build_psid_test_threebus_vsm_reference(; raw_data, kwargs...)
     function dyn_gen_multi_tg(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_classic(),
+            frequency_ref = PSY.get_frequency(threebus_sys),
+            synchronous_machine_dynamics = machine_classic(),
             shaft = shaft_damping(),
-            avr = avr_none(),
-            prime_mover = tg_type2(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_none(),
+            turbine_governor_dynamics = tg_type2(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -669,12 +669,12 @@ function build_psid_test_threebus_genrou_avr(; raw_data, kwargs...)
     function dyn_gen_genrou(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_genrou(),
+            frequency_ref = PSY.get_frequency(sys),
+            synchronous_machine_dynamics = machine_genrou(),
             shaft = shaft_genrou(),
-            avr = avr_type1(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_type1(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -700,9 +700,9 @@ function build_psid_test_droop_inverter(; raw_data, kwargs...)
     function inv_darco_droop(static_device)
         return PSY.DynamicInverter(
             PSY.get_name(static_device),
-            1.0, # ω_ref
+            PSY.get_frequency(omib_sys), # frequency_ref
             converter_low_power(), # converter
-            outer_control_droop(), # outer control
+            outer_control_droop()..., # active and reactive power control
             inner_control(), # inner control
             dc_source_lv(), # dc source
             no_pll(), # no pll
@@ -731,9 +731,9 @@ function build_psid_test_gfoll_inverter(; raw_data, kwargs...)
     function inv_gfoll(static_device)
         return PSY.DynamicInverter(
             PSY.get_name(static_device),
-            1.0, # ω_ref
+            PSY.get_frequency(omib_sys), # frequency_ref
             converter_low_power(), # converter
-            outer_control_gfoll(), # outercontrol
+            outer_control_gfoll()..., # active and reactive power control
             current_mode_inner(), # inner_control
             dc_source_lv(), # dc source
             reduced_pll(), # pll
@@ -761,24 +761,24 @@ function build_psid_test_threebus_multimachine_dynlines(; raw_data, kwargs...)
     function dyn_gen_marconato(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_marconato(),
+            frequency_ref = PSY.get_frequency(sys),
+            synchronous_machine_dynamics = machine_marconato(),
             shaft = shaft_no_damping(),
-            avr = AVRSimple(1.0),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = AVRSimple(1.0),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
     function dyn_gen_marconato_tg(generator)
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_marconato(),
+            frequency_ref = PSY.get_frequency(sys),
+            synchronous_machine_dynamics = machine_marconato(),
             shaft = shaft_no_damping(),
-            avr = AVRSimple(1.0),
-            prime_mover = tg_type2(),
-            pss = pss_none(),
+            excitation_system_dynamics = AVRSimple(1.0),
+            turbine_governor_dynamics = tg_type2(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -824,12 +824,12 @@ function build_psid_test_pvs(; raw_data, kwargs...)
     function dyn_gen_second_order(generator)
         return DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_oneDoneQ(),
+            frequency_ref = PSY.get_frequency(sys),
+            synchronous_machine_dynamics = machine_oneDoneQ(),
             shaft = shaft_no_damping(),
-            avr = avr_type1(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_type1(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -863,8 +863,7 @@ function build_psid_psse_test_constantP_load(; raw_data, kwargs...)
     raw_file = joinpath(raw_data, "ThreeBusMulti.raw")
     dyr_file = joinpath(raw_data, "ThreeBus_GENROU.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
-    sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(sys, dyr_file)
+    sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     return sys
 end
 
@@ -963,8 +962,8 @@ function build_psid_psse_test_exp_load(; kwargs...)
             reactive_power = _total_zip_power(l, "", "reactive_power"),
             # PSY renamed these from `active_power_coefficient`/`reactive_power_coefficient`.
             # Same meaning: the voltage exponent, 0 = constant power.
-            α = 0.0,
-            β = 0.0,
+            alpha = 0.0,
+            beta = 0.0,
             base_power = PSY.get_base_power(l, u"NU"),
             max_active_power = _total_zip_power(l, "max_", "active_power"),
             max_reactive_power = _total_zip_power(l, "max_", "reactive_power"),
@@ -981,8 +980,7 @@ function build_psid_test_indmotor(; raw_data, kwargs...)
     raw_file = joinpath(raw_data, "TVC_System_motor.raw")
     dyr_file = joinpath(raw_data, "TVC_System_motor.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
-    sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(sys, dyr_file)
+    sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     return sys
 end
 

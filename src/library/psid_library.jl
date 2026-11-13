@@ -5,8 +5,7 @@ function build_psid_4bus_multigen(; raw_data, kwargs...)
     dyr_file = joinpath(raw_data, "FourBus_multigen.dyr")
 
     pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
-    sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(sys, dyr_file)
+    sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     for l in get_components(PSY.StandardLoad, sys)
         transform_load_to_constant_impedance(l)
     end
@@ -18,8 +17,7 @@ function build_psid_11bus_andes(; raw_data, kwargs...)
     raw_file = joinpath(raw_data, "11BUS_KUNDUR.raw")
     dyr_file = joinpath(raw_data, "11BUS_KUNDUR_TGOV.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
-    sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(sys, dyr_file)
+    sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     for l in get_components(PSY.StandardLoad, sys)
         transform_load_to_constant_impedance(l)
     end
@@ -56,8 +54,7 @@ function build_psid_14bus_multigen(; raw_data, kwargs...)
     dyr_file = joinpath(raw_data, "dyn_data.dyr")
 
     pm_data = PowerFlowFileParser.PowerModelsData(raw_file)
-    sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(sys, dyr_file)
+    sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     for l in get_components(PSY.StandardLoad, sys)
         transform_load_to_constant_impedance(l)
     end
@@ -142,12 +139,12 @@ function build_psid_wecc_9_dynamic(; raw_data, kwargs...)
         i = get_number(get_bus(generator))
         return PSY.DynamicGenerator(;
             name = PSY.get_name(generator),
-            ω_ref = 1.0,
-            machine = machine_sauerpai(i),
+            frequency_ref = PSY.get_frequency(sys),
+            synchronous_machine_dynamics = machine_sauerpai(i),
             shaft = shaft_sauerpai(i),
-            avr = avr_typei(),
-            prime_mover = tg_none(),
-            pss = pss_none(),
+            excitation_system_dynamics = avr_typei(),
+            turbine_governor_dynamics = tg_none(),
+            power_system_stabilizer_dynamics = pss_none(),
         )
     end
 
@@ -174,8 +171,8 @@ function build_psid_load_tutorial_omib(; raw_data, kwargs...)
         bus = PSY.get_bus(l),
         active_power = PSY.get_constant_active_power(l, u"SU"),
         reactive_power = PSY.get_constant_reactive_power(l, u"SU"),
-        α = 0.0, # Constant Power
-        β = 0.0, # Constant Power
+        alpha = 0.0, # Constant Power
+        beta = 0.0, # Constant Power
         base_power = PSY.get_base_power(l, u"NU"),
         max_active_power = PSY.get_max_constant_active_power(l, u"SU"),
         max_reactive_power = PSY.get_max_constant_reactive_power(l, u"SU"),

@@ -64,6 +64,26 @@ directly; left out, it would default to 100 MVA.
 """
 function system_from_openapi(pm_data::PowerFlowFileParser.PowerModelsData; kwargs...)
     oapi = PowerFlowFileParser.build_openapi_system(pm_data; kwargs...)
+    return _system_from_powermodels_document(oapi, pm_data; kwargs...)
+end
+
+"""
+As above, with the dynamic models of a PSS/E `.dyr` file carried in the document.
+"""
+function system_from_openapi(
+    pm_data::PowerFlowFileParser.PowerModelsData,
+    dyr_file::AbstractString;
+    kwargs...,
+)
+    oapi = PowerFlowFileParser.build_openapi_system(
+        pm_data,
+        PowerFlowFileParser.parse_dyr(dyr_file);
+        kwargs...,
+    )
+    return _system_from_powermodels_document(oapi, pm_data; kwargs...)
+end
+
+function _system_from_powermodels_document(oapi, pm_data; kwargs...)
     sys = system_from_document(
         oapi;
         base_power = Float64(pm_data.data["baseMVA"]),
