@@ -51,7 +51,6 @@ import DataFrames: DataFrame
 import LazyArtifacts
 import JSON
 import SHA
-import YAML
 import InteractiveUtils
 
 using DocStringExtensions
@@ -148,7 +147,6 @@ struct SPISystems <: SystemCategory end
 # Include Parsing files
 include("parsers/known_stale_fixture_data.jl")
 include("parsers/openapi_pipeline.jl")
-include("parsers/psse_dynamic_data.jl")
 include("parsers/psse_metadata_reimport.jl")
 
 # includes

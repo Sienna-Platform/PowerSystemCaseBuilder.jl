@@ -33,16 +33,16 @@
     # Select the 50 deg shifter by its angle (raw ANG1 = 50.0 deg).
     pst = only(
         t for
-        t in t2ws if isapprox(PSY.get_α(PSY.get_circuit(t)), deg2rad(50.0); atol = 1e-9)
+        t in t2ws if isapprox(PSY.get_alpha(PSY.get_circuit(t)), deg2rad(50.0); atol = 1e-9)
     )
-    @test PSY.get_α(PSY.get_circuit(pst)) ≈ deg2rad(50.0) atol = 1e-9
+    @test PSY.get_alpha(PSY.get_circuit(pst)) ≈ deg2rad(50.0) atol = 1e-9
 
     # COD spot-check for the 50 deg 2W circuit. raw winding-1 line:
     # WINDV1=0.95 ANG1=50 ... COD1=0 CONT1=0 RMA1=1.10 RMI1=0.90 VMA1=1.10 VMI1=0.90 NTP1=33
     w_pst = PSY.get_circuit(pst)
     @test PSY.get_control_objective(w_pst) != TransformerControlObjective.UNDEFINED
     @test PSY.get_control_objective(w_pst) == TransformerControlObjective.FIXED  # COD1 = 0
-    @test PSY.get_regulated_bus_number(w_pst) == 0                     # CONT1 = 0
+    @test isnothing(PSY.get_regulated_bus(w_pst))                    # CONT1 = 0
     @test PSY.get_number_of_tap_positions(w_pst) == 33                 # NTP1 = 33
     @test PSY.get_tap_ratio_limits(w_pst) == (min = 0.9, max = 1.1)         # RMI1 / RMA1
     @test PSY.get_controlled_voltage_limits(w_pst) == (min = 0.9, max = 1.1)  # VMI1 / VMA1

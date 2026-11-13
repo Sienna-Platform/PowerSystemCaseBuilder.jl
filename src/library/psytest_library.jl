@@ -92,8 +92,7 @@ function build_psse_Benchmark_4ger_33_2015_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "Benchmark_4ger_33_2015.RAW")
     dyr_file = joinpath(raw_data, "psse_dyr", "Benchmark_4ger_33_2015.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(sys, dyr_file)
+    sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     return sys
 end
 
@@ -102,8 +101,7 @@ function build_psse_OMIB_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "OMIB.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "OMIB.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(sys, dyr_file)
+    sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     return sys
 end
 
@@ -112,8 +110,7 @@ function build_psse_3bus_gen_cls_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "ThreeBusNetwork.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "TestGENCLS.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(sys, dyr_file)
+    sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     return sys
 end
 
@@ -122,8 +119,7 @@ function psse_renewable_parsing_1(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "Benchmark_4ger_33_2015_RENA.RAW")
     dyr_file = joinpath(raw_data, "psse_dyr", "Benchmark_4ger_33_2015_RENA.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(sys, dyr_file)
+    sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     return sys
 end
 
@@ -132,8 +128,7 @@ function build_psse_3bus_sexs_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "ThreeBusNetwork.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "test_SEXS.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(sys, dyr_file)
+    sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     return sys
 end
 
@@ -143,11 +138,10 @@ function build_psse_original_240_case(; raw_data, kwargs...)
     dyr_file = joinpath(raw_data, "psse_dyr", "240busWECC_2018_PSS.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
     sys = system_from_openapi(
-        pm_data;
+        pm_data, dyr_file;
         bus_name_formatter = x -> string(x["name"]) * "-" * string(x["index"]),
         sys_kwargs...,
     )
-    add_dyn_injectors!(sys, dyr_file)
     return sys
 end
 
@@ -156,8 +150,7 @@ function build_psse_3bus_no_cls_sys(; raw_data, kwargs...)
     file_path = joinpath(raw_data, "psse_raw", "ThreeBusNetwork.raw")
     dyr_file = joinpath(raw_data, "psse_dyr", "Test-NoCLS.dyr")
     pm_data = PowerFlowFileParser.PowerModelsData(file_path)
-    sys = system_from_openapi(pm_data; sys_kwargs...)
-    add_dyn_injectors!(sys, dyr_file)
+    sys = system_from_openapi(pm_data, dyr_file; sys_kwargs...)
     return sys
 end
 
@@ -240,7 +233,7 @@ function build_dynamic_inverter_sys(; kwargs...)
     ) #Series resistance lg to grid connection (#Step up transformer or similar)
 
     pll = PSY.KauraPLL(
-        500.0, #ω_lp: Cut-off frequency for LowPass filter of PLL filter.
+        500.0 / (2 * pi), #frequency_lp: Cut-off frequency (Hz) for LowPass filter of PLL filter.
         0.084, #k_p: PLL proportional gain
         4.69,
     ) #k_i: PLL integral gain
@@ -248,16 +241,13 @@ function build_dynamic_inverter_sys(; kwargs...)
     virtual_H = PSY.VirtualInertia(
         2.0, #Ta:: VSM inertia constant
         400.0, #kd:: VSM damping coefficient
-        20.0, #kω:: Frequency droop gain in pu
-        2 * pi * 50.0,
-    ) #ωb:: Rated angular frequency
+        20.0, #k_frequency:: Frequency droop gain in pu
+    )
 
     Q_control = PSY.ReactivePowerDroop(
         0.2, #kq:: Reactive power droop gain in pu
-        1000.0,
-    ) #ωf:: Reactive power cut-off low pass filter frequency
-
-    outer_control = PSY.OuterControl(virtual_H, Q_control)
+        1000.0 / (2 * pi),
+    ) #reactive_power_filter_frequency:: Reactive power cut-off low pass filter frequency (Hz)
 
     vsc = PSY.VoltageModeControl(
         0.59, #kpv:: Voltage controller proportional gain
@@ -268,7 +258,7 @@ function build_dynamic_inverter_sys(; kwargs...)
         1.27, #kpc:: Current controller proportional gain
         14.3, #kiv:: Current controller integral gain
         0.0, #kffi:: Binary variable enabling the current feed-forward in output of current controllers
-        50.0, #ωad:: Active damping low pass filter cut-off frequency
+        50.0 / (2 * pi), #active_damping_filter_frequency:: Active damping low pass filter cut-off frequency (Hz)
         0.2,
     ) #kad:: Active damping gain
 
@@ -283,12 +273,13 @@ function build_dynamic_inverter_sys(; kwargs...)
 
     test_inverter = PSY.DynamicInverter(
         PSY.get_name(battery),
-        1.0, #ω_ref
+        50.0, #frequency_ref (Hz)
         converter, #Converter
-        outer_control, #OuterControl
+        virtual_H, #ActivePowerControl
+        Q_control, #ReactivePowerControl
         vsc, #Voltage Source Controller
         dc_source, #DC Source
-        pll, #Frequency Estimator
+        pll, #ReferenceFrameRotation
         filt,
     ) #Output Filter
 
