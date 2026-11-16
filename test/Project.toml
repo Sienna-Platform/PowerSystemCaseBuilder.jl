@@ -1,4 +1,5 @@
 [deps]
+InfraStore = "6aee0376-896a-4a59-96ff-12f221c99746"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
@@ -29,5 +30,6 @@ PowerSystemCaseBuilder = {path = ".."}
 InfrastructureSystems = {url = "https://github.com/Sienna-Platform/InfrastructureSystems.jl.git", rev = "IS4"}
 PowerFlowFileParser = {url = "https://github.com/Sienna-Platform/PowerFlowFileParser.jl.git", rev = "jd/dynamics-acceptance"}
 PowerSystems = {url = "https://github.com/Sienna-Platform/PowerSystems.jl.git", rev = "jd/dynamics-acceptance"}
-PowerTableDataParser = {url = "https://github.com/NLR-Sienna/PowerTableDataParser.jl.git", rev = "jd/sdk-0.5"}
+# TODO: back to NLR-Sienna rev = "psy6" once PowerTableDataParser.jl#18 merges.
+PowerTableDataParser = {url = "https://github.com/luke-kiernan/PowerTableDataParser.jl.git", rev = "lk/ts-translate-multipliers"}
 
