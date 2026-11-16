@@ -36,7 +36,7 @@ PowerOperationsOpenAPIModels = "a372b6d7-45a2-44c2-8199-6a724b72e8ff"
 InfrastructureSystems = {url = "https://github.com/Sienna-Platform/InfrastructureSystems.jl.git", rev = "IS4"}
 PowerFlowFileParser = {url = "https://github.com/Sienna-Platform/PowerFlowFileParser.jl.git", rev = "jd/dynamics-acceptance"}
 PowerSystems = {url = "https://github.com/Sienna-Platform/PowerSystems.jl.git", rev = "jd/dynamics-acceptance"}
-PowerTableDataParser = {url = "https://github.com/NLR-Sienna/PowerTableDataParser.jl.git", rev = "psy6"}
+PowerTableDataParser = {url = "https://github.com/NLR-Sienna/PowerTableDataParser.jl.git", rev = "jd/sdk-0.5"}
 
 [compat]
 CSV = "~0.10"
@@ -46,17 +46,17 @@ Dates = "1"
 DocStringExtensions = "0.9.3"
 Downloads = "1.6"
 HDF5 = "0.17"
-InfrastructureCoreOpenAPIModels = "0.4"
+InfrastructureCoreOpenAPIModels = "0.5"
 InfrastructureSystems = "^3.2"
-InfrastructureTimeSeriesOpenAPIModels = "0.4"
+InfrastructureTimeSeriesOpenAPIModels = "0.5"
 InteractiveUtils = "1.11.0"
 JSON = "^1.5"
 LazyArtifacts = "1"
-PowerCoreOpenAPIModels = "0.4"
-PowerDynamicsOpenAPIModels = "0.4"
-PowerInvestmentsOpenAPIModels = "0.4"
-PowerOpenAPIModels = "0.4"
-PowerOperationsOpenAPIModels = "0.4"
+PowerCoreOpenAPIModels = "0.5"
+PowerDynamicsOpenAPIModels = "0.5"
+PowerInvestmentsOpenAPIModels = "0.5"
+PowerOpenAPIModels = "0.5"
+PowerOperationsOpenAPIModels = "0.5"
 PowerSystems = "^5.10"
 PrettyTables = "2.4, 3.1"
 Random = "1"
