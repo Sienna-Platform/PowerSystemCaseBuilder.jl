@@ -8,18 +8,22 @@ _build(name; kwargs...) = build_system(
     PSITestSystems, name; force_build = true, skip_serialization = true, kwargs...)
 
 @testset "Hydro test system data is stored in natural units" begin
-    # An ENERGY reservoir: flows are the profile times the 100 MVA system base, levels the
-    # profile times the reservoir's maximum. Both the single series and forecast branches.
+    # An ENERGY reservoir: the inflow is the profile times the reservoir's `inflow` field (MW);
+    # levels and the budget are the profile times its maximum. Both the single series and
+    # forecast branches.
     for single in (true, false)
         sys = _build("c_sys5_hy_turbine_energy";
             add_single_time_series = single, add_forecasts = !single)
         res = only(get_components(HydroReservoir, sys))
         max_level = get_storage_level_limits(res).max
+        energy = (IS.NU, "MW*hr", "energy", nothing)
         for (name, raw_single, raw_windows, scale, expected) in (
-            ("inflow", PSB.hydro_single_timeseries_DA, PSB.hydro_timeseries_DA, 100.0,
-                (IS.NU, "MW", "active_power", nothing)),
+            ("inflow", PSB.hydro_single_timeseries_DA, PSB.hydro_timeseries_DA,
+                get_inflow(res), (IS.NU, "MW", "active_power", nothing)),
+            ("hydro_budget", PSB.hydro_budget_single_ts_DA, PSB.hydro_budget_DA,
+                max_level, energy),
             ("storage_target", PSB.storage_target_single_ts_DA, PSB.storage_target_DA,
-                max_level, (IS.NU, "MW*hr", "energy", nothing)),
+                max_level, energy),
         )
             if single
                 ts = get_time_series(SingleTimeSeries, res, name)
@@ -42,6 +46,12 @@ _build(name; kwargs...) = build_system(
           values(PSB.inflow_single_ts_DA_water)
     @test labels(get_time_series(SingleTimeSeries, res, "inflow")) ==
           (IS.NU, "m^3/s", "volume_flow_rate", nothing)
+
+    # A reserve's requirement is stated in MW: the data's 100 MW reads as 1 SU of the 100 MVA base.
+    sys = _build("c_sys5_hy"; add_reserves = true)
+    serv = get_component(OnlineReserve{ReserveUp}, sys, "Reserve5")
+    @test get_requirement(serv, u"SU") ≈ 1.0
+    @test get_requirement(serv, u"MW") ≈ 100.0
 
     # A battery's level stays CU of its capacity, values unchanged.
     sys = _build("c_sys5_bat_ems"; add_forecasts = true)

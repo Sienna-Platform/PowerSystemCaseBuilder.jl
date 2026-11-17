@@ -515,6 +515,7 @@ function build_c_sys5_re(;
             reserve_re[3],
             PSY.get_components(PSY.RenewableDispatch, c_sys5_re),
         )
+        requirement_as_mw!(reserve_re[1], reserve_re[2])
         for (ix, serv) in enumerate(
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_re),
         )
@@ -658,6 +659,7 @@ function build_c_sys5_re_fuel_cost(;
             reserve_re[3],
             PSY.get_components(PSY.RenewableDispatch, c_sys5_re),
         )
+        requirement_as_mw!(reserve_re[1], reserve_re[2])
         for (ix, serv) in enumerate(
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_re),
         )
@@ -913,6 +915,7 @@ function build_c_sys5_hy(;
             [collect(PSY.get_components(PSY.HydroDispatch, c_sys5_hy))[end]],
         )
 
+        requirement_as_mw!(reserve_hy[1], reserve_hy[2])
         for (ix, serv) in enumerate(
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hy),
         )
@@ -1047,8 +1050,8 @@ function build_c_sys5_hy_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, hydro_budget_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         else
@@ -1058,8 +1061,8 @@ function build_c_sys5_hy_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        in_mw(c_sys5_hyd, forecast_data);
-                        ENERGY_FLOW...,
+                        reservoir_level_values(h, forecast_data);
+                        reservoir_level_labels(h)...,
                     ),
                 )
             end
@@ -1079,7 +1082,7 @@ function build_c_sys5_hy_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1099,7 +1102,7 @@ function build_c_sys5_hy_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "inflow",
-                        in_mw(c_sys5_hyd, forecast_data_inflow);
+                        inflow_in_mw(h, forecast_data_inflow);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -1128,6 +1131,7 @@ function build_c_sys5_hy_turbine_energy(;
             turb,
         )
 
+        requirement_as_mw!(reserve_hy[1], reserve_hy[2])
         for (ix, serv) in enumerate(
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
         )
@@ -1276,6 +1280,7 @@ function build_c_sys5_hy_turbine_head(;
             turb,
         )
 
+        requirement_as_mw!(reserve_hy[1], reserve_hy[2])
         for (ix, serv) in enumerate(
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
         )
@@ -1415,8 +1420,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, hydro_budget_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         else
@@ -1426,8 +1431,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        in_mw(c_sys5_hyd, forecast_data);
-                        ENERGY_FLOW...,
+                        reservoir_level_values(h, forecast_data);
+                        reservoir_level_labels(h)...,
                     ),
                 )
             end
@@ -1447,7 +1452,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1467,7 +1472,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "inflow",
-                        in_mw(c_sys5_hyd, forecast_data_inflow);
+                        inflow_in_mw(h, forecast_data_inflow);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -1496,6 +1501,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
             turb_down,
         )
 
+        requirement_as_mw!(reserve_hy[1], reserve_hy[2])
         for (ix, serv) in enumerate(
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
         )
@@ -1648,6 +1654,7 @@ function build_c_sys5_hy_cascading_turbine_head(;
             turb_down,
         )
 
+        requirement_as_mw!(reserve_hy[1], reserve_hy[2])
         for (ix, serv) in enumerate(
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
         )
@@ -1776,8 +1783,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, hydro_budget_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         elseif add_forecasts
@@ -1786,8 +1793,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, forecast_data);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, forecast_data);
+                    reservoir_level_labels(h)...,
                 ),
             )
         end
@@ -1806,7 +1813,7 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1825,7 +1832,7 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    in_mw(c_sys5_hyd, forecast_data_inflow);
+                    inflow_in_mw(h, forecast_data_inflow);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1858,6 +1865,7 @@ function build_c_sys5_hyd(;
             reserve_hy[3],
             PSY.get_components(PSY.HydroTurbine, c_sys5_hyd),
         )
+        requirement_as_mw!(reserve_hy[1], reserve_hy[2])
         for (ix, serv) in enumerate(
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
         )
@@ -1993,8 +2001,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, hydro_budget_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         elseif add_forecasts
@@ -2003,8 +2011,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, forecast_data);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, forecast_data);
+                    reservoir_level_labels(h)...,
                 ),
             )
         end
@@ -2023,7 +2031,7 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -2042,7 +2050,7 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    in_mw(c_sys5_hyd, forecast_data_inflow);
+                    inflow_in_mw(h, forecast_data_inflow);
                     ENERGY_FLOW...,
                 ),
             )
@@ -2075,6 +2083,7 @@ function build_c_sys5_hyd_ems(;
             reserve_hy[3],
             PSY.get_components(PSY.HydroTurbine, c_sys5_hyd),
         )
+        requirement_as_mw!(reserve_hy[1], reserve_hy[2])
         for (ix, serv) in enumerate(
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hyd),
         )
@@ -2551,6 +2560,7 @@ function build_c_sys5_il(;
             reserve_il[3],
             PSY.get_components(PSY.InterruptiblePowerLoad, c_sys5_il),
         )
+        requirement_as_mw!(reserve_il[1], reserve_il[2])
         for (ix, serv) in enumerate(
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_il),
         )
@@ -3978,7 +3988,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hy_uc, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -3988,7 +3998,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    in_mw(c_sys5_hy_uc, forecast_data);
+                    inflow_in_mw(h, forecast_data);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4006,8 +4016,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_uc, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, hydro_budget_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         elseif add_forecasts
@@ -4016,8 +4026,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_uc, forecast_data);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, forecast_data);
+                    reservoir_level_labels(h)...,
                 ),
             )
         end
@@ -4233,7 +4243,7 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hy_uc, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4243,7 +4253,7 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    in_mw(c_sys5_hy_uc, forecast_data);
+                    inflow_in_mw(h, forecast_data);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4261,8 +4271,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_uc, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, hydro_budget_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         elseif add_forecasts
@@ -4271,8 +4281,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_uc, forecast_data);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, forecast_data);
+                    reservoir_level_labels(h)...,
                 ),
             )
         end
@@ -4538,7 +4548,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 l,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hy_ed, hydro_single_timeseries_RT);
+                    inflow_in_mw(l, hydro_single_timeseries_RT);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4549,7 +4559,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     l,
                     PSY.Deterministic(
                         "inflow",
-                        in_mw(c_sys5_hy_ed, forecast_data);
+                        inflow_in_mw(l, forecast_data);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -4572,8 +4582,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_ed, hydro_budget_single_ts_RT);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, hydro_budget_single_ts_RT);
+                    reservoir_level_labels(h)...,
                 ),
             )
         else
@@ -4583,8 +4593,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        in_mw(c_sys5_hy_ed, forecast_data);
-                        ENERGY_FLOW...,
+                        reservoir_level_values(h, forecast_data);
+                        reservoir_level_labels(h)...,
                     ),
                 )
             end
@@ -4840,7 +4850,7 @@ function build_c_sys5_hy_ems_ed(;
                 l,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hy_ed, hydro_single_timeseries_RT);
+                    inflow_in_mw(l, hydro_single_timeseries_RT);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4851,7 +4861,7 @@ function build_c_sys5_hy_ems_ed(;
                     l,
                     PSY.Deterministic(
                         "inflow",
-                        in_mw(c_sys5_hy_ed, forecast_data);
+                        inflow_in_mw(l, forecast_data);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -4874,8 +4884,8 @@ function build_c_sys5_hy_ems_ed(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_ed, hydro_budget_single_ts_RT);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, hydro_budget_single_ts_RT);
+                    reservoir_level_labels(h)...,
                 ),
             )
         else
@@ -4885,8 +4895,8 @@ function build_c_sys5_hy_ems_ed(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        in_mw(c_sys5_hy_ed, forecast_data);
-                        ENERGY_FLOW...,
+                        reservoir_level_values(h, forecast_data);
+                        reservoir_level_labels(h)...,
                     ),
                 )
             end
@@ -5198,6 +5208,7 @@ function build_c_sys5_phes_ed(;
             [collect(PSY.get_components(PSY.HydroPumpTurbine, c_sys5_phes_ed))[end]],
         )
 
+        requirement_as_mw!(reserve_uc[1], reserve_uc[2])
         for serv in
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_phes_ed)
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
@@ -7350,7 +7361,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    in_mw(c_sys5_all_components, forecast_data);
+                    inflow_in_mw(h, forecast_data);
                     ENERGY_FLOW...,
                 ),
             )
@@ -7359,7 +7370,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_all_components, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -7376,8 +7387,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    in_mw(c_sys5_all_components, forecast_data);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, forecast_data);
+                    reservoir_level_labels(h)...,
                 ),
             )
             PSY.add_time_series!(
@@ -7385,8 +7396,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_all_components, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    reservoir_level_values(h, hydro_budget_single_ts_DA);
+                    reservoir_level_labels(h)...,
                 ),
             )
         end
