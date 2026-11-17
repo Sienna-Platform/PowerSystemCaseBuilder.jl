@@ -29,13 +29,6 @@ natural_units(quantity_kind::AbstractString, units::AbstractString) =
     (units = units, quantity_kind = quantity_kind)
 
 """
-An `ENERGY` reservoir's `"inflow"` or `"hydro_budget"` profile in MW, for
-[`ENERGY_FLOW`](@ref). The test system data's profiles are fractions of the reservoir's own
-`inflow` field (MW), so they are scaled by it, as reserve profiles are by `requirement`.
-"""
-inflow_in_mw(reservoir::PSY.HydroReservoir, data) = scaled(data, PSY.get_inflow(reservoir))
-
-"""
 A reserve's requirement profile in MW. PowerSystems takes a service's series in natural
 units only, and the test system data's profiles are fractions of the reserve's own
 `requirement`, so they are scaled by it, as PowerTableDataParser does for tabular data. The

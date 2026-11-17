@@ -1047,8 +1047,8 @@ function build_c_sys5_hy_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    inflow_in_mw(h, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    hydro_budget_single_ts_DA;
+                    ENERGY_BUDGET...,
                 ),
             )
         else
@@ -1058,8 +1058,8 @@ function build_c_sys5_hy_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        inflow_in_mw(h, forecast_data);
-                        ENERGY_FLOW...,
+                        forecast_data;
+                        ENERGY_BUDGET...,
                     ),
                 )
             end
@@ -1069,8 +1069,8 @@ function build_c_sys5_hy_turbine_energy(;
         forecast_data_inflow = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         forecast_data_target = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
-            ini_time = TimeSeries.timestamp(hydro_timeseries_DA[t][ix])[1]
-            forecast_data_inflow[ini_time] = hydro_timeseries_DA[t][ix]
+            ini_time = TimeSeries.timestamp(reservoir_inflow_DA[t][ix])[1]
+            forecast_data_inflow[ini_time] = reservoir_inflow_DA[t][ix]
             forecast_data_target[ini_time] = storage_target_DA[t][ix]
         end
         if add_single_time_series
@@ -1079,7 +1079,7 @@ function build_c_sys5_hy_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    inflow_in_mw(h, hydro_single_timeseries_DA);
+                    reservoir_inflow_single_ts_DA;
                     ENERGY_FLOW...,
                 ),
             )
@@ -1099,7 +1099,7 @@ function build_c_sys5_hy_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "inflow",
-                        inflow_in_mw(h, forecast_data_inflow);
+                        forecast_data_inflow;
                         ENERGY_FLOW...,
                     ),
                 )
@@ -1415,8 +1415,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    inflow_in_mw(h, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    hydro_budget_single_ts_DA;
+                    ENERGY_BUDGET...,
                 ),
             )
         else
@@ -1426,8 +1426,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        inflow_in_mw(h, forecast_data);
-                        ENERGY_FLOW...,
+                        forecast_data;
+                        ENERGY_BUDGET...,
                     ),
                 )
             end
@@ -1437,8 +1437,8 @@ function build_c_sys5_hy_cascading_turbine_energy(;
         forecast_data_inflow = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         forecast_data_target = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
-            ini_time = TimeSeries.timestamp(hydro_timeseries_DA[t][1])[1]
-            forecast_data_inflow[ini_time] = hydro_timeseries_DA[t][1]
+            ini_time = TimeSeries.timestamp(reservoir_inflow_DA[t][1])[1]
+            forecast_data_inflow[ini_time] = reservoir_inflow_DA[t][1]
             forecast_data_target[ini_time] = storage_target_DA[t][1]
         end
         if add_single_time_series
@@ -1447,7 +1447,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    inflow_in_mw(h, hydro_single_timeseries_DA);
+                    reservoir_inflow_single_ts_DA;
                     ENERGY_FLOW...,
                 ),
             )
@@ -1467,7 +1467,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "inflow",
-                        inflow_in_mw(h, forecast_data_inflow);
+                        forecast_data_inflow;
                         ENERGY_FLOW...,
                     ),
                 )
@@ -1776,8 +1776,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    inflow_in_mw(h, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    hydro_budget_single_ts_DA;
+                    ENERGY_BUDGET...,
                 ),
             )
         elseif add_forecasts
@@ -1786,8 +1786,8 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    inflow_in_mw(h, forecast_data);
-                    ENERGY_FLOW...,
+                    forecast_data;
+                    ENERGY_BUDGET...,
                 ),
             )
         end
@@ -1796,8 +1796,8 @@ function build_c_sys5_hyd(;
         forecast_data_inflow = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         forecast_data_target = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
-            ini_time = TimeSeries.timestamp(hydro_timeseries_DA[t][ix])[1]
-            forecast_data_inflow[ini_time] = hydro_timeseries_DA[t][ix]
+            ini_time = TimeSeries.timestamp(reservoir_inflow_DA[t][ix])[1]
+            forecast_data_inflow[ini_time] = reservoir_inflow_DA[t][ix]
             forecast_data_target[ini_time] = storage_target_DA[t][ix]
         end
         if add_single_time_series
@@ -1806,7 +1806,7 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    inflow_in_mw(h, hydro_single_timeseries_DA);
+                    reservoir_inflow_single_ts_DA;
                     ENERGY_FLOW...,
                 ),
             )
@@ -1825,7 +1825,7 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    inflow_in_mw(h, forecast_data_inflow);
+                    forecast_data_inflow;
                     ENERGY_FLOW...,
                 ),
             )
@@ -1993,8 +1993,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    inflow_in_mw(h, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    hydro_budget_single_ts_DA;
+                    ENERGY_BUDGET...,
                 ),
             )
         elseif add_forecasts
@@ -2003,8 +2003,8 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    inflow_in_mw(h, forecast_data);
-                    ENERGY_FLOW...,
+                    forecast_data;
+                    ENERGY_BUDGET...,
                 ),
             )
         end
@@ -2013,8 +2013,8 @@ function build_c_sys5_hyd_ems(;
         forecast_data_inflow = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         forecast_data_target = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
-            ini_time = TimeSeries.timestamp(hydro_timeseries_DA[t][ix])[1]
-            forecast_data_inflow[ini_time] = hydro_timeseries_DA[t][ix]
+            ini_time = TimeSeries.timestamp(reservoir_inflow_DA[t][ix])[1]
+            forecast_data_inflow[ini_time] = reservoir_inflow_DA[t][ix]
             forecast_data_target[ini_time] = storage_target_DA[t][ix]
         end
         if add_single_time_series
@@ -2023,7 +2023,7 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    inflow_in_mw(h, hydro_single_timeseries_DA);
+                    reservoir_inflow_single_ts_DA;
                     ENERGY_FLOW...,
                 ),
             )
@@ -2042,7 +2042,7 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    inflow_in_mw(h, forecast_data_inflow);
+                    forecast_data_inflow;
                     ENERGY_FLOW...,
                 ),
             )
@@ -3971,8 +3971,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
     for (ix, h) in enumerate(sorted_components(PSY.HydroReservoir, c_sys5_hy_uc))
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
-            ini_time = timestamp(hydro_timeseries_DA[t][ix])[1]
-            forecast_data[ini_time] = hydro_timeseries_DA[t][ix] .* 0.8
+            ini_time = timestamp(reservoir_inflow_DA[t][ix])[1]
+            forecast_data[ini_time] = reservoir_inflow_DA[t][ix]
         end
         if add_single_time_series
             PSY.add_time_series!(
@@ -3980,7 +3980,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    inflow_in_mw(h, hydro_single_timeseries_DA);
+                    reservoir_inflow_single_ts_DA;
                     ENERGY_FLOW...,
                 ),
             )
@@ -3990,7 +3990,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    inflow_in_mw(h, forecast_data);
+                    forecast_data;
                     ENERGY_FLOW...,
                 ),
             )
@@ -4008,8 +4008,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    inflow_in_mw(h, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    hydro_budget_single_ts_DA;
+                    ENERGY_BUDGET...,
                 ),
             )
         elseif add_forecasts
@@ -4018,8 +4018,8 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    inflow_in_mw(h, forecast_data);
-                    ENERGY_FLOW...,
+                    forecast_data;
+                    ENERGY_BUDGET...,
                 ),
             )
         end
@@ -4226,8 +4226,8 @@ function build_c_sys5_hy_ems_uc(;
     for (ix, h) in enumerate(sorted_components(PSY.HydroReservoir, c_sys5_hy_uc))
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
-            ini_time = timestamp(hydro_timeseries_DA[t][ix])[1]
-            forecast_data[ini_time] = hydro_timeseries_DA[t][ix] .* 0.8
+            ini_time = timestamp(reservoir_inflow_DA[t][ix])[1]
+            forecast_data[ini_time] = reservoir_inflow_DA[t][ix]
         end
         if add_single_time_series
             PSY.add_time_series!(
@@ -4235,7 +4235,7 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    inflow_in_mw(h, hydro_single_timeseries_DA);
+                    reservoir_inflow_single_ts_DA;
                     ENERGY_FLOW...,
                 ),
             )
@@ -4245,7 +4245,7 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    inflow_in_mw(h, forecast_data);
+                    forecast_data;
                     ENERGY_FLOW...,
                 ),
             )
@@ -4263,8 +4263,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    inflow_in_mw(h, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    hydro_budget_single_ts_DA;
+                    ENERGY_BUDGET...,
                 ),
             )
         elseif add_forecasts
@@ -4273,8 +4273,8 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    inflow_in_mw(h, forecast_data);
-                    ENERGY_FLOW...,
+                    forecast_data;
+                    ENERGY_BUDGET...,
                 ),
             )
         end
@@ -4527,10 +4527,10 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
     for (ix, l) in enumerate(sorted_components(PSY.HydroReservoir, c_sys5_hy_ed))
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
-            ta = hydro_timeseries_DA[t][ix]
+            ta = reservoir_inflow_DA[t][ix]
             for i in 1:length(ta)
                 ini_time = timestamp(ta[i])
-                data = when(hydro_timeseries_RT[t][ix], hour, hour(ini_time[1]))
+                data = when(reservoir_inflow_RT[t][ix], hour, hour(ini_time[1]))
                 forecast_data[ini_time[1]] = data
             end
         end
@@ -4540,7 +4540,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 l,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    inflow_in_mw(l, hydro_single_timeseries_RT);
+                    reservoir_inflow_single_ts_RT;
                     ENERGY_FLOW...,
                 ),
             )
@@ -4551,7 +4551,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     l,
                     PSY.Deterministic(
                         "inflow",
-                        inflow_in_mw(l, forecast_data);
+                        forecast_data;
                         ENERGY_FLOW...,
                     ),
                 )
@@ -4564,7 +4564,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
             ta = hydro_budget_DA[t][ix]
             for i in 1:length(ta)
                 ini_time = timestamp(ta[i])
-                data = when(hydro_budget_RT[t][ix] .* 0.8, hour, hour(ini_time[1]))
+                data = when(hydro_budget_RT[t][ix], hour, hour(ini_time[1]))
                 forecast_data[ini_time[1]] = data
             end
         end
@@ -4574,8 +4574,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    inflow_in_mw(h, hydro_budget_single_ts_RT);
-                    ENERGY_FLOW...,
+                    hydro_budget_single_ts_RT;
+                    ENERGY_BUDGET...,
                 ),
             )
         else
@@ -4585,8 +4585,8 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        inflow_in_mw(h, forecast_data);
-                        ENERGY_FLOW...,
+                        forecast_data;
+                        ENERGY_BUDGET...,
                     ),
                 )
             end
@@ -4829,10 +4829,10 @@ function build_c_sys5_hy_ems_ed(;
     for (ix, l) in enumerate(sorted_components(PSY.HydroReservoir, c_sys5_hy_ed))
         forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
         for t in 1:2
-            ta = hydro_timeseries_DA[t][ix]
+            ta = reservoir_inflow_DA[t][ix]
             for i in 1:length(ta)
                 ini_time = timestamp(ta[i])
-                data = when(hydro_timeseries_RT[t][ix], hour, hour(ini_time[1]))
+                data = when(reservoir_inflow_RT[t][ix], hour, hour(ini_time[1]))
                 forecast_data[ini_time[1]] = data
             end
         end
@@ -4842,7 +4842,7 @@ function build_c_sys5_hy_ems_ed(;
                 l,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    inflow_in_mw(l, hydro_single_timeseries_RT);
+                    reservoir_inflow_single_ts_RT;
                     ENERGY_FLOW...,
                 ),
             )
@@ -4853,7 +4853,7 @@ function build_c_sys5_hy_ems_ed(;
                     l,
                     PSY.Deterministic(
                         "inflow",
-                        inflow_in_mw(l, forecast_data);
+                        forecast_data;
                         ENERGY_FLOW...,
                     ),
                 )
@@ -4866,7 +4866,7 @@ function build_c_sys5_hy_ems_ed(;
             ta = hydro_budget_DA[t][ix]
             for i in 1:length(ta)
                 ini_time = timestamp(ta[i])
-                data = when(hydro_budget_RT[t][ix] .* 0.8, hour, hour(ini_time[1]))
+                data = when(hydro_budget_RT[t][ix], hour, hour(ini_time[1]))
                 forecast_data[ini_time[1]] = data
             end
         end
@@ -4876,8 +4876,8 @@ function build_c_sys5_hy_ems_ed(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    inflow_in_mw(h, hydro_budget_single_ts_RT);
-                    ENERGY_FLOW...,
+                    hydro_budget_single_ts_RT;
+                    ENERGY_BUDGET...,
                 ),
             )
         else
@@ -4887,8 +4887,8 @@ function build_c_sys5_hy_ems_ed(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        inflow_in_mw(h, forecast_data);
-                        ENERGY_FLOW...,
+                        forecast_data;
+                        ENERGY_BUDGET...,
                     ),
                 )
             end
@@ -7349,15 +7349,15 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
             enumerate(sorted_components(PSY.HydroReservoir, c_sys5_all_components))
             forecast_data = SortedDict{Dates.DateTime, TimeSeries.TimeArray}()
             for t in 1:2
-                ini_time = timestamp(hydro_timeseries_DA[t][ix])[1]
-                forecast_data[ini_time] = hydro_timeseries_DA[t][ix] .* 0.8
+                ini_time = timestamp(reservoir_inflow_DA[t][ix])[1]
+                forecast_data[ini_time] = reservoir_inflow_DA[t][ix]
             end
             PSY.add_time_series!(
                 c_sys5_all_components,
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    inflow_in_mw(h, forecast_data);
+                    forecast_data;
                     ENERGY_FLOW...,
                 ),
             )
@@ -7366,7 +7366,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    inflow_in_mw(h, hydro_single_timeseries_DA);
+                    reservoir_inflow_single_ts_DA;
                     ENERGY_FLOW...,
                 ),
             )
@@ -7383,8 +7383,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    inflow_in_mw(h, forecast_data);
-                    ENERGY_FLOW...,
+                    forecast_data;
+                    ENERGY_BUDGET...,
                 ),
             )
             PSY.add_time_series!(
@@ -7392,8 +7392,8 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    inflow_in_mw(h, hydro_budget_single_ts_DA);
-                    ENERGY_FLOW...,
+                    hydro_budget_single_ts_DA;
+                    ENERGY_BUDGET...,
                 ),
             )
         end
