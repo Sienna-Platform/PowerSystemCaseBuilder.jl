@@ -43,6 +43,7 @@ import PowerTableDataParser
 
 #TimeStamp Management Imports
 import TimeSeries
+import Random
 import Dates
 import Dates: DateTime, Hour, Minute
 import CSV
@@ -173,6 +174,7 @@ end
 
 include("utils/utils.jl")
 include("utils/spi_library_utils.jl")
+include("utils/market_bid_cost_scenarios.jl")
 
 include("build_system.jl")
 include("system_descriptor_data.jl")
