@@ -6,10 +6,12 @@ lazy = true
     url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/refs/tags/5.0-dev17.tar.gz"
     sha256 = "05ae824802dc4eaffab51b979614005d7b3546486835a9dc2d966333393eda87"
 
+# TODO: back to a GridMod/RTS-GMLC tag once its SIIP pointers state their units; this is
+# v0.2.3 plus that change, on luke-kiernan/RTS-GMLC lk/siip-stated-units.
 [rts]
-git-tree-sha1 = "c257b2c37b981f261fdc328b0fb9b96436a96537"
+git-tree-sha1 = "355a8f4bf1807af981dfaedd8fa8e198683dacc0"
 lazy = true
 
     [[rts.download]]
-    url = "https://github.com/GridMod/RTS-GMLC/archive/refs/tags/v0.2.3.tar.gz"
-    sha256 = "993429b8dc5f096e62479ca3b8551d52a53941322b452c825d12881cda915eae"
+    url = "https://github.com/luke-kiernan/RTS-GMLC/archive/e94cbd11524145507c551e9f060343b7570a717f.tar.gz"
+    sha256 = "55ebbc433e354e962a5d06c272c2828476b9e82db53711b23876169d2b5ea99c"

@@ -15,18 +15,12 @@
 Confirmed dangling time-series pointer rows: the referenced component genuinely does not
 exist anywhere in that dataset's own csv tables.
 
-RTS-GMLC-0.2.3 (`rts` artifact, RTS_SIIP_DIR/timeseries_pointers.json): 201_HYDRO_4 is a
-run-of-river unit (gen.csv: Unit Type = ROR) and, unlike every other *_HYDRO_* unit, has no
-storage.csv row — by design it has no HydroReservoir — yet the pointer file still names
-"201_HYDRO_4_RESERVOIR_head" for its inflow/storage_target series.
-
 PowerSystemsTestData-5.0-dev4 5-Bus dataset (CaseData artifact, 5bus_ts/7day/*.json): the
 pointer files were evidently authored against a richer template (real solar/wind
 generators, 4 reserves) than this snapshot's gen.csv (no renewables) / reserves.csv
 (REG1 only) actually contains.
 """
 const KNOWN_STALE_TIME_SERIES_ROWS = Set([
-    ("Component", "201_HYDRO_4_RESERVOIR_head"),
     ("Generator", "SolarBusC"),
     ("Generator", "WindBusA"),
     ("Reserve", "REG2"),
@@ -40,13 +34,10 @@ series name). PowerTableDataParser moves a reservoir-normalized series off a tur
 reservoir feeding it; a `HydroDispatch` has none, so the parser rejects the row. Unlike
 [`KNOWN_STALE_TIME_SERIES_ROWS`](@ref), the component's other series are kept.
 
-PowerSystemsTestData-5.0-dev13: `201_HYDRO_4` (RTS_GMLC/timeseries_pointers.json, the
-run-of-river unit above) and `HydroDispatch2` (5-Bus 5bus_ts/7day/
+PowerSystemsTestData-5.0-dev13: `HydroDispatch2` (5-Bus 5bus_ts/7day/
 timeseries_pointers_da_7day.json).
 """
 const KNOWN_RESERVOIR_SERIES_WITHOUT_RESERVOIR = Set([
-    ("Generator", "201_HYDRO_4", "inflow"),
-    ("Generator", "201_HYDRO_4", "storage_capacity"),
     ("Generator", "HydroDispatch2", "inflow"),
 ])
 
