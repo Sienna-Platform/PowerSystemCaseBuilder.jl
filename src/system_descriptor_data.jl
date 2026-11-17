@@ -2269,6 +2269,20 @@ const SYSTEM_CATALOG = [
         build_function = build_3bus_inverter,
     ),
     SystemDescriptor(;
+        name = "IEEE 9 Bus with PCM Time Series",
+        description = "IEEE 9-bus with RTS load/cost TS and dynamics",
+        category = PSIDSystems,
+        raw_data = joinpath(DATA_DIR, "ieee9_bus_pcm_time_series"),
+        build_function = build_ieee9_bus_pcm_time_series,
+    ),
+    SystemDescriptor(;
+        name = "IEEE 9 Bus with PCM Time Series and RE",
+        description = "IEEE 9-bus PCM TS with GFM solar at bus 2",
+        category = PSIDSystems,
+        raw_data = joinpath(DATA_DIR, "ieee9_bus_pcm_time_series"),
+        build_function = build_ieee9_bus_pcm_time_series_and_re,
+    ),
+    SystemDescriptor(;
         name = "WECC 9 Bus",
         description = "WECC 9 Bus System with dynamic gens from Sauer and Pai",
         category = PSIDSystems,
