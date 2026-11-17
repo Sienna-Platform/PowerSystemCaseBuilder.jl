@@ -8,15 +8,17 @@ _build(name; kwargs...) = build_system(
     PSITestSystems, name; force_build = true, skip_serialization = true, kwargs...)
 
 @testset "Hydro test system data is stored in natural units" begin
-    # An ENERGY reservoir: flows are the profile times the 100 MVA system base, levels the
+    # An ENERGY reservoir: flows are the profile times its `inflow` field (MW), levels the
     # profile times the reservoir's maximum. Both the single series and forecast branches.
     for single in (true, false)
         sys = _build("c_sys5_hy_turbine_energy";
             add_single_time_series = single, add_forecasts = !single)
         res = only(get_components(HydroReservoir, sys))
         max_level = get_storage_level_limits(res).max
+        @test get_inflow(res) == 400.0
         for (name, raw_single, raw_windows, scale, expected) in (
-            ("inflow", PSB.hydro_single_timeseries_DA, PSB.hydro_timeseries_DA, 100.0,
+            ("inflow", PSB.hydro_single_timeseries_DA, PSB.hydro_timeseries_DA,
+                get_inflow(res),
                 (IS.NU, "MW", "active_power", nothing)),
             ("storage_target", PSB.storage_target_single_ts_DA, PSB.storage_target_DA,
                 max_level, (IS.NU, "MW*hr", "energy", nothing)),

@@ -1047,7 +1047,7 @@ function build_c_sys5_hy_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
+                    inflow_in_mw(h, hydro_budget_single_ts_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1058,7 +1058,7 @@ function build_c_sys5_hy_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        in_mw(c_sys5_hyd, forecast_data);
+                        inflow_in_mw(h, forecast_data);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -1079,7 +1079,7 @@ function build_c_sys5_hy_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1099,7 +1099,7 @@ function build_c_sys5_hy_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "inflow",
-                        in_mw(c_sys5_hyd, forecast_data_inflow);
+                        inflow_in_mw(h, forecast_data_inflow);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -1415,7 +1415,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
+                    inflow_in_mw(h, hydro_budget_single_ts_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1426,7 +1426,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        in_mw(c_sys5_hyd, forecast_data);
+                        inflow_in_mw(h, forecast_data);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -1447,7 +1447,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1467,7 +1467,7 @@ function build_c_sys5_hy_cascading_turbine_energy(;
                     h,
                     PSY.Deterministic(
                         "inflow",
-                        in_mw(c_sys5_hyd, forecast_data_inflow);
+                        inflow_in_mw(h, forecast_data_inflow);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -1776,7 +1776,7 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
+                    inflow_in_mw(h, hydro_budget_single_ts_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1786,7 +1786,7 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, forecast_data);
+                    inflow_in_mw(h, forecast_data);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1806,7 +1806,7 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1825,7 +1825,7 @@ function build_c_sys5_hyd(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    in_mw(c_sys5_hyd, forecast_data_inflow);
+                    inflow_in_mw(h, forecast_data_inflow);
                     ENERGY_FLOW...,
                 ),
             )
@@ -1993,7 +1993,7 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, hydro_budget_single_ts_DA);
+                    inflow_in_mw(h, hydro_budget_single_ts_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -2003,7 +2003,7 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    in_mw(c_sys5_hyd, forecast_data);
+                    inflow_in_mw(h, forecast_data);
                     ENERGY_FLOW...,
                 ),
             )
@@ -2023,7 +2023,7 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hyd, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -2042,7 +2042,7 @@ function build_c_sys5_hyd_ems(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    in_mw(c_sys5_hyd, forecast_data_inflow);
+                    inflow_in_mw(h, forecast_data_inflow);
                     ENERGY_FLOW...,
                 ),
             )
@@ -2684,31 +2684,33 @@ function build_c_sys5_events(; add_forecasts, raw_data, sys_kwargs...)
         branches5(nodes);
         sys_kwargs...,
     )
-    pv_device = PSY.RenewableDispatch(
-        "PVBus5",
-        true,
-        nodes[3],
-        0.0,
-        0.0,
-        3.84,
-        PrimeMovers.PVe,
-        (min = 0.0, max = 0.0),
-        1.0,
-        RenewableGenerationCost(nothing),
-        100.0,
+    pv_device = PSY.RenewableDispatch(;
+        name = "PVBus5",
+        available = true,
+        bus = nodes[3],
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 384.0,
+        prime_mover_type = PrimeMovers.PVe,
+        reactive_power_limits = (min = 0.0, max = 0.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(nothing),
+        base_power = 384.0,
+        input_basis = u"NU",
     )
-    wind_device = PSY.RenewableDispatch(
-        "WindBus1",
-        true,
-        nodes[1],
-        0.0,
-        0.0,
-        4.51,
-        PrimeMovers.WT,
-        (min = 0.0, max = 0.0),
-        1.0,
-        RenewableGenerationCost(nothing),
-        100.0,
+    wind_device = PSY.RenewableDispatch(;
+        name = "WindBus1",
+        available = true,
+        bus = nodes[1],
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 451.0,
+        prime_mover_type = PrimeMovers.WT,
+        reactive_power_limits = (min = 0.0, max = 0.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(nothing),
+        base_power = 451.0,
+        input_basis = u"NU",
     )
     PSY.add_component!(c_sys5, pv_device)
     PSY.add_component!(c_sys5, wind_device)
@@ -2768,10 +2770,9 @@ function build_c_sys5_events(; add_forecasts, raw_data, sys_kwargs...)
     peak_load = maximum(da_load_time_series_val)
     if add_forecasts
         for (ix, l) in enumerate(sorted_components(PowerLoad, c_sys5))
-            set_max_active_power!(
-                l,
-                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * u"SU",
-            )
+            # The load is its own base, so its profile is per unit of `base_power`.
+            PSY.rebase_component!(l, bus_dist_fact[PSY.get_name(l)] * peak_load)
+            set_max_active_power!(l, 1.0 * u"CU")
             add_time_series!(
                 c_sys5,
                 l,
@@ -2819,31 +2820,33 @@ function build_c_sys5_events_rt(; add_forecasts, raw_data, sys_kwargs...)
         branches5(nodes);
         sys_kwargs...,
     )
-    pv_device = PSY.RenewableDispatch(
-        "PVBus5",
-        true,
-        nodes[3],
-        0.0,
-        0.0,
-        3.84,
-        PrimeMovers.PVe,
-        (min = 0.0, max = 0.0),
-        1.0,
-        RenewableGenerationCost(nothing),
-        100.0,
+    pv_device = PSY.RenewableDispatch(;
+        name = "PVBus5",
+        available = true,
+        bus = nodes[3],
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 384.0,
+        prime_mover_type = PrimeMovers.PVe,
+        reactive_power_limits = (min = 0.0, max = 0.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(nothing),
+        base_power = 384.0,
+        input_basis = u"NU",
     )
-    wind_device = PSY.RenewableDispatch(
-        "WindBus1",
-        true,
-        nodes[1],
-        0.0,
-        0.0,
-        4.51,
-        PrimeMovers.WT,
-        (min = 0.0, max = 0.0),
-        1.0,
-        RenewableGenerationCost(nothing),
-        100.0,
+    wind_device = PSY.RenewableDispatch(;
+        name = "WindBus1",
+        available = true,
+        bus = nodes[1],
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 451.0,
+        prime_mover_type = PrimeMovers.WT,
+        reactive_power_limits = (min = 0.0, max = 0.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(nothing),
+        base_power = 451.0,
+        input_basis = u"NU",
     )
     PSY.add_component!(c_sys5, pv_device)
     PSY.add_component!(c_sys5, wind_device)
@@ -2912,10 +2915,9 @@ function build_c_sys5_events_rt(; add_forecasts, raw_data, sys_kwargs...)
     peak_load = maximum(rt_load_time_series_val)
     if add_forecasts
         for (ix, l) in enumerate(sorted_components(PowerLoad, c_sys5))
-            set_max_active_power!(
-                l,
-                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * u"SU",
-            )
+            # The load is its own base, so its profile is per unit of `base_power`.
+            PSY.rebase_component!(l, bus_dist_fact[PSY.get_name(l)] * peak_load)
+            set_max_active_power!(l, 1.0 * u"CU")
             rt_timearray =
                 TimeArray(rt_load_time_series, rt_load_time_series_val ./ peak_load)
             rt_timearray = collapse(rt_timearray, Minute(5), first, TimeSeries.mean)
@@ -3978,7 +3980,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hy_uc, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -3988,7 +3990,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    in_mw(c_sys5_hy_uc, forecast_data);
+                    inflow_in_mw(h, forecast_data);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4006,7 +4008,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_uc, hydro_budget_single_ts_DA);
+                    inflow_in_mw(h, hydro_budget_single_ts_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4016,7 +4018,7 @@ function build_c_sys5_hy_uc(; add_forecasts, add_single_time_series, kwargs...)
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_uc, forecast_data);
+                    inflow_in_mw(h, forecast_data);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4233,7 +4235,7 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hy_uc, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4243,7 +4245,7 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    in_mw(c_sys5_hy_uc, forecast_data);
+                    inflow_in_mw(h, forecast_data);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4261,7 +4263,7 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_uc, hydro_budget_single_ts_DA);
+                    inflow_in_mw(h, hydro_budget_single_ts_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4271,7 +4273,7 @@ function build_c_sys5_hy_ems_uc(;
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_uc, forecast_data);
+                    inflow_in_mw(h, forecast_data);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4538,7 +4540,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 l,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hy_ed, hydro_single_timeseries_RT);
+                    inflow_in_mw(l, hydro_single_timeseries_RT);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4549,7 +4551,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     l,
                     PSY.Deterministic(
                         "inflow",
-                        in_mw(c_sys5_hy_ed, forecast_data);
+                        inflow_in_mw(l, forecast_data);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -4572,7 +4574,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_ed, hydro_budget_single_ts_RT);
+                    inflow_in_mw(h, hydro_budget_single_ts_RT);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4583,7 +4585,7 @@ function build_c_sys5_hy_ed(; add_forecasts, add_single_time_series, raw_data, k
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        in_mw(c_sys5_hy_ed, forecast_data);
+                        inflow_in_mw(h, forecast_data);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -4840,7 +4842,7 @@ function build_c_sys5_hy_ems_ed(;
                 l,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_hy_ed, hydro_single_timeseries_RT);
+                    inflow_in_mw(l, hydro_single_timeseries_RT);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4851,7 +4853,7 @@ function build_c_sys5_hy_ems_ed(;
                     l,
                     PSY.Deterministic(
                         "inflow",
-                        in_mw(c_sys5_hy_ed, forecast_data);
+                        inflow_in_mw(l, forecast_data);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -4874,7 +4876,7 @@ function build_c_sys5_hy_ems_ed(;
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_hy_ed, hydro_budget_single_ts_RT);
+                    inflow_in_mw(h, hydro_budget_single_ts_RT);
                     ENERGY_FLOW...,
                 ),
             )
@@ -4885,7 +4887,7 @@ function build_c_sys5_hy_ems_ed(;
                     h,
                     PSY.Deterministic(
                         "hydro_budget",
-                        in_mw(c_sys5_hy_ed, forecast_data);
+                        inflow_in_mw(h, forecast_data);
                         ENERGY_FLOW...,
                     ),
                 )
@@ -6741,18 +6743,19 @@ function build_batt_test_case_b_sys(; raw_data, kwargs...)
             "d/m/y  H:M:S",
         ),
     )
-    re = RenewableDispatch(
-        "WindBusC",
-        true,
-        node,
-        0.0,
-        0.0,
-        1.20,
-        PrimeMovers.WT,
-        (min = -0.800, max = 0.800),
-        1.0,
-        RenewableGenerationCost(CostCurve(LinearCurve(0.220))),
-        100.0,
+    re = RenewableDispatch(;
+        name = "WindBusC",
+        available = true,
+        bus = node,
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 120.0,
+        prime_mover_type = PrimeMovers.WT,
+        reactive_power_limits = (min = -80.0, max = 80.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(CostCurve(LinearCurve(0.220))),
+        base_power = 120.0,
+        input_basis = u"NU",
     )
 
     batt = PSY.EnergyReservoirStorage(;
@@ -6845,18 +6848,19 @@ function build_batt_test_case_c_sys(; raw_data, kwargs...)
             "d/m/y  H:M:S",
         ),
     )
-    re = RenewableDispatch(
-        "WindBusC",
-        true,
-        node,
-        0.0,
-        0.0,
-        1.20,
-        PrimeMovers.WT,
-        (min = -0.800, max = 0.800),
-        1.0,
-        RenewableGenerationCost(CostCurve(LinearCurve(0.220))),
-        100.0,
+    re = RenewableDispatch(;
+        name = "WindBusC",
+        available = true,
+        bus = node,
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 120.0,
+        prime_mover_type = PrimeMovers.WT,
+        reactive_power_limits = (min = -80.0, max = 80.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(CostCurve(LinearCurve(0.220))),
+        base_power = 120.0,
+        input_basis = u"NU",
     )
 
     batt = PSY.EnergyReservoirStorage(;
@@ -6949,18 +6953,19 @@ function build_batt_test_case_d_sys(; raw_data, kwargs...)
             "d/m/y  H:M:S",
         ),
     )
-    re = RenewableDispatch(
-        "WindBusC",
-        true,
-        node,
-        0.0,
-        0.0,
-        1.20,
-        PrimeMovers.WT,
-        (min = -0.800, max = 0.800),
-        1.0,
-        RenewableGenerationCost(CostCurve(LinearCurve(0.220))),
-        100.0,
+    re = RenewableDispatch(;
+        name = "WindBusC",
+        available = true,
+        bus = node,
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 120.0,
+        prime_mover_type = PrimeMovers.WT,
+        reactive_power_limits = (min = -80.0, max = 80.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(CostCurve(LinearCurve(0.220))),
+        base_power = 120.0,
+        input_basis = u"NU",
     )
 
     batt = PSY.EnergyReservoirStorage(;
@@ -7053,18 +7058,19 @@ function build_batt_test_case_e_sys(; raw_data, kwargs...)
             "d/m/y  H:M:S",
         ),
     )
-    re = RenewableDispatch(
-        "WindBusC",
-        true,
-        node,
-        0.0,
-        0.0,
-        1.20,
-        PrimeMovers.WT,
-        (min = -0.800, max = 0.800),
-        1.0,
-        RenewableGenerationCost(CostCurve(LinearCurve(0.220))),
-        100.0,
+    re = RenewableDispatch(;
+        name = "WindBusC",
+        available = true,
+        bus = node,
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 120.0,
+        prime_mover_type = PrimeMovers.WT,
+        reactive_power_limits = (min = -80.0, max = 80.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(CostCurve(LinearCurve(0.220))),
+        base_power = 120.0,
+        input_basis = u"NU",
     )
 
     batt = PSY.EnergyReservoirStorage(;
@@ -7157,18 +7163,19 @@ function build_batt_test_case_f_sys(; raw_data, kwargs...)
             "d/m/y  H:M:S",
         ),
     )
-    re = RenewableDispatch(
-        "WindBusC",
-        true,
-        node,
-        0.0,
-        0.0,
-        1.20,
-        PrimeMovers.WT,
-        (min = -0.800, max = 0.800),
-        1.0,
-        RenewableGenerationCost(CostCurve(LinearCurve(0.220))),
-        100.0,
+    re = RenewableDispatch(;
+        name = "WindBusC",
+        available = true,
+        bus = node,
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 120.0,
+        prime_mover_type = PrimeMovers.WT,
+        reactive_power_limits = (min = -80.0, max = 80.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(CostCurve(LinearCurve(0.220))),
+        base_power = 120.0,
+        input_basis = u"NU",
     )
 
     batt = PSY.EnergyReservoirStorage(;
@@ -7350,7 +7357,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.Deterministic(
                     "inflow",
-                    in_mw(c_sys5_all_components, forecast_data);
+                    inflow_in_mw(h, forecast_data);
                     ENERGY_FLOW...,
                 ),
             )
@@ -7359,7 +7366,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "inflow",
-                    in_mw(c_sys5_all_components, hydro_single_timeseries_DA);
+                    inflow_in_mw(h, hydro_single_timeseries_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -7376,7 +7383,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.Deterministic(
                     "hydro_budget",
-                    in_mw(c_sys5_all_components, forecast_data);
+                    inflow_in_mw(h, forecast_data);
                     ENERGY_FLOW...,
                 ),
             )
@@ -7385,7 +7392,7 @@ function build_c_sys5_all_components(; add_forecasts, raw_data, kwargs...)
                 h,
                 PSY.SingleTimeSeries(
                     "hydro_budget",
-                    in_mw(c_sys5_all_components, hydro_budget_single_ts_DA);
+                    inflow_in_mw(h, hydro_budget_single_ts_DA);
                     ENERGY_FLOW...,
                 ),
             )
@@ -7559,6 +7566,9 @@ function build_c_sys5_radial(; raw_data, kwargs...)
     copy_time_series!(load_ext1, load_bus3)
     copy_time_series!(load_ext2, load_bus3)
 
+    # Bus3 keeps a third of its load and stays its own base. Its profile is per unit of the
+    # base, so it moves with it.
+    PSY.rebase_component!(load_bus3, 100.0; keep_time_series = true)
     set_active_power!(load_bus3, 1.0 * u"SU")
     set_max_active_power!(load_bus3, 1.0 * u"SU")
     set_reactive_power!(load_bus3, 0.3287 * u"SU")
@@ -7673,31 +7683,33 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
         set_area!(n, area2)
     end
 
-    pv_device = PSY.RenewableDispatch(
-        "PVBus5",
-        true,
-        nodes_area1[3],
-        0.0,
-        0.0,
-        3.84,
-        PrimeMovers.PVe,
-        (min = 0.0, max = 0.0),
-        1.0,
-        RenewableGenerationCost(nothing),
-        100.0,
+    pv_device = PSY.RenewableDispatch(;
+        name = "PVBus5",
+        available = true,
+        bus = nodes_area1[3],
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 384.0,
+        prime_mover_type = PrimeMovers.PVe,
+        reactive_power_limits = (min = 0.0, max = 0.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(nothing),
+        base_power = 384.0,
+        input_basis = u"NU",
     )
-    wind_device = PSY.RenewableDispatch(
-        "WindBus1",
-        true,
-        nodes_area2[1],
-        0.0,
-        0.0,
-        4.51,
-        PrimeMovers.WT,
-        (min = 0.0, max = 0.0),
-        1.0,
-        RenewableGenerationCost(nothing),
-        100.0,
+    wind_device = PSY.RenewableDispatch(;
+        name = "WindBus1",
+        available = true,
+        bus = nodes_area2[1],
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 451.0,
+        prime_mover_type = PrimeMovers.WT,
+        reactive_power_limits = (min = 0.0, max = 0.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(nothing),
+        base_power = 451.0,
+        input_basis = u"NU",
     )
     PSY.add_component!(sys, pv_device)
     PSY.add_component!(sys, wind_device)
@@ -7760,10 +7772,9 @@ function build_two_area_pjm_DA(; add_forecasts, add_reserves, raw_data, sys_kwar
     peak_load = maximum(da_load_time_series_val)
     if add_forecasts
         for (ix, l) in enumerate(sorted_components(PowerLoad, sys))
-            set_max_active_power!(
-                l,
-                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * u"SU",
-            )
+            # The load is its own base, so its profile is per unit of `base_power`.
+            PSY.rebase_component!(l, bus_dist_fact[PSY.get_name(l)] * peak_load)
+            set_max_active_power!(l, 1.0 * u"CU")
             add_time_series!(
                 sys,
                 l,

@@ -177,6 +177,8 @@ function convert_to_hydropump!(d::EnergyReservoirStorage, sys::System)
         efficiency = (turbine = d.efficiency.out, pump = d.efficiency.in),
         input_basis = u"CU",
     )
+    # A device's power profile is per unit of its `base_power`, so the pump is its own base.
+    PSY.rebase_component!(hpump, PSY.get_max_active_power(hpump, u"MW"))
     head_reservoir = HydroReservoir(;
         name = "$(d.name)_head_reservoir",
         available = d.available,

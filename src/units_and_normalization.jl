@@ -29,11 +29,11 @@ natural_units(quantity_kind::AbstractString, units::AbstractString) =
     (units = units, quantity_kind = quantity_kind)
 
 """
-Flows of an `ENERGY` reservoir in the test system data, in MW for [`ENERGY_FLOW`](@ref).
-The test system data states them per unit of the system base (`data_5bus_pu.jl`: "per-unit
-(100MW base)").
+An `ENERGY` reservoir's `"inflow"` or `"hydro_budget"` profile in MW, for
+[`ENERGY_FLOW`](@ref). The test system data's profiles are fractions of the reservoir's own
+`inflow` field (MW), so they are scaled by it, as reserve profiles are by `requirement`.
 """
-in_mw(sys::PSY.System, data) = scaled(data, PSY.get_base_power(sys))
+inflow_in_mw(reservoir::PSY.HydroReservoir, data) = scaled(data, PSY.get_inflow(reservoir))
 
 """
 A reserve's requirement profile in MW. PowerSystems takes a service's series in natural
