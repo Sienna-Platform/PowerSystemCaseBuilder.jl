@@ -61,3 +61,31 @@ _build(name; kwargs...) = build_system(
     @test get_time_series_values(SingleTimeSeries, battery, "storage_target") ≈
           values(PSB.storage_target_single_ts_DA)
 end
+
+@testset "Hydro pump test systems keep every reservoir an ENERGY reservoir" begin
+    for (name, turbines) in
+        (("c_sys5_hy_pump_turbine_energy", 1), ("c_sys5_hy_pump_only_energy", 0))
+        sys = _build(name)
+        @test length(get_components(HydroTurbine, sys)) == turbines
+        @test length(get_components(HydroPumpTurbine, sys)) == 1
+        for res in get_components(HydroReservoir, sys)
+            @test get_level_data_type(res) == ReservoirDataType.ENERGY
+            @test labels(get_time_series(Deterministic, res, "hydro_budget")) ==
+                  (IS.NU, "MW*hr", "energy", nothing)
+            @test labels(get_time_series(Deterministic, res, "inflow")) ==
+                  (IS.NU, "MW", "active_power", nothing)
+        end
+    end
+end
+
+@testset "c_sys5_hy_small_reserves states every requirement as 1 MW" begin
+    sys = _build(
+        "c_sys5_hy_small_reserves";
+        add_single_time_series = true,
+        add_reserves = true,
+    )
+    for serv in get_components(OnlineReserve, sys)
+        @test get_requirement(serv, u"MW") ≈ 1.0
+        @test maximum(get_time_series_values(SingleTimeSeries, serv, "requirement")) <= 1.0
+    end
+end

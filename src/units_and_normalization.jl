@@ -46,6 +46,15 @@ function requirement_as_mw!(reserves::PSY.Service...)
     return
 end
 
+"""Sets the `requirement` of reserves to `megawatts` MW; `nothing` keeps the data's values."""
+set_requirement_mw!(::Nothing, reserves::PSY.Service...) = nothing
+function set_requirement_mw!(megawatts::Real, reserves::PSY.Service...)
+    for serv in reserves
+        PSY.set_requirement!(serv, megawatts * u"MW")
+    end
+    return
+end
+
 """
 A reserve's requirement profile in MW. PowerSystems takes a service's series in natural
 units only, and the test system data's profiles are fractions of the reserve's own
