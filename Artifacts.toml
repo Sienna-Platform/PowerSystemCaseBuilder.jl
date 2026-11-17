@@ -1,10 +1,11 @@
+# TODO: back to a PowerSystemsTestData tag once lk/5bus-natural-units merges and is tagged.
 [CaseData]
-git-tree-sha1 = "1b25ce6ff8075362ded44225f30bc09e27dac1eb"
+git-tree-sha1 = "331c61f4dd9dadd2adb3a670f6e6c309aa7d70e7"
 lazy = true
 
     [[CaseData.download]]
-    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/refs/tags/5.0-dev17.tar.gz"
-    sha256 = "05ae824802dc4eaffab51b979614005d7b3546486835a9dc2d966333393eda87"
+    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/c91a5452fc264d411519fa352c6d45402df768cf.tar.gz"
+    sha256 = "5a27133d60436bbf50d39cfe9efa01d8d1964fb95fbcad55de0292f0ba3da4dd"
 
 [rts]
 git-tree-sha1 = "c257b2c37b981f261fdc328b0fb9b96436a96537"
