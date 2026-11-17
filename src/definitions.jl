@@ -4,7 +4,8 @@ const PACKAGE_DIR = joinpath(dirname(dirname(pathof(PowerSystemCaseBuilder))))
 const _CASE_DATA_ARTIFACT_DIR = LazyArtifacts.artifact"CaseData"
 const DATA_DIR = joinpath(_CASE_DATA_ARTIFACT_DIR, only(readdir(_CASE_DATA_ARTIFACT_DIR)))
 
-const RTS_DIR = joinpath(LazyArtifacts.artifact"rts", "RTS-GMLC-0.2.3")
+const _RTS_ARTIFACT_DIR = LazyArtifacts.artifact"rts"
+const RTS_DIR = joinpath(_RTS_ARTIFACT_DIR, only(readdir(_RTS_ARTIFACT_DIR)))
 
 const SYSTEM_DESCRIPTORS_FILE = joinpath(PACKAGE_DIR, "src", "system_descriptor.jl")
 
