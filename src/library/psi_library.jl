@@ -2152,7 +2152,7 @@ function build_118_bus_DA(; kwargs...)
     end
     wind_generators = PSY.collect(
         get_components(
-            gen -> gen.prime_mover_type == PrimeMovers.WT,
+            gen -> PSY.get_prime_mover_type(gen) == PrimeMovers.WT,
             RenewableDispatch,
             sys,
         ),
@@ -2162,7 +2162,7 @@ function build_118_bus_DA(; kwargs...)
     end
     solar_generators = PSY.collect(
         get_components(
-            gen -> gen.prime_mover_type == PrimeMovers.PVe,
+            gen -> PSY.get_prime_mover_type(gen) == PrimeMovers.PVe,
             RenewableDispatch,
             sys,
         ),
@@ -2173,10 +2173,8 @@ function build_118_bus_DA(; kwargs...)
     loads = power_load118(nodes118())
     for i in 1:3
         region = get_component(Area, sys, "R$i")
-        begin_time_series_update(sys) do
-            for component in get_components_in_aggregation_topology(PowerLoad, sys, region)
-                add_time_series!(sys, component, load_TS[i])
-            end
+        for component in get_components_in_aggregation_topology(PowerLoad, sys, region)
+            add_time_series!(sys, component, load_TS[i])
         end
     end
     return sys
@@ -2262,7 +2260,7 @@ function build_118_bus_RT(; kwargs...)
     end
     wind_generators = PSY.collect(
         get_components(
-            gen -> gen.prime_mover_type == PrimeMovers.WT,
+            gen -> PSY.get_prime_mover_type(gen) == PrimeMovers.WT,
             RenewableDispatch,
             sys,
         ),
@@ -2272,7 +2270,7 @@ function build_118_bus_RT(; kwargs...)
     end
     solar_generators = PSY.collect(
         get_components(
-            gen -> gen.prime_mover_type == PrimeMovers.PVe,
+            gen -> PSY.get_prime_mover_type(gen) == PrimeMovers.PVe,
             RenewableDispatch,
             sys,
         ),
@@ -2283,10 +2281,8 @@ function build_118_bus_RT(; kwargs...)
     loads = power_load118(nodes118())
     for i in 1:3
         region = get_component(Area, sys, "R$i")
-        begin_time_series_update(sys) do
-            for component in get_components_in_aggregation_topology(PowerLoad, sys, region)
-                add_time_series!(sys, component, load_TS[i])
-            end
+        for component in get_components_in_aggregation_topology(PowerLoad, sys, region)
+            add_time_series!(sys, component, load_TS[i])
         end
     end
     return sys
