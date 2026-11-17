@@ -10,6 +10,8 @@ const PSY = PowerSystems
 using PowerSystemCaseBuilder
 const PSB = PowerSystemCaseBuilder
 
+include("roundtrip_helpers.jl")
+
 LOG_FILE = "power-systems-case_builder.log"
 LOG_LEVELS = Dict(
     "Debug" => Logging.Debug,
