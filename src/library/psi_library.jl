@@ -606,13 +606,13 @@ function make_modified_RTS_GMLC_sys(
         PSY.clear_services!(d)
     end
 
+    # Twice the utility PV and 30% of the rooftop PV: each plant's size and its MW output.
     for g in PSY.get_components(
         x -> PSY.get_prime_mover_type(x) == PSY.PrimeMovers.PVe,
         PSY.RenewableDispatch,
         sys,
     )
-        rat_ = PSY.get_rating(g, u"CU")
-        PSY.set_rating!(g, DISPATCH_INCREASE * rat_ * u"CU")
+        scale_capacity!(sys, g, DISPATCH_INCREASE)
     end
 
     for g in PSY.get_components(
@@ -620,8 +620,7 @@ function make_modified_RTS_GMLC_sys(
         PSY.RenewableNonDispatch,
         sys,
     )
-        rat_ = PSY.get_rating(g, u"CU")
-        PSY.set_rating!(g, FIX_DECREASE * rat_ * u"CU")
+        scale_capacity!(sys, g, FIX_DECREASE)
     end
 
     ### Update Buses to PQ that got devices removed ###
@@ -1357,6 +1356,14 @@ store and the attribute associations key on.
 _detach_id!(component) = IS.set_id!(component, IS.UNASSIGNED_ID)
 
 function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line::Bool)
+    # Resizing devices rewrites their series, which only works before the forecast views
+    # exist: drop them here and rebuild them, with the same horizon and interval, at the end.
+    horizon = PSY.get_forecast_horizon(main_sys)
+    interval = PSY.get_forecast_interval(main_sys)
+    if !isnothing(horizon)
+        PSY.remove_time_series!(main_sys, PSY.DeterministicSingleTimeSeries)
+        PSY.remove_time_series!(twin_sys, PSY.DeterministicSingleTimeSeries)
+    end
     names = [
         "114_SYNC_COND_1",
         "314_SYNC_COND_1",
@@ -1520,14 +1527,14 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
                 end
             end
         end
-        # Change scale: moving base_power directly (bypassing set_base_power!, which
-        # throws) keeps the per-unit values, so the device's MW scale with its base.
+        # Change scale: the twin's renewables are 1.2x the original and the main area's
+        # 0.9x the twin's; the main area's loads are 1.2x.
         if typeof(b) <: RenewableGen
-            b.base_power = 1.2 * PSY.get_base_power(b, u"NU")
-            main_comp.base_power = 0.9 * PSY.get_base_power(b, u"NU")
+            scale_capacity!(main_sys, b, 1.2)
+            scale_capacity!(main_sys, main_comp, 0.9 * 1.2)
         end
         if typeof(b) <: PowerLoad
-            main_comp.base_power = 1.2 * PSY.get_base_power(b, u"NU")
+            scale_capacity!(main_sys, main_comp, 1.2)
         end
     end
 
@@ -1583,8 +1590,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
     end
 
     for bat in get_components(EnergyReservoirStorage, main_sys)
-        # 10x the battery: moving base_power directly keeps its per-unit values.
-        bat.base_power = get_base_power(bat, u"NU") * 10
+        scale_capacity!(main_sys, bat, 10)
     end
 
     for r in get_components(
@@ -1660,19 +1666,6 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
     # set service participation
     PARTICIPATION = 0.2
 
-    # remove Flex services and fix max participation
-    for srvc in PSY.get_components(PSY.Service, main_sys)
-        PSY.set_max_participation_factor!(srvc, PARTICIPATION)
-        if PSY.get_name(srvc) in ["Flex_Up", "Flex_Down", "Flex_Up_twin", "Flex_Down_twin"]
-            # remove Flex services from DA and RT model
-            PSY.remove_time_series!(
-                main_sys,
-                PSY.DeterministicSingleTimeSeries,
-                srvc,
-                "requirement",
-            )
-        end
-    end
     for srvc in PSY.get_components(PSY.Service, main_sys)
         PSY.set_max_participation_factor!(srvc, PARTICIPATION)
         if PSY.get_name(srvc) in ["Flex_Up", "Flex_Down", "Flex_Up_twin", "Flex_Down_twin"]
@@ -1680,6 +1673,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
             PSY.remove_component!(main_sys, srvc)
         end
     end
+    isnothing(horizon) || PSY.transform_single_time_series!(main_sys, horizon, interval)
     return main_sys
 end
 
