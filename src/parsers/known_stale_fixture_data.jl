@@ -1,4 +1,4 @@
-# Known, verified defects in the RTS-GMLC and 5-Bus test-data artifacts (external,
+# Known, verified defects in the RTS-GMLC test-data artifact (external,
 # version-pinned via Artifacts.toml — not owned by this repo; fixing them at the source
 # needs a new artifact release, out of reach here).
 #
@@ -19,19 +19,9 @@ RTS-GMLC-0.2.3 (`rts` artifact, RTS_SIIP_DIR/timeseries_pointers.json): 201_HYDR
 run-of-river unit (gen.csv: Unit Type = ROR) and, unlike every other *_HYDRO_* unit, has no
 storage.csv row — by design it has no HydroReservoir — yet the pointer file still names
 "201_HYDRO_4_RESERVOIR_head" for its inflow/storage_target series.
-
-PowerSystemsTestData-5.0-dev4 5-Bus dataset (CaseData artifact, 5bus_ts/7day/*.json): the
-pointer files were evidently authored against a richer template (real solar/wind
-generators, 4 reserves) than this snapshot's gen.csv (no renewables) / reserves.csv
-(REG1 only) actually contains.
 """
 const KNOWN_STALE_TIME_SERIES_ROWS = Set([
     ("Component", "201_HYDRO_4_RESERVOIR_head"),
-    ("Generator", "SolarBusC"),
-    ("Generator", "WindBusA"),
-    ("Reserve", "REG2"),
-    ("Reserve", "REG3"),
-    ("Reserve", "REG4"),
 ])
 
 """
@@ -41,36 +31,18 @@ reservoir feeding it; a `HydroDispatch` has none, so the parser rejects the row.
 [`KNOWN_STALE_TIME_SERIES_ROWS`](@ref), the component's other series are kept.
 
 PowerSystemsTestData-5.0-dev13: `201_HYDRO_4` (RTS_GMLC/timeseries_pointers.json, the
-run-of-river unit above) and `HydroDispatch2` (5-Bus 5bus_ts/7day/
-timeseries_pointers_da_7day.json).
+run-of-river unit above).
 """
 const KNOWN_RESERVOIR_SERIES_WITHOUT_RESERVOIR = Set([
     ("Generator", "201_HYDRO_4", "inflow"),
     ("Generator", "201_HYDRO_4", "storage_capacity"),
-    ("Generator", "HydroDispatch2", "inflow"),
 ])
 
 """
-Confirmed stale `scaling_factor_multiplier` names: a getter that exists in PSY but not on
-the component type the pointer row applies it to.
-
-`"get_storage_target"` (PowerSystemsTestData-5.0-dev4 5-Bus dataset,
-5bus_ts/7day/*.json): a real PSY getter, but only on `EnergyReservoirStorage` — every
-occurrence in these pointer files names a `HydroReservoir` (`HydroReservoir1_head`,
-`HydroReservoir2_head`), whose equivalent end-of-simulation target field is
-`level_targets`, i.e. `get_level_targets`.
-"""
-const KNOWN_STALE_SCALING_FACTOR_MULTIPLIERS = Dict(
-    "get_storage_target" => "get_level_targets",
-)
-
-"""
 Return `rawsys` unchanged if it carries no time-series pointer file, or its
-`timeseries_metadata_file` matches nothing in [`KNOWN_STALE_TIME_SERIES_ROWS`](@ref),
-[`KNOWN_RESERVOIR_SERIES_WITHOUT_RESERVOIR`](@ref) or
-[`KNOWN_STALE_SCALING_FACTOR_MULTIPLIERS`](@ref). Otherwise return a copy pointing at a
-fixed temp copy of the pointer file: known-dangling rows dropped, known-stale multiplier
-names remapped.
+`timeseries_metadata_file` matches nothing in [`KNOWN_STALE_TIME_SERIES_ROWS`](@ref) or
+[`KNOWN_RESERVOIR_SERIES_WITHOUT_RESERVOIR`](@ref). Otherwise return a copy pointing at a
+fixed temp copy of the pointer file, with the known-dangling rows dropped.
 """
 function fix_known_stale_time_series_data(
     rawsys::PowerTableDataParser.PowerSystemTableData,
@@ -80,25 +52,11 @@ function fix_known_stale_time_series_data(
         return rawsys
     end
     rows = JSON.parsefile(path)
-    kept = [
+    fixed = [
         row for row in rows if
         (row["category"], row["component_name"]) ∉ KNOWN_STALE_TIME_SERIES_ROWS &&
         (row["category"], row["component_name"], row["name"]) ∉
         KNOWN_RESERVOIR_SERIES_WITHOUT_RESERVOIR
-    ]
-    fixed = [
-        if haskey(row, "scaling_factor_multiplier") &&
-           haskey(KNOWN_STALE_SCALING_FACTOR_MULTIPLIERS, row["scaling_factor_multiplier"])
-            merge(
-                row,
-                Dict(
-                    "scaling_factor_multiplier" =>
-                        KNOWN_STALE_SCALING_FACTOR_MULTIPLIERS[row["scaling_factor_multiplier"]],
-                ),
-            )
-        else
-            row
-        end for row in kept
     ]
     if fixed == rows
         return rawsys
