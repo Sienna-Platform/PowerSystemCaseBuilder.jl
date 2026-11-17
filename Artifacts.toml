@@ -1,10 +1,12 @@
+# TODO: back to a PowerSystemsTestData tag once Sienna-Platform/PowerSystemsTestData#139
+# merges and is tagged.
 [CaseData]
-git-tree-sha1 = "1b25ce6ff8075362ded44225f30bc09e27dac1eb"
+git-tree-sha1 = "d13644d0aa91778d40f24e9703ee6aa6596c112c"
 lazy = true
 
     [[CaseData.download]]
-    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/refs/tags/5.0-dev17.tar.gz"
-    sha256 = "05ae824802dc4eaffab51b979614005d7b3546486835a9dc2d966333393eda87"
+    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/c0414b1135063853d5fffef701e9d6c1c267ed32.tar.gz"
+    sha256 = "904c813fca59a4d2169b761c80b5c8f6fc8ffd401b56d390c91e930179317367"
 
 [rts]
 git-tree-sha1 = "c257b2c37b981f261fdc328b0fb9b96436a96537"
