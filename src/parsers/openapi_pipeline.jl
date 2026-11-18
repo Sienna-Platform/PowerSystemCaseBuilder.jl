@@ -42,9 +42,7 @@ function system_from_openapi(
     time_series_resolution::Union{Dates.Period, Nothing} = nothing,
     kwargs...,
 )
-    oapi = PowerTableDataParser.build_openapi_system(
-        fix_known_stale_time_series_data(rawsys),
-    )
+    oapi = PowerTableDataParser.build_openapi_system(rawsys)
     PowerTableDataParser.keep_time_series_resolution!(oapi, time_series_resolution)
     return system_from_document(oapi; kwargs...)
 end

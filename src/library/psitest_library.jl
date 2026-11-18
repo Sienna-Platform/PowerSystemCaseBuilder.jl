@@ -5499,10 +5499,9 @@ end
 
 function build_5_bus_matpower_DA(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    data_dir = dirname(dirname(raw_data))
     pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
 
-    FORECASTS_DIR = joinpath(data_dir, "5-Bus", "5bus_ts", "7day")
+    FORECASTS_DIR = joinpath(dirname(raw_data), "case5_re_uc_ts")
 
     sys = system_from_openapi(pm_data; sys_kwargs...)
     reserves = [
@@ -5518,7 +5517,7 @@ function build_5_bus_matpower_DA(; raw_data, kwargs...)
 
     PowerTableDataParser.add_time_series_from_pointers!(
         sys,
-        joinpath(FORECASTS_DIR, "timeseries_pointers_da_7day.json"),
+        joinpath(FORECASTS_DIR, "timeseries_pointers_da.json"),
     )
     transform_single_time_series!(sys, Hour(48), Hour(24))
 
@@ -5527,16 +5526,14 @@ end
 
 function build_5_bus_matpower_RT(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    data_dir = dirname(dirname(raw_data))
-
-    FORECASTS_DIR = joinpath(data_dir, "5-Bus", "5bus_ts", "7day")
+    FORECASTS_DIR = joinpath(dirname(raw_data), "case5_re_uc_ts")
 
     pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
     sys = system_from_openapi(pm_data; sys_kwargs...)
 
     PowerTableDataParser.add_time_series_from_pointers!(
         sys,
-        joinpath(FORECASTS_DIR, "timeseries_pointers_rt_7day.json"),
+        joinpath(FORECASTS_DIR, "timeseries_pointers_rt.json"),
     )
     transform_single_time_series!(sys, Hour(12), Hour(1))
 
@@ -5545,16 +5542,15 @@ end
 
 function build_5_bus_matpower_AGC(; raw_data, kwargs...)
     sys_kwargs = filter_kwargs(; kwargs...)
-    data_dir = dirname(dirname(raw_data))
     pm_data = PowerFlowFileParser.PowerModelsData(raw_data)
 
-    FORECASTS_DIR = joinpath(data_dir, "5-Bus", "5bus_ts", "7day")
+    FORECASTS_DIR = joinpath(dirname(raw_data), "case5_re_uc_ts")
 
     sys = system_from_openapi(pm_data; sys_kwargs...)
 
     PowerTableDataParser.add_time_series_from_pointers!(
         sys,
-        joinpath(FORECASTS_DIR, "timeseries_pointers_agc_7day.json"),
+        joinpath(FORECASTS_DIR, "timeseries_pointers_agc.json"),
     )
     return sys
 end
