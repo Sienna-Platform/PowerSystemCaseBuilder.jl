@@ -1,11 +1,10 @@
-# PowerSystemsTestData psy6 at the merge of #137. TODO: a tag once one includes it.
 [CaseData]
-git-tree-sha1 = "ea4b1ccf9ea7c5c5cc90daa1b7142192037f5f7a"
+git-tree-sha1 = "fb66774d84f5f9b3f65515ad38d3002729a65c15"
 lazy = true
 
     [[CaseData.download]]
-    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/71c8dfb8055b5c1a582fe5c890feb8dbb5b3aed4.tar.gz"
-    sha256 = "c93f71f1e372d29b5b01db84ef282958d815984e5ddf763c14795b4c313f5e0f"
+    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/refs/tags/5.0-dev19.tar.gz"
+    sha256 = "07139725681a12ffa203abe89ab51c79bdee9466ed82c69b4fdac996abe0a80e"
 
 # TODO: back to a GridMod/RTS-GMLC tag once its SIIP pointers state their units
 # (GridMod/RTS-GMLC#161); this is v0.2.3 plus that change, on luke-kiernan/RTS-GMLC.

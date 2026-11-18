@@ -1,48 +1,3 @@
-@testset "Test time series bases are normalized without changing their scaling" begin
-    catalog = SystemCatalog(SYSTEM_CATALOG)
-    series_values(c, md) =
-        get_time_series_values(c, get_time_series(c, PSY.IS.get_time_series_key(md)))
-    n_devices = 0
-    n_reserves = 0
-    for (category, name, kwargs) in (
-        (PSITestSystems, "c_sys5_uc", (add_reserves = true,)),
-        (PSISystems, "5_bus_hydro_uc_sys", (;)),
-        (PSISystems, "5_bus_matpower_DA", (;)),
-    )
-        descriptor = PSB.get_system_descriptor(category, catalog, name)
-        raw = PSB.get_build_function(descriptor)(;
-            raw_data = PSB.get_raw_data(descriptor),
-            PSB.filter_descriptor_kwargs(descriptor; kwargs...)...,
-        )
-        sys = build_system(
-            category, name; force_build = true, skip_serialization = true, kwargs...)
-
-        for c in get_components(PSB._rebase_to_max_active_power, StaticInjection, raw)
-            normalized = get_component(typeof(c), sys, get_name(c))
-            @test get_max_active_power(normalized, u"CU") ≈ 1.0
-            @test get_max_active_power(normalized, u"SU") ≈ get_max_active_power(c, u"SU")
-            # The arrays are kept as they are: an operations model reads the same inputs.
-            n_devices += 1
-            for md in PSY.IS.list_time_series_metadata(c)
-                @test series_values(normalized, md) == series_values(c, md)
-            end
-        end
-
-        # Reserves' series are built in MW, so normalization leaves them alone.
-        for r in get_components(has_time_series, PSY.AbstractReserve, raw)
-            n_reserves += 1
-            normalized = get_component(typeof(r), sys, get_name(r))
-            @test get_requirement(normalized, u"SU") == get_requirement(r, u"SU")
-            for md in PSY.IS.list_time_series_metadata(r)
-                @test PSY.IS.get_units(md) == "MW"
-                @test series_values(normalized, md) == series_values(r, md)
-            end
-        end
-    end
-    @test n_devices > 0
-    @test n_reserves > 0
-end
-
 # Hand-made data that states its devices on their own base.
 const _OWN_BASE_DATA =
     ("data_5bus_pu.jl", "data_14bus_pu.jl", "data_10bus_ac_dc_pu.jl", "data_118bus.jl")
@@ -66,4 +21,35 @@ const _OWN_BASE_DATA =
         )
     end
     @test n_systems > 0
+end
+
+@testset "5-bus pointer data states every series in natural units" begin
+    catalog = SystemCatalog(SYSTEM_CATALOG)
+    for name in (
+        "5_bus_hydro_uc_sys",
+        "5_bus_hydro_uc_sys_with_targets",
+        "5_bus_hydro_ed_sys",
+        "5_bus_hydro_ed_sys_with_targets",
+        "5_bus_hydro_wk_sys",
+        "5_bus_hydro_wk_sys_with_targets",
+        "5_bus_matpower_DA",
+        "5_bus_matpower_RT",
+        "5_bus_matpower_AGC",
+    )
+        descriptor = PSB.get_system_descriptor(PSISystems, catalog, name)
+        sys = PSB.get_build_function(descriptor)(;
+            raw_data = PSB.get_raw_data(descriptor),
+            PSB.get_default_arguments(descriptor)...,
+        )
+        n_series = 0
+        for c in get_components(has_time_series, Component, sys),
+            md in PSY.IS.list_time_series_metadata(c)
+
+            n_series += 1
+            @test !isnothing(PSY.IS.get_units(md))
+            @test !isnothing(PSY.IS.get_quantity_kind(md))
+            @test isnothing(PSY.IS.get_per_unit_of(md))
+        end
+        @test n_series > 0
+    end
 end
