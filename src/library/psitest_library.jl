@@ -825,6 +825,7 @@ function build_c_sys5_hy(;
     add_single_time_series,
     add_reserves,
     raw_data,
+    reserve_requirement_mw = nothing,
     kwargs...,
 )
     sys_kwargs = filter_kwargs(; kwargs...)
@@ -913,6 +914,7 @@ function build_c_sys5_hy(;
             [collect(PSY.get_components(PSY.HydroDispatch, c_sys5_hy))[end]],
         )
 
+        set_requirement_mw!(reserve_requirement_mw, reserve_hy[1], reserve_hy[2])
         for (ix, serv) in enumerate(
             PSY.get_components(!PSY.has_demand_curve, PSY.OnlineReserve, c_sys5_hy),
         )
@@ -948,6 +950,10 @@ function build_c_sys5_hy(;
     end
 
     return c_sys5_hy
+end
+
+function build_c_sys5_hy_small_reserves(; kwargs...)
+    return build_c_sys5_hy(; reserve_requirement_mw = 1.0, kwargs...)
 end
 
 function build_c_sys5_hy_turbine_energy(;
@@ -1163,6 +1169,69 @@ function build_c_sys5_hy_turbine_energy(;
     end
 
     return c_sys5_hyd
+end
+
+function _build_c_sys5_hy_pump_energy(; with_turbine, kwargs...)
+    sys = build_c_sys5_hy_turbine_energy(; kwargs...)
+    head_res = PSY.get_component(PSY.HydroReservoir, sys, "HydroEnergyReservoir__reservoir")
+    turbine = only(PSY.get_components(PSY.HydroTurbine, sys))
+    PSY.set_active_power_limits!(turbine, (min = 0.3 * u"SU", max = 7.0 * u"SU"))
+    tail_res = PSY.HydroReservoir(;
+        name = "Reservoir_tail",
+        available = true,
+        storage_level_limits = (min = 0.0, max = 50000.0),
+        initial_level = 0.5,
+        spillage_limits = nothing,
+        inflow = 0.0,
+        outflow = 0.0,
+        level_targets = 0.0,
+        intake_elevation = 0.0,
+        head_to_volume_factor = LinearFunctionData(0.0),
+        level_data_type = PSY.ReservoirDataType.ENERGY,
+    )
+    PSY.add_component!(sys, tail_res)
+    PSY.copy_time_series!(tail_res, head_res)
+
+    hpump = PSY.HydroPumpTurbine(;
+        name = "PumpTurbine",
+        available = true,
+        bus = PSY.get_bus(turbine),
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 4.0,
+        active_power_limits = (min = 0.1, max = 4.0),
+        reactive_power_limits = nothing,
+        active_power_limits_pump = (min = 0.2, max = 4.0),
+        outflow_limits = nothing,
+        powerhouse_elevation = 0.0,
+        ramp_limits = nothing,
+        time_limits = nothing,
+        base_power = 100.0,
+        active_power_pump = 0.0,
+        efficiency = (turbine = 0.93, pump = 0.93),
+        input_basis = u"CU",
+    )
+    PSY.add_component!(sys, hpump)
+    PSY.set_upstream_turbines!(tail_res, [hpump])
+
+    if with_turbine
+        PSY.set_downstream_turbines!(head_res, [turbine, hpump])
+    else
+        PSY.set_downstream_turbines!(head_res, [hpump])
+        for service in PSY.get_services(turbine)
+            PSY.add_service!(hpump, service, sys)
+        end
+        PSY.remove_component!(sys, turbine)
+    end
+    return sys
+end
+
+function build_c_sys5_hy_pump_turbine_energy(; kwargs...)
+    return _build_c_sys5_hy_pump_energy(; with_turbine = true, kwargs...)
+end
+
+function build_c_sys5_hy_pump_only_energy(; kwargs...)
+    return _build_c_sys5_hy_pump_energy(; with_turbine = false, kwargs...)
 end
 
 function build_c_sys5_hy_turbine_head(;
