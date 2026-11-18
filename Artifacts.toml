@@ -1,17 +1,18 @@
-# TODO: back to a PowerSystemsTestData tag once Sienna-Platform/PowerSystemsTestData#139
-# merges and is tagged.
+# PowerSystemsTestData psy6 at the merge of #137. TODO: a tag once one includes it.
 [CaseData]
-git-tree-sha1 = "d13644d0aa91778d40f24e9703ee6aa6596c112c"
+git-tree-sha1 = "ea4b1ccf9ea7c5c5cc90daa1b7142192037f5f7a"
 lazy = true
 
     [[CaseData.download]]
-    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/c0414b1135063853d5fffef701e9d6c1c267ed32.tar.gz"
-    sha256 = "904c813fca59a4d2169b761c80b5c8f6fc8ffd401b56d390c91e930179317367"
+    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/71c8dfb8055b5c1a582fe5c890feb8dbb5b3aed4.tar.gz"
+    sha256 = "c93f71f1e372d29b5b01db84ef282958d815984e5ddf763c14795b4c313f5e0f"
 
+# TODO: back to a GridMod/RTS-GMLC tag once its SIIP pointers state their units
+# (GridMod/RTS-GMLC#161); this is v0.2.3 plus that change, on luke-kiernan/RTS-GMLC.
 [rts]
-git-tree-sha1 = "c257b2c37b981f261fdc328b0fb9b96436a96537"
+git-tree-sha1 = "355a8f4bf1807af981dfaedd8fa8e198683dacc0"
 lazy = true
 
     [[rts.download]]
-    url = "https://github.com/GridMod/RTS-GMLC/archive/refs/tags/v0.2.3.tar.gz"
-    sha256 = "993429b8dc5f096e62479ca3b8551d52a53941322b452c825d12881cda915eae"
+    url = "https://github.com/luke-kiernan/RTS-GMLC/archive/e94cbd11524145507c551e9f060343b7570a717f.tar.gz"
+    sha256 = "55ebbc433e354e962a5d06c272c2828476b9e82db53711b23876169d2b5ea99c"

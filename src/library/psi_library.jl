@@ -8,31 +8,33 @@ function build_c_sys5_pjm(; add_forecasts, raw_data, sys_kwargs...)
         branches5(nodes);
         sys_kwargs...,
     )
-    pv_device = PSY.RenewableDispatch(
-        "PVBus5",
-        true,
-        nodes[3],
-        0.0,
-        0.0,
-        3.84,
-        PrimeMovers.PVe,
-        (min = 0.0, max = 0.0),
-        1.0,
-        RenewableGenerationCost(nothing),
-        100.0,
+    pv_device = PSY.RenewableDispatch(;
+        name = "PVBus5",
+        available = true,
+        bus = nodes[3],
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 384.0,
+        prime_mover_type = PrimeMovers.PVe,
+        reactive_power_limits = (min = 0.0, max = 0.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(nothing),
+        base_power = 384.0,
+        input_basis = u"NU",
     )
-    wind_device = PSY.RenewableDispatch(
-        "WindBus1",
-        true,
-        nodes[1],
-        0.0,
-        0.0,
-        4.51,
-        PrimeMovers.WT,
-        (min = 0.0, max = 0.0),
-        1.0,
-        RenewableGenerationCost(nothing),
-        100.0,
+    wind_device = PSY.RenewableDispatch(;
+        name = "WindBus1",
+        available = true,
+        bus = nodes[1],
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 451.0,
+        prime_mover_type = PrimeMovers.WT,
+        reactive_power_limits = (min = 0.0, max = 0.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(nothing),
+        base_power = 451.0,
+        input_basis = u"NU",
     )
     PSY.add_component!(c_sys5, pv_device)
     PSY.add_component!(c_sys5, wind_device)
@@ -88,10 +90,9 @@ function build_c_sys5_pjm(; add_forecasts, raw_data, sys_kwargs...)
     peak_load = maximum(da_load_time_series_val)
     if add_forecasts
         for (ix, l) in enumerate(sorted_components(PowerLoad, c_sys5))
-            set_max_active_power!(
-                l,
-                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * u"SU",
-            )
+            # The load is its own base, so its profile is per unit of `base_power`.
+            PSY.rebase_component!(l, bus_dist_fact[PSY.get_name(l)] * peak_load)
+            set_max_active_power!(l, 1.0 * u"CU")
             add_time_series!(
                 c_sys5,
                 l,
@@ -128,31 +129,33 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
         branches5(nodes);
         sys_kwargs...,
     )
-    pv_device = PSY.RenewableDispatch(
-        "PVBus5",
-        true,
-        nodes[3],
-        0.0,
-        0.0,
-        3.84,
-        PrimeMovers.PVe,
-        (min = 0.0, max = 0.0),
-        1.0,
-        RenewableGenerationCost(nothing),
-        100.0,
+    pv_device = PSY.RenewableDispatch(;
+        name = "PVBus5",
+        available = true,
+        bus = nodes[3],
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 384.0,
+        prime_mover_type = PrimeMovers.PVe,
+        reactive_power_limits = (min = 0.0, max = 0.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(nothing),
+        base_power = 384.0,
+        input_basis = u"NU",
     )
-    wind_device = PSY.RenewableDispatch(
-        "WindBus1",
-        true,
-        nodes[1],
-        0.0,
-        0.0,
-        4.51,
-        PrimeMovers.WT,
-        (min = 0.0, max = 0.0),
-        1.0,
-        RenewableGenerationCost(nothing),
-        100.0,
+    wind_device = PSY.RenewableDispatch(;
+        name = "WindBus1",
+        available = true,
+        bus = nodes[1],
+        active_power = 0.0,
+        reactive_power = 0.0,
+        rating = 451.0,
+        prime_mover_type = PrimeMovers.WT,
+        reactive_power_limits = (min = 0.0, max = 0.0),
+        power_factor = 1.0,
+        operation_cost = RenewableGenerationCost(nothing),
+        base_power = 451.0,
+        input_basis = u"NU",
     )
     PSY.add_component!(c_sys5, pv_device)
     PSY.add_component!(c_sys5, wind_device)
@@ -214,10 +217,9 @@ function build_c_sys5_pjm_rt(; add_forecasts, raw_data, sys_kwargs...)
     peak_load = maximum(rt_load_time_series_val)
     if add_forecasts
         for (ix, l) in enumerate(sorted_components(PowerLoad, c_sys5))
-            set_max_active_power!(
-                l,
-                bus_dist_fact[PSY.get_name(l)] * peak_load / 100 * u"SU",
-            )
+            # The load is its own base, so its profile is per unit of `base_power`.
+            PSY.rebase_component!(l, bus_dist_fact[PSY.get_name(l)] * peak_load)
+            set_max_active_power!(l, 1.0 * u"CU")
             rt_timearray =
                 TimeArray(rt_load_time_series, rt_load_time_series_val ./ peak_load)
             rt_timearray = collapse(rt_timearray, Minute(5), first, TimeSeries.mean)
@@ -606,13 +608,13 @@ function make_modified_RTS_GMLC_sys(
         PSY.clear_services!(d)
     end
 
+    # Twice the utility PV and 30% of the rooftop PV: each plant's size and its MW output.
     for g in PSY.get_components(
         x -> PSY.get_prime_mover_type(x) == PSY.PrimeMovers.PVe,
         PSY.RenewableDispatch,
         sys,
     )
-        rat_ = PSY.get_rating(g, u"CU")
-        PSY.set_rating!(g, DISPATCH_INCREASE * rat_ * u"CU")
+        scale_capacity!(sys, g, DISPATCH_INCREASE)
     end
 
     for g in PSY.get_components(
@@ -620,8 +622,7 @@ function make_modified_RTS_GMLC_sys(
         PSY.RenewableNonDispatch,
         sys,
     )
-        rat_ = PSY.get_rating(g, u"CU")
-        PSY.set_rating!(g, FIX_DECREASE * rat_ * u"CU")
+        scale_capacity!(sys, g, FIX_DECREASE)
     end
 
     ### Update Buses to PQ that got devices removed ###
@@ -1192,12 +1193,72 @@ function build_two_zone_5_bus(; kwargs...)
 
     # Loads
     loads10(nodes10) = [
-        PowerLoad("Load-nodeB", true, nodes10[2], 3.0, 0.9861, 100.0, 3.0, 0.9861),
-        PowerLoad("Load-nodeC", true, nodes10[3], 3.0, 0.9861, 100.0, 3.0, 0.9861),
-        PowerLoad("Load-nodeD", true, nodes10[4], 4.0, 1.3147, 100.0, 4.0, 1.3147),
-        PowerLoad("Load-nodeB2", true, nodes10[7], 3.0, 0.9861, 100.0, 3.0, 0.9861),
-        PowerLoad("Load-nodeC2", true, nodes10[8], 3.0, 0.9861, 100.0, 3.0, 0.9861),
-        PowerLoad("Load-nodeD2", true, nodes10[9], 4.0, 1.3147, 100.0, 4.0, 1.3147),
+        PowerLoad(;
+            name = "Load-nodeB",
+            available = true,
+            bus = nodes10[2],
+            active_power = 300.0,
+            reactive_power = 98.61,
+            base_power = 300.0,
+            max_active_power = 300.0,
+            max_reactive_power = 98.61,
+            input_basis = u"NU",
+        ),
+        PowerLoad(;
+            name = "Load-nodeC",
+            available = true,
+            bus = nodes10[3],
+            active_power = 300.0,
+            reactive_power = 98.61,
+            base_power = 300.0,
+            max_active_power = 300.0,
+            max_reactive_power = 98.61,
+            input_basis = u"NU",
+        ),
+        PowerLoad(;
+            name = "Load-nodeD",
+            available = true,
+            bus = nodes10[4],
+            active_power = 400.0,
+            reactive_power = 131.47,
+            base_power = 400.0,
+            max_active_power = 400.0,
+            max_reactive_power = 131.47,
+            input_basis = u"NU",
+        ),
+        PowerLoad(;
+            name = "Load-nodeB2",
+            available = true,
+            bus = nodes10[7],
+            active_power = 300.0,
+            reactive_power = 98.61,
+            base_power = 300.0,
+            max_active_power = 300.0,
+            max_reactive_power = 98.61,
+            input_basis = u"NU",
+        ),
+        PowerLoad(;
+            name = "Load-nodeC2",
+            available = true,
+            bus = nodes10[8],
+            active_power = 300.0,
+            reactive_power = 98.61,
+            base_power = 300.0,
+            max_active_power = 300.0,
+            max_reactive_power = 98.61,
+            input_basis = u"NU",
+        ),
+        PowerLoad(;
+            name = "Load-nodeD2",
+            available = true,
+            bus = nodes10[9],
+            active_power = 400.0,
+            reactive_power = 131.47,
+            base_power = 400.0,
+            max_active_power = 400.0,
+            max_reactive_power = 131.47,
+            input_basis = u"NU",
+        ),
     ]
 
     # Load Timeseries
@@ -1357,6 +1418,14 @@ store and the attribute associations key on.
 _detach_id!(component) = IS.set_id!(component, IS.UNASSIGNED_ID)
 
 function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line::Bool)
+    # Resizing devices rewrites their series, which only works before the forecast views
+    # exist: drop them here and rebuild them, with the same horizon and interval, at the end.
+    horizon = PSY.get_forecast_horizon(main_sys)
+    interval = PSY.get_forecast_interval(main_sys)
+    if !isnothing(horizon)
+        PSY.remove_time_series!(main_sys, PSY.DeterministicSingleTimeSeries)
+        PSY.remove_time_series!(twin_sys, PSY.DeterministicSingleTimeSeries)
+    end
     names = [
         "114_SYNC_COND_1",
         "314_SYNC_COND_1",
@@ -1520,14 +1589,14 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
                 end
             end
         end
-        # Change scale: moving base_power directly (bypassing set_base_power!, which
-        # throws) keeps the per-unit values, so the device's MW scale with its base.
+        # Change scale: the twin's renewables are 1.2x the original and the main area's
+        # 0.9x the twin's; the main area's loads are 1.2x.
         if typeof(b) <: RenewableGen
-            b.base_power = 1.2 * PSY.get_base_power(b, u"NU")
-            main_comp.base_power = 0.9 * PSY.get_base_power(b, u"NU")
+            scale_capacity!(main_sys, b, 1.2)
+            scale_capacity!(main_sys, main_comp, 0.9 * 1.2)
         end
         if typeof(b) <: PowerLoad
-            main_comp.base_power = 1.2 * PSY.get_base_power(b, u"NU")
+            scale_capacity!(main_sys, main_comp, 1.2)
         end
     end
 
@@ -1583,8 +1652,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
     end
 
     for bat in get_components(EnergyReservoirStorage, main_sys)
-        # 10x the battery: moving base_power directly keeps its per-unit values.
-        bat.base_power = get_base_power(bat, u"NU") * 10
+        scale_capacity!(main_sys, bat, 10)
     end
 
     for r in get_components(
@@ -1660,19 +1728,6 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
     # set service participation
     PARTICIPATION = 0.2
 
-    # remove Flex services and fix max participation
-    for srvc in PSY.get_components(PSY.Service, main_sys)
-        PSY.set_max_participation_factor!(srvc, PARTICIPATION)
-        if PSY.get_name(srvc) in ["Flex_Up", "Flex_Down", "Flex_Up_twin", "Flex_Down_twin"]
-            # remove Flex services from DA and RT model
-            PSY.remove_time_series!(
-                main_sys,
-                PSY.DeterministicSingleTimeSeries,
-                srvc,
-                "requirement",
-            )
-        end
-    end
     for srvc in PSY.get_components(PSY.Service, main_sys)
         PSY.set_max_participation_factor!(srvc, PARTICIPATION)
         if PSY.get_name(srvc) in ["Flex_Up", "Flex_Down", "Flex_Up_twin", "Flex_Down_twin"]
@@ -1680,6 +1735,7 @@ function _duplicate_system(main_sys::PSY.System, twin_sys::PSY.System, HVDC_line
             PSY.remove_component!(main_sys, srvc)
         end
     end
+    isnothing(horizon) || PSY.transform_single_time_series!(main_sys, horizon, interval)
     return main_sys
 end
 
@@ -2094,12 +2150,12 @@ function build_118_bus_DA(; kwargs...)
     for i in 1:75
         solardf_path = joinpath(DATA_DIR, "118-Bus/Solar/DA", "Solar$(i)DA.csv")
         solardf = CSV.read(solardf_path, DataFrame)
-        local max = maximum(solar_gens[i, "Max Capacity (MW)"])
-        solar_array = TimeArray(timestamps, (solardf[:, 2] ./ max) / 100)
+        # The CSV is the plant's output in MW.
+        solar_array = TimeArray(timestamps, solardf[:, 2])
         local solar_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = solar_array,
-            component_base("active_power")...,
+            natural_units("active_power", "MW")...,
         )
         push!(solar_DA_TS, solar_TS)
     end
@@ -2107,12 +2163,12 @@ function build_118_bus_DA(; kwargs...)
     for i in 1:17
         winddf_path = joinpath(DATA_DIR, "118-Bus/Wind/DA", "Wind$(i)DA.csv")
         winddf = CSV.read(winddf_path, DataFrame)
-        local max = maximum(wind_gens[i, "Max Capacity (MW)"])
-        local wind_array = TimeArray(timestamps, (winddf[:, 2] ./ max) / 100)
+        # The CSV is the plant's output in MW.
+        local wind_array = TimeArray(timestamps, winddf[:, 2])
         local wind_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = wind_array,
-            component_base("active_power")...,
+            natural_units("active_power", "MW")...,
         )
         push!(wind_DA_TS, wind_TS)
     end
@@ -2150,25 +2206,15 @@ function build_118_bus_DA(; kwargs...)
     for i in 1:length(hydro_generators)
         add_time_series!(sys, hydro_generators[i], hydro_DA_RT_TS[i])
     end
-    wind_generators = PSY.collect(
-        get_components(
-            gen -> PSY.get_prime_mover_type(gen) == PrimeMovers.WT,
-            RenewableDispatch,
-            sys,
-        ),
-    )
-    for i in 1:length(wind_generators)
-        add_time_series!(sys, wind_generators[i], wind_DA_TS[i])
+    # `Wind$(i)` data belongs to `wind$(lpad(i, 3, '0'))`.
+    for (i, ts) in enumerate(wind_DA_TS)
+        gen = get_component(RenewableDispatch, sys, "wind$(lpad(i, 3, '0'))")
+        add_time_series!(sys, gen, ts)
     end
-    solar_generators = PSY.collect(
-        get_components(
-            gen -> PSY.get_prime_mover_type(gen) == PrimeMovers.PVe,
-            RenewableDispatch,
-            sys,
-        ),
-    )
-    for i in 1:length(solar_generators)
-        add_time_series!(sys, solar_generators[i], solar_DA_TS[i])
+    # `Solar$(i)` data belongs to `solar$(lpad(i, 3, '0'))`.
+    for (i, ts) in enumerate(solar_DA_TS)
+        gen = get_component(RenewableDispatch, sys, "solar$(lpad(i, 3, '0'))")
+        add_time_series!(sys, gen, ts)
     end
     loads = power_load118(nodes118())
     for i in 1:3
@@ -2201,12 +2247,12 @@ function build_118_bus_RT(; kwargs...)
     for i in 1:75
         solardf_path = joinpath(DATA_DIR, "118-Bus/Solar/RT", "Solar$(i)RT.csv")
         solardf = CSV.read(solardf_path, DataFrame)
-        local max = maximum(solar_gens[i, "Max Capacity (MW)"])
-        solar_array = TimeArray(timestamps, (solardf[:, 2] ./ max) / 100)
+        # The CSV is the plant's output in MW.
+        solar_array = TimeArray(timestamps, solardf[:, 2])
         local solar_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = solar_array,
-            component_base("active_power")...,
+            natural_units("active_power", "MW")...,
         )
         push!(solar_RT_TS, solar_TS)
     end
@@ -2214,12 +2260,12 @@ function build_118_bus_RT(; kwargs...)
     for i in 1:17
         winddf_path = joinpath(DATA_DIR, "118-Bus/Wind/RT", "Wind$(i)RT.csv")
         winddf = CSV.read(winddf_path, DataFrame)
-        local max = maximum(wind_gens[i, "Max Capacity (MW)"])
-        local wind_array = TimeArray(timestamps, (winddf[:, 2] ./ max) / 100)
+        # The CSV is the plant's output in MW.
+        local wind_array = TimeArray(timestamps, winddf[:, 2])
         local wind_TS = SingleTimeSeries(;
             name = "max_active_power",
             data = wind_array,
-            component_base("active_power")...,
+            natural_units("active_power", "MW")...,
         )
         push!(wind_RT_TS, wind_TS)
     end
@@ -2258,25 +2304,15 @@ function build_118_bus_RT(; kwargs...)
     for i in 1:length(hydro_generators)
         add_time_series!(sys, hydro_generators[i], hydro_DA_RT_TS[i])
     end
-    wind_generators = PSY.collect(
-        get_components(
-            gen -> PSY.get_prime_mover_type(gen) == PrimeMovers.WT,
-            RenewableDispatch,
-            sys,
-        ),
-    )
-    for i in 1:length(wind_generators)
-        add_time_series!(sys, wind_generators[i], wind_RT_TS[i])
+    # `Wind$(i)` data belongs to `wind$(lpad(i, 3, '0'))`.
+    for (i, ts) in enumerate(wind_RT_TS)
+        gen = get_component(RenewableDispatch, sys, "wind$(lpad(i, 3, '0'))")
+        add_time_series!(sys, gen, ts)
     end
-    solar_generators = PSY.collect(
-        get_components(
-            gen -> PSY.get_prime_mover_type(gen) == PrimeMovers.PVe,
-            RenewableDispatch,
-            sys,
-        ),
-    )
-    for i in 1:length(solar_generators)
-        add_time_series!(sys, solar_generators[i], solar_RT_TS[i])
+    # `Solar$(i)` data belongs to `solar$(lpad(i, 3, '0'))`.
+    for (i, ts) in enumerate(solar_RT_TS)
+        gen = get_component(RenewableDispatch, sys, "solar$(lpad(i, 3, '0'))")
+        add_time_series!(sys, gen, ts)
     end
     loads = power_load118(nodes118())
     for i in 1:3

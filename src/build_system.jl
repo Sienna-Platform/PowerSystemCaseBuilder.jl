@@ -157,12 +157,17 @@ function normalize_time_series_bases!(sys::PSY.System)
     return sys
 end
 
-# Devices with their own base whose profiles scale by `max_active_power`. Hybrid systems
-# scale by a subunit's rating and storage by its capacity, so neither fits.
+# Devices with their own base and a component-base series whose profiles scale by
+# `max_active_power`. Hybrid systems scale by a subunit's rating and storage by its
+# capacity, so neither fits. The 5-bus data already makes each such device its own base, so
+# none of its systems has one.
 function _rebase_to_max_active_power(c::PSY.StaticInjection)
     c isa Union{PSY.HybridSystem, PSY.Storage} && return false
-    PSY.base_power_kind(c) isa PSY.ComponentBasePower && PSY.has_time_series(c) ||
-        return false
+    PSY.base_power_kind(c) isa PSY.ComponentBasePower || return false
+    any(
+        md -> IS.get_unit_system(md) isa PSY.ComponentBaseUnit,
+        IS.list_time_series_metadata(c),
+    ) || return false
     max_active_power = _max_active_power(c, u"CU")
     return !isnothing(max_active_power) && !iszero(max_active_power) &&
            !isapprox(max_active_power, 1.0)

@@ -28,12 +28,14 @@ component_base(quantity_kind::AbstractString, per_unit_of::AbstractString = "bas
 natural_units(quantity_kind::AbstractString, units::AbstractString) =
     (units = units, quantity_kind = quantity_kind)
 
-"""
-Flows of an `ENERGY` reservoir in the test system data, in MW for [`ENERGY_FLOW`](@ref).
-The test system data states them per unit of the system base (`data_5bus_pu.jl`: "per-unit
-(100MW base)").
-"""
-in_mw(sys::PSY.System, data) = scaled(data, PSY.get_base_power(sys))
+"""Sets the `requirement` of reserves to `megawatts` MW; `nothing` keeps the data's values."""
+set_requirement_mw!(::Nothing, reserves::PSY.Service...) = nothing
+function set_requirement_mw!(megawatts::Real, reserves::PSY.Service...)
+    for serv in reserves
+        PSY.set_requirement!(serv, megawatts * u"MW")
+    end
+    return
+end
 
 """
 A reserve's requirement profile in MW. PowerSystems takes a service's series in natural
@@ -90,3 +92,37 @@ end
 reservoir_level_values(::PSY.EnergyReservoirStorage, data) = data
 reservoir_level_values(reservoir::PSY.HydroReservoir, data) =
     scaled(data, PSY.get_storage_level_limits(reservoir).max)
+
+"""
+Make `device` `factor` times bigger, for scenario builders. This is a change to the system,
+not a units conversion: `base_power` moves without re-expressing the per-unit fields, so
+every one of them (rating, limits, CU series) scales with it, and each power series stored
+in natural units is replaced by `factor` times its values, keeping its labels.
+
+Only `SingleTimeSeries` are rescaled, so call it before `transform_single_time_series!`.
+"""
+function scale_capacity!(sys::PSY.System, device::PSY.Device, factor::Real)
+    PSY._set_base_power!(device, factor * PSY.get_base_power(device, u"NU"))
+    for md in IS.list_time_series_metadata(device)
+        IS.get_quantity_kind(md) in ("active_power", "reactive_power") || continue
+        IS.get_unit_system(md) isa PSY.ComponentBaseUnit && continue
+        T = IS.get_time_series_type(md)
+        T <: PSY.SingleTimeSeries || throw(
+            ArgumentError(
+                "scale_capacity! rescales SingleTimeSeries only; $(summary(device)) has " *
+                "$T \"$(IS.get_name(md))\". Call it before transform_single_time_series!.",
+            ),
+        )
+        name = IS.get_name(md)
+        ta = IS.get_time_array(PSY.get_time_series(T, device, name))
+        scaled_ts = PSY.SingleTimeSeries(
+            name,
+            TimeSeries.TimeArray(TimeSeries.timestamp(ta), TimeSeries.values(ta) .* factor);
+            natural_units(IS.get_quantity_kind(md), IS.get_units(md))...,
+        )
+        # Replace rather than mutate: other components may share the stored array.
+        PSY.remove_time_series!(sys, T, device, name)
+        PSY.add_time_series!(sys, device, scaled_ts)
+    end
+    return device
+end
