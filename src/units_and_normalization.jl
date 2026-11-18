@@ -29,13 +29,6 @@ natural_units(quantity_kind::AbstractString, units::AbstractString) =
     (units = units, quantity_kind = quantity_kind)
 
 """
-Flows of an `ENERGY` reservoir in the test system data, in MW for [`ENERGY_FLOW`](@ref).
-The test system data states them per unit of the system base (`data_5bus_pu.jl`: "per-unit
-(100MW base)").
-"""
-in_mw(sys::PSY.System, data) = scaled(data, PSY.get_base_power(sys))
-
-"""
 A reserve's requirement profile in MW. PowerSystems takes a service's series in natural
 units only, and the test system data's profiles are fractions of the reserve's own
 `requirement`, so they are scaled by it, as PowerTableDataParser does for tabular data. The

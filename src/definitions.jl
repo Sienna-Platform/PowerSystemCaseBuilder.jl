@@ -55,8 +55,11 @@ const PSSE_PARSER_TAP_RATIO_LBOUND = 0.5
 const WATER_FLOW =
     (units = "m^3/s", quantity_kind = "volume_flow_rate")
 
-"""An `ENERGY` reservoir's inflow, outflow and water budget: power in MW."""
+"""An `ENERGY` reservoir's inflow and outflow: power in MW."""
 const ENERGY_FLOW = (units = "MW", quantity_kind = "active_power")
+
+"""An `ENERGY` reservoir's budget: energy in MWh per step."""
+const ENERGY_BUDGET = (units = "MW*hr", quantity_kind = "energy")
 
 """A reserve's requirement: power in MW, see [`requirement_in_mw`](@ref)."""
 const RESERVE_REQUIREMENT = (units = "MW", quantity_kind = "active_power")

@@ -1,10 +1,11 @@
+# PowerSystemsTestData psy6 at the merge of #137. TODO: a tag once one includes it.
 [CaseData]
-git-tree-sha1 = "1b25ce6ff8075362ded44225f30bc09e27dac1eb"
+git-tree-sha1 = "ea4b1ccf9ea7c5c5cc90daa1b7142192037f5f7a"
 lazy = true
 
     [[CaseData.download]]
-    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/refs/tags/5.0-dev17.tar.gz"
-    sha256 = "05ae824802dc4eaffab51b979614005d7b3546486835a9dc2d966333393eda87"
+    url = "https://github.com/Sienna-Platform/PowerSystemsTestData/archive/71c8dfb8055b5c1a582fe5c890feb8dbb5b3aed4.tar.gz"
+    sha256 = "c93f71f1e372d29b5b01db84ef282958d815984e5ddf763c14795b4c313f5e0f"
 
 [rts]
 git-tree-sha1 = "c257b2c37b981f261fdc328b0fb9b96436a96537"
